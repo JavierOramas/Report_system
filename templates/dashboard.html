@@ -1,4 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="card-wrapper">
+
+   <div class="card">
+       <h1 class="center">Dashboard</h1>
+       <p class="center">
+           You are currently logged in.
+        </p>
+        <div class="center">
+            <a class="btn btn--secondary" href="/user/signout/">Sign Out</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 class="center">
+            Your Info
+        </h2>
+        <p>
+            <strong>ID:</strong>{{ session['user']['_id'] }} <br>
+            <strong>Name:</strong>{{ session['user']['name'] }} <br>
+            <strong>Email:</strong>{{ session['user']['email'] }} <br>
+
+        </p>
+    </div>
+    <div class="card">
+        <h1>Upload your CSV file</h1>
+        <form method="POST" action="" enctype="multipart/form-data">
+            <p><input type="file" name="file"></p>
+            <p><input type="submit" value="Submit"></p>
+        </form>
+    </div>
+</div>
 {% endblock %}

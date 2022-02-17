@@ -1,4 +1,5 @@
 {
+
     "database":{
         "addr":"localhost",
         "port":27017
@@ -6,5 +7,6 @@
 
     "setup": "pip install -r requirements.txt",
 
-    "run": "gunicorn app:app"
+    "run": "gunicorn app:app -b :8000"
+
 }

@@ -3,6 +3,9 @@
 {% block content %}
 <div class="card-wrapper">
     <div class="card">
+        <div class='center'>
+            <img src="/static/Logo.jpg" alt="logo" class="logo">
+        </div>
         <h1 class="center">Create Account</h1>
         <form name="signup_form" method="POST">
             <label for="name">Name</label>
@@ -17,6 +20,24 @@
             <p class="error error--hidden"></p>
 
             <input type="submit" value="Sign Up" class="btn">
+        </form>
+    </div>
+
+    <div class="card">
+        <div class='center'>
+            <img src="/static/Logo.jpg" alt="logo" class="logo">
+        </div>
+        <h1 class="center">Login</h1>
+        <form name="login_form" method="POST">
+            <label for="email">Email</label>
+            <input type="text" name="email" class="field" required>
+
+            <label for="password">Password</label>
+            <input type="password" name="password" class="field" required>
+
+            <p class="error error--hidden"></p>
+
+            <input type="submit" value="Log In" class="btn">
         </form>
     </div>
 </div>

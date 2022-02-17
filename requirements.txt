@@ -1,0 +1,4 @@
+Flask==2.0.2
+passlib==1.7.4
+pymongo==4.0.1
+termcolor==1.1.0
