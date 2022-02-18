@@ -35,8 +35,15 @@
     </div>
     <div class="card-wrapper">
         <div class="card-table">
-            <div class="table">
-                <table>
+            <div>
+                <table class="table">
+                <tr>
+                    {% for i in ['DateTimeFrom','DateTimeTo','ProviderId','ClientId','ProcedureCodeId','DateOfService'] %}
+                    <th>
+                    {{i}}
+                    </th>
+                    {% endfor %}
+                </tr>
                 {% for entry in entries %}
                 <tr>
                     <td>{{ entry['DateTimeFrom'] }}</td>
