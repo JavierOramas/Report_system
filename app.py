@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, session, request, url_for
+from flask import Flask, render_template, redirect, session, request, url_for, jsonify
 from functools import wraps
 import os
 import pymongo
@@ -35,11 +35,12 @@ from user import routes
 from registry import routes
 @app.route('/')
 def home():
+    # print('here')
     return render_template('home.html')
 
 
 # Get the uploaded files
-@app.route("/dashboard/", methods=['POST'])
+@app.route("/dasboard/", methods=['POST'])
 def uploadFiles():
       # get the uploaded file
       uploaded_file = request.files['file']
@@ -54,4 +55,7 @@ def uploadFiles():
 @app.route('/dashboard/')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    entries = db.Registry.find()
+    entries = [entry for entry in entries]
+    print(entries)
+    return render_template('dashboard.html', entries=entries)

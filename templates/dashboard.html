@@ -31,5 +31,26 @@
             <p><input type="submit" value="Submit"></p>
         </form>
     </div>
-</div>
+    
+    </div>
+    <div class="card-wrapper">
+        <div class="card-table">
+            <div class="table">
+                <table>
+                {% for entry in entries %}
+                <tr>
+                    <td>{{ entry['DateTimeFrom'] }}</td>
+                    <td>{{ entry['DateTimeTo'] }}</td>
+                    <td>{{ entry['ProviderId'] }}</td>
+                    <td>{{ entry['ClientId'] }}</td>
+                    <td>{{ entry['ProcedureCodeId'] }}</td>
+                    <td>{{ entry['DateOfService'] }}</td>
+                    <td hidden>{{ entry['_id'] }}</td>
+                    
+                </tr>
+                {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
 {% endblock %}

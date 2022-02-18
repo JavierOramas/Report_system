@@ -34,7 +34,7 @@ class User:
         return jsonify({"error":"Sign Up failed"}), 400
     
     def login(self):
-        
+        print('here')
         user = {
             "email" : request.form.get('email'),
             # "password": request.form.get('password'),
