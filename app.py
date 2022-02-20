@@ -57,5 +57,11 @@ def uploadFiles():
 def dashboard():
     entries = db.Registry.find()
     entries = [entry for entry in entries]
-    print(entries)
-    return render_template('dashboard.html', entries=entries)
+    user = session
+    return render_template('dashboard.html', user=user, entries=entries)
+
+
+@app.route('/config/')
+@login_required
+def config():
+    return render_template('config.html')

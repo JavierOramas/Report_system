@@ -10,6 +10,11 @@
         </p>
         <div class="center">
             <a class="btn btn--secondary" href="/user/signout/">Sign Out</a>
+            
+            {% if user.role == 'admin' %}
+            <a class="btn btn--secondary" href="/config/">Config</a>
+            {% endif %}
+
         </div>
     </div>
 
@@ -24,15 +29,18 @@
 
         </p>
     </div>
-    <div class="card">
+    <div class="form-group card">
         <h1>Upload your CSV file</h1>
         <form method="POST" action="" enctype="multipart/form-data">
-            <p><input type="file" name="file"></p>
-            <p><input type="submit" value="Submit"></p>
+            <p><input class='form-control' type="file" accept=".csv" name="file"></p>
+            <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
         </form>
     </div>
     
     </div>
+    
+
+    <!-- To Be Removed -->
     <div class="card-wrapper">
         <div class="card-table">
             <div>
@@ -60,4 +68,5 @@
             </div>
         </div>
     </div>
+
 {% endblock %}
