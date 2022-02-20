@@ -10,8 +10,8 @@
         </p>
         <div class="center">
             <a class="btn btn--secondary" href="/user/signout/">Sign Out</a>
-            
-            {% if user.role == 'admin' %}
+
+            {% if role == 'admin' %}
             <a class="btn btn--secondary" href="/config/">Config</a>
             {% endif %}
 

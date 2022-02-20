@@ -18,7 +18,7 @@ class User:
             "_id" : uuid.uuid4().hex,
             "name" : request.form.get('name'),
             "email" : request.form.get('email'),
-            "password": request.form.get('password'),user
+            "password": request.form.get('password'),
             "role": 'basic',
             "active": False,
         }

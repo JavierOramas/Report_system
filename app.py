@@ -57,11 +57,15 @@ def uploadFiles():
 def dashboard():
     entries = db.Registry.find()
     entries = [entry for entry in entries]
-    user = session
-    return render_template('dashboard.html', user=user, entries=entries)
+    if 'role' in session['user']:
+        role = session['user']['role']
+    else:
+        role = 'basic'
+    return render_template('dashboard.html', role=role, entries=entries)
 
 
 @app.route('/config/')
 @login_required
 def config():
-    return render_template('config.html')
+    if session['user']['role'] == 'admin':
+        return render_template('config.html')
