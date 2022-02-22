@@ -34,18 +34,25 @@ def login_required(f):
 #routes
 from user import routes
 from registry import routes
+
+### Home Page
+
+# Home Route with login form
 @app.route('/')
 def home():
     return render_template('home.html', register=False)
-
+# Home Route With Regiter form
 @app.route('/register/')
 def register():
     return render_template('home.html', register=True)
 
 
-# Get the uploaded files
+### Dashboard
+
+# Post endpoint to upoad file
 @app.route("/dasboard/", methods=['POST'])
-def uploadFiles():
+@login_required
+def upload_files():
       # get the uploaded file
       uploaded_file = request.files['file']
       if uploaded_file.filename != '':
@@ -55,20 +62,23 @@ def uploadFiles():
           # save the file
       return redirect(url_for('upload'))
 
-
+# Dashoard for client (login Needed)
 @app.route('/dashboard/')
 @login_required
 def dashboard():
+
+    # Find all the entries
     entries = db.Registry.find()
     entries = [entry for entry in entries]
 
+    # Detect the role of the loged user to determine the permissions
     if 'role' in session['user']:
         role = session['user']['role']
     else:
         role = 'basic'
 
+    # If user is not admin, remove the entries thet dont belong to him/her 
     if role == 'basic':
-        # print(session)
         temp = []
         for entry in entries:
             if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']):
@@ -76,12 +86,12 @@ def dashboard():
 
         entries = temp
 
-    date = datetime.datetime.now()
-    min_date = min(entry['DateOfService'] for entry in entries)
+    return render_template('dashboard.html', role=role, entries=entries)
 
-    return render_template('dashboard.html', role=role, entries=entries, date = date, min_date= min_date)
+### Config
 
-
+# Onlyadmins will see this page and it will let edit users and provider ids
+# For now it blank
 @app.route('/config/')
 @login_required
 def config():

@@ -2,6 +2,7 @@
 
 {% block content %}
 <div class="card-wrapper">
+
     {% if register == True %}
     <div class="card">
         <div class='center'>
@@ -25,7 +26,7 @@
 
             <input type="submit" value="Sign Up" class="btn">
         </form>
-        <a class="center btn btn--primary" href="/">Log In</a>
+        <a class="center btn btn--secondary" href="/">Log In</a>
     </div>
     {% endif %}
 
@@ -46,7 +47,7 @@
 
             <input type="submit" value="Log In" class="btn">
         </form>
-        <a class="center btn btn--primary" href="register/">Register</a>
+        <a class="center btn btn--secondary" href="register/">Register</a>
     </div>
     {% endif %}
 
