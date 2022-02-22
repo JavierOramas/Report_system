@@ -50,7 +50,7 @@ def register():
 ### Dashboard
 
 # Post endpoint to upoad file
-@app.route("/dasboard/", methods=['POST'])
+@app.route("/dashboard/", methods=['POST'])
 @login_required
 def upload_files():
       # get the uploaded file

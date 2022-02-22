@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <div class="card-wrapper">
 
    <div class="card">
@@ -46,22 +47,23 @@
             <div class="table-preferences">
                 <span>
                     <label for="date-of-service-from">Date of Service from</label>
-                    <input type="datetime-local" name="date-of-service-from">
+                    <input type="datetime-local" id="FilterDateFrom" name="date-of-service-from" onchange="filterDateFrom();"> 
                 </span>
                 <span>
                     <label for="date-of-service-to">Date of Service To</label>
-                    <input type="datetime-local" name="date-of-service-to">
+                    <input type="datetime-local" id="FilterDateTo" name="date-of-service-to" onchange="filterDateTo();"> 
                 </span>
                 <span>
-                    <p><input class='btn btn--secondary filter' type="submit" value="Filter"></p>
+                    <label for="ProviderID">Provider ID</label>
+                    <input type="text" id="ProviderID" name="ProviderID" onkeyup="filterProv();" placeholder="Filter Provider ID">
                 </span>
             </div>
-            <div>
-                <table class="table">
+            <div class="center">
+                <table class="table" id="entries">
                 <tr>
-                    {% for i in ['DateTimeFrom','DateTimeTo','ProviderId','ClientId','ProcedureCodeId','DateOfService'] %}
+                    {% for i in ['DateTimeFrom (DD/MM/AAAA HH:MM)','DateTimeTo (DD/MM/AAAA HH:MM)','ProviderId','ClientId','ProcedureCodeId','DateOfService (DD/MM/AAAA HH:MM)'] %}
                     <th>
-                    {{i}}
+                        {{i}}
                     </th>
                     {% endfor %}
                 </tr>

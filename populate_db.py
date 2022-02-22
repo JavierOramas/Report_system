@@ -4,9 +4,9 @@ import json
 import uuid
 from passlib.hash import pbkdf2_sha256
 
-
+# Insert master user to the DB
 def signup(name, email, passwd):
-    
+
         user = {
             "_id" : uuid.uuid4().hex,
             "name" : name,
