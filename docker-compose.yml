@@ -2,7 +2,7 @@ version: '3'
 services:
   flask:
     build:
-      context: app
+      context: .
       dockerfile: Dockerfile
     container_name: ABS_Tracker
     image: digitalocean.com/flask-python:3.6
