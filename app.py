@@ -50,7 +50,7 @@ def register():
 ### Dashboard
 
 # Post endpoint to upoad file
-@app.route("/dasboard/", methods=['POST'])
+@app.route("/dashboard/", methods=['POST'])
 @login_required
 def upload_files():
       # get the uploaded file
@@ -86,7 +86,9 @@ def dashboard():
 
         entries = temp
 
-    return render_template('dashboard.html', role=role, entries=entries)
+    ids = []
+    ids = ['all'] + [i['ProviderId'] for i in entries if i['ProviderId'] not in ids]
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids)
 
 ### Config
 

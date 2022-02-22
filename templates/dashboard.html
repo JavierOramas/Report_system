@@ -1,67 +1,36 @@
 {% extends "base.html" %}
+{% from 'heading.html' import heading %}
 
 {% block content %}
+
 <div class="card-wrapper">
-
-   <div class="card">
-       <h1 class="center">Dashboard</h1>
-        <div class="center">
-            <a class="btn btn--secondary" href="/user/signout/">Sign Out</a>
-
-            {% if role == 'admin' %}
-            <a class="btn btn--secondary" href="/config/">Config</a>
-            <a class="btn btn--secondary" href="/users/">Edit Users</a>
-            {% endif %}
-
-        </div>
-    </div>
-
-    <div class="card">
-        <h2 class="center">
-            Your Info
-        </h2>
-        <p>
-            <strong>ID:</strong>{{ session['user']['_id'] }} <br>
-            <strong>Name:</strong>{{ session['user']['name'] }} <br>
-            <strong>Email:</strong>{{ session['user']['email'] }} <br>
-            <strong>ProviderId:</strong>{{ session['user']['providerId'] }} <br>
-
-        </p>
-    </div>
-    {% if role == 'admin' %}
-    <div class="form-group card">
-        <h1>Upload your CSV file</h1>
-        <form method="POST" action="" enctype="multipart/form-data">
-            <p><input class='form-control' type="file" accept=".csv" name="file"></p>
-            <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
-        </form>
-    </div>
-    {% endif %}
-    
-    </div>
-
-    <!-- To Be Removed -->
+    {{ heading(session, role) }}
     <div class="card-wrapper">
         <div class="card-table">
             <div class="table-preferences">
                 <span>
                     <label for="date-of-service-from">Date of Service from</label>
-                    <input type="datetime-local" name="date-of-service-from">
+                    <input class="datetimepicker" type="datetime-local" id="FilterDateFrom" name="date-of-service-from" onchange="filterDateFrom();"> 
                 </span>
                 <span>
                     <label for="date-of-service-to">Date of Service To</label>
-                    <input type="datetime-local" name="date-of-service-to">
+                    <input class="datetimepicker" type="datetime-local" id="FilterDateTo" name="date-of-service-to" onchange="filterDateTo();"> 
                 </span>
                 <span>
-                    <p><input class='btn btn--secondary filter' type="submit" value="Filter"></p>
+                    <label for="ProviderID">Provider ID</label>
+                    <select class="form-select" name="ProviderID" id="ProviderID" onchange="filterProv();">
+                        {% for i in providerIds %}
+                        <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+                    </select>
                 </span>
             </div>
-            <div>
-                <table class="table">
+            <div class="center">
+                <table class="table" id="entries">
                 <tr>
-                    {% for i in ['DateTimeFrom','DateTimeTo','ProviderId','ClientId','ProcedureCodeId','DateOfService'] %}
+                    {% for i in ['DateTimeFrom (DD/MM/AAAA HH:MM)','DateTimeTo (DD/MM/AAAA HH:MM)','ProviderId','ClientId','ProcedureCodeId','DateOfService (DD/MM/AAAA HH:MM)'] %}
                     <th>
-                    {{i}}
+                        {{i}}
                     </th>
                     {% endfor %}
                 </tr>

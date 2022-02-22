@@ -4,6 +4,7 @@ import uuid
 from termcolor import colored
 import pandas as pd
 from app import db
+import datetime
 import os
 
 class Registry:
@@ -11,8 +12,12 @@ class Registry:
     def add_data(self):
         # Load data from csv pre-loaded from the client
         data = pd.read_csv('static/files/data.csv')
+        
         # crete the collection entries
         for index,entry in data.iterrows():
+            entry['DateTimeFrom'] = datetime.datetime.strptime(entry['DateTimeFrom'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
+            entry['DateTimeTo'] = datetime.datetime.strptime(entry['DateTimeTo'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
+            entry['DateOfService'] = datetime.datetime.strptime(entry['DateOfService'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
             entry = {
                 "_id":              uuid.uuid4().hex,
                 "DateTimeFrom":     entry['DateTimeFrom'],

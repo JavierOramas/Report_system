@@ -70,7 +70,7 @@ p {
 .card {
   margin: 0 30px 10px;
   padding: 20px 40px;
-  width: 460px;
+  width: 28%;
   box-shadow: 0 8px 26px -4px rgba(0,0,0,0.15);
   border-radius: 5px;
   background: var(--white);
@@ -79,7 +79,7 @@ p {
 .card-table {
   margin: 0 30px 60px;
   padding: 20px 40px;
-  width: 80%;
+  width: 90%;
   box-shadow: 0 8px 26px -4px rgba(0,0,0,0.15);
   border-radius: 5px;
   background: var(--white);
@@ -198,4 +198,8 @@ input[type=submit] {
   flex-direction: column;
   flex-wrap: wrap;
   height: 80px;
+}
+
+div {
+  word-wrap: break-word;
 }
