@@ -40,6 +40,8 @@ from registry import routes
 # Home Route with login form
 @app.route('/')
 def home():
+    if 'logged_in' in session:
+        return redirect('/dashboard/')
     return render_template('home.html', register=False)
 # Home Route With Regiter form
 @app.route('/register/')
@@ -77,7 +79,7 @@ def dashboard():
     else:
         role = 'basic'
 
-    # If user is not admin, remove the entries thet dont belong to him/her 
+    # If user is not admin, remove the entries that dont belong to him/her 
     if role == 'basic':
         temp = []
         for entry in entries:
@@ -87,7 +89,8 @@ def dashboard():
         entries = temp
 
     ids = []
-    ids = ['all'] + [i['ProviderId'] for i in entries if i['ProviderId'] not in ids]
+    ids = ['all'] + list(set([i['ProviderId'] for i in entries]))
+    
     return render_template('dashboard.html', role=role, entries=entries, providerIds=ids)
 
 ### Config
