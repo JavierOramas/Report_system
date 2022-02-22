@@ -21,6 +21,7 @@ class User:
             "email" : request.form.get('email'),
             "password": request.form.get('password'),
             "providerId": request.form.get('providerId'),
+            "providertype":request.form.get('providerType'),
             "role": 'basic',
             "active": False,
         }
