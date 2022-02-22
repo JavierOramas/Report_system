@@ -46,7 +46,8 @@ def home():
 # Home Route With Regiter form
 @app.route('/register/')
 def register():
-    return render_template('home.html', register=True)
+    types = ['None'] + [i['type'] for i in db.providerType.find()]
+    return render_template('home.html', register=True, types=types)
 
 
 ### Dashboard

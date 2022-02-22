@@ -19,6 +19,13 @@
             <label for="providerId">ProviderId</label>
             <input type="text" name="providerId" class="field" required>
 
+            <label for="providerId">Provider Type</label>
+            <select name="providerType" class="field form-select">
+                {% for i in types %}
+                <option value="{{i}}">{{i}}</option>
+                {% endfor %}
+            </select>
+
             <label for="password">Password</label>
             <input type="password" name="password" class="field" required>
 
