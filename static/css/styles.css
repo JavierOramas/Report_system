@@ -61,14 +61,14 @@ p {
 /* Cards */
 .card-wrapper {
   margin: 0 auto;
-  padding: 90px 30px;
+  padding: 50px;
   flex-wrap: wrap;
   justify-content: center;
   display: flex;
 }
 
 .card {
-  margin: 0 30px 60px;
+  margin: 0 30px 10px;
   padding: 20px 40px;
   width: 460px;
   box-shadow: 0 8px 26px -4px rgba(0,0,0,0.15);
@@ -191,4 +191,11 @@ input[type=submit] {
 .logo{
   width: 120px;
   /* height: 30px; */
+}
+
+.table-preferences{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  height: 80px;
 }
