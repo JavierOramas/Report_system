@@ -2,6 +2,7 @@
 
 {% block content %}
 <div class="card-wrapper">
+    {% if register == True %}
     <div class="card">
         <div class='center'>
             <img src="/static/Logo.jpg" alt="logo" class="logo">
@@ -14,6 +15,9 @@
             <label for="email">Email</label>
             <input type="text" name="email" class="field" required>
 
+            <label for="providerId">ProviderId</label>
+            <input type="text" name="providerId" class="field" required>
+
             <label for="password">Password</label>
             <input type="password" name="password" class="field" required>
 
@@ -21,8 +25,11 @@
 
             <input type="submit" value="Sign Up" class="btn">
         </form>
+        <a class="center btn btn--primary" href="/">Log In</a>
     </div>
+    {% endif %}
 
+    {% if register == False %}
     <div class="card">
         <div class='center'>
             <img src="/static/Logo.jpg" alt="logo" class="logo">
@@ -39,6 +46,9 @@
 
             <input type="submit" value="Log In" class="btn">
         </form>
+        <a class="center btn btn--primary" href="register/">Register</a>
     </div>
+    {% endif %}
+
 </div>
 {% endblock %}

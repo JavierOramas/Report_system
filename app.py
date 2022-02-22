@@ -3,6 +3,7 @@ from functools import wraps
 import os
 import pymongo
 import json
+import datetime
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -35,8 +36,11 @@ from user import routes
 from registry import routes
 @app.route('/')
 def home():
-    # print('here')
-    return render_template('home.html')
+    return render_template('home.html', register=False)
+
+@app.route('/register/')
+def register():
+    return render_template('home.html', register=True)
 
 
 # Get the uploaded files
@@ -57,11 +61,25 @@ def uploadFiles():
 def dashboard():
     entries = db.Registry.find()
     entries = [entry for entry in entries]
+
     if 'role' in session['user']:
         role = session['user']['role']
     else:
         role = 'basic'
-    return render_template('dashboard.html', role=role, entries=entries)
+
+    if role == 'basic':
+        # print(session)
+        temp = []
+        for entry in entries:
+            if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']):
+                temp.append(entry)
+
+        entries = temp
+
+    date = datetime.datetime.now()
+    min_date = min(entry['DateOfService'] for entry in entries)
+
+    return render_template('dashboard.html', role=role, entries=entries, date = date, min_date= min_date)
 
 
 @app.route('/config/')
