@@ -35,7 +35,12 @@
                     {% endfor %}
                 </tr>
                 {% for entry in entries %}
+                
+                {% if entry['ProviderId'] == session['user']['providerId'] %}
+                <tr class="table-success">
+                {% else %} 
                 <tr>
+                {% endif %}
                     <td>{{ entry['DateTimeFrom'] }}</td>
                     <td>{{ entry['DateTimeTo'] }}</td>
                     <td>{{ entry['ProviderId'] }}</td>

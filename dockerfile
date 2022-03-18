@@ -11,7 +11,7 @@ ADD ./requirements.txt /var/www/requirements.txt
 RUN pip install -r requirements.txt
 ADD . /var/www/
 RUN pip install gunicorn
-RUN addgroup -g $GROUP_ID www
+RUN addgroup -gid $GROUP_ID www
 RUN adduser -D -u $USER_ID -G www www -s /bin/sh
 
 USER www

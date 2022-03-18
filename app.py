@@ -31,6 +31,17 @@ def login_required(f):
             return redirect('/')
     return wrap
 
+def admin_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'role' in session['user']:
+            if session['user']['role'] == 'admin':
+                return f(*args, **kwargs)
+        else:
+            return redirect('/')
+    return wrap
+
+
 #routes
 from user import routes
 from registry import routes
@@ -55,6 +66,7 @@ def register():
 # Post endpoint to upoad file
 @app.route("/dashboard/", methods=['POST'])
 @login_required
+@admin_required
 def upload_files():
       # get the uploaded file
       uploaded_file = request.files['file']
@@ -65,17 +77,39 @@ def upload_files():
           # save the file
       return redirect(url_for('upload'))
 
+@app.route("/dashboard/providers/", methods=['POST'])
+@login_required
+@admin_required
+def upload_file():
+      # get the uploaded file
+      uploaded_file = request.files['file']
+      if uploaded_file.filename != '':
+           file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'data.csv')
+          # set the file path
+           uploaded_file.save(file_path)
+          # save the file
+      return redirect(url_for('upload-providers'))
+
+@app.route('/providers/')
+@login_required
+@admin_required
+def providers():
+
+    entries = db.user.find()
+    return render_template('dashboard.html', role='admin', entries=entries, providerIds=ids, session = session)
+
 # Dashoard for client (login Needed)
 @app.route('/dashboard/')
 @login_required
 def dashboard():
-
+    if 'providerId' in session['user']:
+        session['user']['providerId'] = int(session['user']['providerId'])
     # Find all the entries
     entries = db.Registry.find()
     entries = [entry for entry in entries]
 
     # Detect the role of the loged user to determine the permissions
-    if 'role' in session['user']:
+    if 'role' in session['user'] and session['user']['role'] != None:
         role = session['user']['role']
     else:
         role = 'basic'
@@ -83,16 +117,25 @@ def dashboard():
     # If user is not admin, remove the entries that dont belong to him/her 
     if role == 'basic':
         temp = []
+        clients = []
+        dates = []
         for entry in entries:
-            if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']):
+            entry['ProviderId'] = int(entry['ProviderId'])
+            # print(int(session['user']['providerId']))
+            if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']) and "ClientId" in entry:
+                clients.append(entry['ClientId'])
+                dates.append(entry['DateOfService'])
                 temp.append(entry)
-
         entries = temp
+        entries = sorted(entries, key=lambda d: d['DateOfService']) 
 
-    ids = []
-    ids = ['all'] + list(set([i['ProviderId'] for i in entries]))
-    
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids)
+    ids = ['all']
+    for i in entries:
+        # print(i)
+        if 'ProviderId' in i:
+            ids += list(set([i['ProviderId'] for i in entries]))
+
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session = session)
 
 ### Config
 
