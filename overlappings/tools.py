@@ -298,6 +298,7 @@ def process(incoming_data, db_providers, fix=False):
         ol = []
         final_labels = labels+['MeetingDuration']
         for j in overlappings[i]:
+            print(j)
             try:
                 d,i_ol,time = j[0]
                 if time.seconds == 0:
@@ -315,11 +316,8 @@ def process(incoming_data, db_providers, fix=False):
             # ol = ol.drop(['ClientId'], axis=1)
             ol["Id"] = i
             final_ol = final_ol.append(ol)
-            ol.to_csv(path.join('done',names[i]+' '+str(i)+'.csv'))
+            # ol.to_csv(path.join('done',names[i]+' '+str(i)+'.csv'))
 
-    print(final_ol)
+    # print(final_ol)
     return final_ol
 
-
-if __name__ == '__main__':
-    process()

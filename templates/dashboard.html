@@ -41,14 +41,19 @@
                 {% else %} 
                 <tr>
                 {% endif %}
-                    <td>{{ entry['DateTimeFrom'] }}</td>
-                    <td>{{ entry['DateTimeTo'] }}</td>
-                    <td>{{ entry['ProviderId'] }}</td>
-                    <td>{{ entry['ClientId'] }}</td>
-                    <td>{{ entry['ProcedureCodeId'] }}</td>
-                    <td>{{ entry['DateOfService'] }}</td>
-                    <td hidden>{{ entry['_id'] }}</td>
-                    
+                    <td>{{ entry["ProviderId"] }}</td>
+                    <td>{{ entry["ProcedureCodeId"] }}</td>
+                    <td>{{ entry["TimeWorkedInHours"] }}</td>
+                    <td>{{ entry["MeetingDuration"] }}</td>
+                    <td>{{ entry["DateOfService"] }}</td>
+                    <td>{{ entry["DateTimeFrom"] }}</td>
+                    <td>{{ entry["DateTimeTo"] }}</td>
+                    <td>{{ entry["Supervisor"] }}</td>
+                    <td>{{ entry["ClientId"] }}</td>
+                    <td>{{ entry["Group"] }}</td>
+                    <td>{{ entry["Individual"] }}</td>
+                    <td>{{ entry["ObservedwithClient"] }}</td>
+                    <td>{{ entry["ModeofMeeting"] }}</td>
                 </tr>
                 {% endfor %}
                 </table>
