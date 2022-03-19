@@ -128,7 +128,7 @@ def dashboard():
                 temp.append(entry)
         entries = temp
         entries = sorted(entries, key=lambda d: d['DateOfService']) 
-
+    print(len(entries))
     ids = ['all']
     for i in entries:
         # print(i)

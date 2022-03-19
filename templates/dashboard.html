@@ -16,38 +16,30 @@
                     <label for="date-of-service-to">Date of Service To</label>
                     <input class="datetimepicker" type="datetime-local" id="FilterDateTo" name="date-of-service-to" onchange="filterDateTo();"> 
                 </span>
-                <span>
-                    <label for="ProviderID">Provider ID</label>
-                    <select class="form-select" name="ProviderID" id="ProviderID" onchange="filterProv();">
-                        {% for i in providerIds %}
-                        <option value="{{i}}">{{i}}</option>
-                        {% endfor %}
-                    </select>
-                </span>
+
             </div>
             <div class="center">
                 <table class="table" id="entries">
-                <tr>
-                    {% for i in ['DateTimeFrom (DD/MM/AAAA HH:MM)','DateTimeTo (DD/MM/AAAA HH:MM)','ProviderId','ClientId','ProcedureCodeId','DateOfService (DD/MM/AAAA HH:MM)'] %}
-                    <th>
-                        {{i}}
-                    </th>
-                    {% endfor %}
-                </tr>
+                    <tr>
+                        {% for i in entries[0] %}
+                        {% if not i in ['_id', 'ProviderId', "DateTimeFrom","DateTimeTo"] %}
+                        <th>
+                            {{i}}
+                        </th>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    
                 {% for entry in entries %}
-                
-                {% if entry['ProviderId'] == session['user']['providerId'] %}
-                <tr class="table-success">
-                {% else %} 
                 <tr>
-                {% endif %}
-                    <td>{{ entry["ProviderId"] }}</td>
+                    <!-- <td>{{ entry["_id"] }}</td> -->
+                    <!-- <td>{{ entry["ProviderId"] }}</td> -->
                     <td>{{ entry["ProcedureCodeId"] }}</td>
                     <td>{{ entry["TimeWorkedInHours"] }}</td>
                     <td>{{ entry["MeetingDuration"] }}</td>
                     <td>{{ entry["DateOfService"] }}</td>
-                    <td>{{ entry["DateTimeFrom"] }}</td>
-                    <td>{{ entry["DateTimeTo"] }}</td>
+                    <!-- <td>{{ entry["DateTimeFrom"] }}</td> -->
+                    <!-- <td>{{ entry["DateTimeTo"] }}</td> -->
                     <td>{{ entry["Supervisor"] }}</td>
                     <td>{{ entry["ClientId"] }}</td>
                     <td>{{ entry["Group"] }}</td>
