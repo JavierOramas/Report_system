@@ -14,14 +14,38 @@ risen_supervisors = []
 supervisors = []
 providersErrors = []
 
-def get_providers():
-    return pd.read_csv('providers.csv', sep=',')
+# TODO get this from DB in other stuff
+def get_trainee_codes():
+    return [150582, 194640]
 
-providers_data = get_providers()
-labels = ['DateTimeFrom', 'DateTimeTo','TimeWorkedInHours','ProviderId', 'ProviderFirstName', 'ProcedureCodeId','DateOfService', 'ClientId']
+def get_supervisor_codes():
+    return [150582, 194640,255975]
 
-def get_data(entries):
-    df = pd.DataFrame.from_records(entries)
+def get_rbt_codes():
+    return [150580]
+
+def get_indirect_codes():
+    return [194642]
+
+def get_remote_individual_supervision_codes():
+    return [150577]
+
+def get_valid_ids():
+    return [150582, 194640, 150577, 150580, 194642,194641]
+
+def get_supervisor_ids():
+    return [150582, 194640, 150577]
+
+def get_group_supervisor_ids():
+    return [194641]
+
+def get_providers(path):
+    return pd.read_csv(path, sep=',')
+
+labels = ['Id', 'DateTimeFrom', 'DateTimeTo','TimeWorkedInHours','ProviderId', 'ProviderFirstName', 'ProcedureCodeId','DateOfService', 'ClientId']
+
+def get_data(path):
+    df = pd.read_csv(path)
     return df.drop(df.columns.difference(labels), 1)
 
 def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId):
@@ -31,15 +55,15 @@ def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId
     if entry[providerId] in RBTs and i[providerId] in trainees:
         return False
 
-    if procedure in [150582, 194640] and i[procedureCodeId] in [150582, 194640]:
+    if procedure in get_trainee_codes() and i[procedureCodeId] in get_supervisor_codes():
         return True
-    if procedure in [150580] and i[procedureCodeId] in [150582, 194640]:
+    if procedure in get_rbt_codes() and i[procedureCodeId] in get_supervisor_codes():
         return True
-    if procedure in [194642] and i[procedureCodeId] == 150577:
+    if procedure in get_indirect_codes() and i[procedureCodeId] in get_remote_individual_supervision_codes() :
         return True
     return False
 
-def calculate_overlapping(entry, providerName,providerId,depured_data, procedureCodeId, client, DateTimeFrom, timeTo, risen_supervisors):
+def calculate_overlapping(entry,providerName,providerId,depured_data,procedureCodeId,client,DateTimeFrom,timeTo,risen_supervisors):
     overlapping = []
 
     try:
@@ -88,22 +112,23 @@ def calculate_overlapping(entry, providerName,providerId,depured_data, procedure
 
     return overlapping
 
-def process(entries, fix=False):
+def process(incoming_data, db_providers, fix=False):
+
+    final_ol = pd.DataFrame()
+
+    providers_data = get_providers(db_providers)
 
     supervisors = providers_data[providers_data['Type'] == 'Supervisor']
     risen_supervisors = providers_data[providers_data['Type'] == 'Risen Supervisor']
     # print(risen_supervisors)
     trainees = providers_data[providers_data['Status'] == 'Trainee']
     RBTs = providers_data[providers_data['Status'] == 'RBT']
-    data = get_data(entries)
+    data = get_data(incoming_data)
 
-
-    valid = [150582, 194640, 150577, 150580, 194642,194641]
-    supervisors_id = [150582, 194640, 150577]
-    supervisors_codes = ['risensupervisor', 'supervisor']
+    supervisors_id = get_supervisor_codes()
 
     # eliminar datos no deseados
-    data_filter = [i in valid for i in data.ProcedureCodeId]
+    data_filter = [i in get_valid_ids() for i in data.ProcedureCodeId]
     data['data_filter1'] = data_filter
     data = data[data.data_filter1]
     data = data.drop('data_filter1', 1)
@@ -119,7 +144,7 @@ def process(entries, fix=False):
     cols = data.columns
 
     providerId = list(cols).index('ProviderId')
-    # providerName = list(cols).index('ProviderFirstName')
+    providerName = list(cols).index('ProviderFirstName')
     procedureCodeId = list(cols).index('ProcedureCodeId')
     # print(procedureCodeId)
     DateTimeFrom = list(cols).index('DateTimeFrom')
@@ -131,6 +156,8 @@ def process(entries, fix=False):
     supervisors_data = data[filter_supervisors]
 
     supervisors_data = np.array(supervisors_data)
+
+    # print(len(supervisors_data))
 
     for k in range(len(supervisors_data)):
 
@@ -166,10 +193,10 @@ def process(entries, fix=False):
 
 
 ###### Using procedure code id because its faster and better than procedure code
-    code53 = np.array(data[[i in [150580] for i in data['ProcedureCodeId']]])
-    code_doc = np.array(data[[i in [194642] for i in data['ProcedureCodeId']]])
-    code55 = np.array(data[[i in [150582, 194640] for i in data['ProcedureCodeId']]])
-    code_meeting = np.array(data[[i in [194641] for i in data['ProcedureCodeId']]])
+    code53 = np.array(data[[i in get_rbt_codes() for i in data['ProcedureCodeId']]])
+    code_doc = np.array(data[[i in get_indirect_codes() for i in data['ProcedureCodeId']]])
+    code55 = np.array(data[[i in get_supervisor_ids() for i in data['ProcedureCodeId']]])
+    code_meeting = np.array(data[[i in get_group_supervisor_ids() for i in data['ProcedureCodeId']]])
 
     for i in code_doc:
         if i[procedureCodeId] == 194642 and (i[providerId] in list(supervisors['ProviderId']) or i[providerId] in list(risen_supervisors['ProviderId'])):
@@ -194,6 +221,7 @@ def process(entries, fix=False):
 
         non_supervisors.append(i)
 
+    # print(non_supervisors)
     if len(non_supervisors) > 0:
         non_supervisors = np.stack(non_supervisors, axis=0)
     if len(depured_data) > 0:
@@ -217,28 +245,22 @@ def process(entries, fix=False):
             non_supervisors_meeting.append(i)
 
     for i in non_supervisors_meeting:
-        # names[i[providerId]] = i[providerName]
+        names[i[providerId]] = i[providerName]
 
         flag = False
         for j in supervisors_meeting:
             if i[DateTimeFrom] == j[DateTimeFrom]:
-                try:
-                    overlappings[i[providerId]].append((i,j,datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')-datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M')))
-                except:
-                    overlappings[i[providerId]].append((i,j,datetime.strptime(i[timeTo], '%m/%d/%y %H:%M')-datetime.strptime(i[DateTimeFrom], '%m/%d/%y %H:%M')))
+                overlappings[i[providerId]].append((i,j,datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')-datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M')))
                 flag = True
-                #TODO check mmdd ddmm
                 break
         if not flag:
             temp = i
-            # temp[providerName] = ''
-            try:
-                overlappings[i[providerId]].append(('',i, datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')-datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M')))
-            except:
-                overlappings[i[providerId]].append(('',i, datetime.strptime(i[timeTo], '%m/%d/%y %H:%M')-datetime.strptime(i[DateTimeFrom], '%m/%d/%y %H:%M')))
+            temp[providerName] = ''
+            overlappings[i[providerId]].append(('',i, datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')-datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M')))
+
     for i in non_supervisors:
 
-        # names[i[providerId]] = i[providerName]
+        names[i[providerId]] = i[providerName]
 
         new_ol = calculate_overlapping(i, providerName=providerName, providerId=providerId, depured_data=depured_data, procedureCodeId=procedureCodeId,
                                        client=client, DateTimeFrom=DateTimeFrom, timeTo=timeTo, risen_supervisors=risen_supervisors)
@@ -257,12 +279,12 @@ def process(entries, fix=False):
             if len(new_ol) != 0:
                 overlappings[i[providerId]].append(new_ol)
 
-    # if len(errors) > 0:
-        # pd.DataFrame(errors).to_csv('errors.csv')
-        # pd.DataFrame(supervisors_data).to_csv('supervisors_data.csv')
+    if len(errors) > 0:
+        pd.DataFrame(errors).to_csv('errors.csv')
+        pd.DataFrame(supervisors_data).to_csv('supervisors_data.csv')
     if len(notifications) > 0:
         notifications = pd.DataFrame(np.stack(notifications, axis=0), columns=cols)
-        # notifications.to_csv('auto_fixed.csv')
+        notifications.to_csv('auto_fixed.csv')
 
 
     lab = list(cols)
@@ -272,7 +294,6 @@ def process(entries, fix=False):
     if not os.path.exists('done'):
         os.mkdir('done')
 
-    final_overlappings = []
     for i in overlappings:
         ol = []
         final_labels = labels+['MeetingDuration']
@@ -283,7 +304,6 @@ def process(entries, fix=False):
                     continue
                 i_ol = np.append(i_ol,time.seconds/3600)
                 ol.append(i_ol)
-                print(i_ol)
             except:
                 d,i_ol,time = j
                 i_ol = np.append(i_ol,time.seconds/3600)
@@ -293,10 +313,10 @@ def process(entries, fix=False):
             ol = pd.DataFrame(np.stack(ol, axis=0), columns=lab)
             ol = ol[final_labels] 
             # ol = ol.drop(['ClientId'], axis=1)
+            ol["ProvId"] = i
+            final_ol = final_ol.append(ol)
             # ol.to_csv(path.join('done',names[i]+' '+str(i)+'.csv'))
-            final_overlappings.append(ol)
-            
-    return errors, notifications, final_overlappings
 
-if __name__ == '__main__':
-    process()
+    # print(final_ol)
+    return final_ol
+

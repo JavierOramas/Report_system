@@ -4,46 +4,40 @@
 {% block content %}
 
 <div class="card-wrapper">
-    {{ heading(session, role) }}
+    {{ heading(session, role, total_hours, supervised_hours, meeting_group, minimum_supervised) }}
     <div class="card-wrapper">
         <div class="card-table">
             <div class="table-preferences">
-                <span>
-                    <label for="date-of-service-from">Date of Service from</label>
-                    <input class="datetimepicker" type="datetime-local" id="FilterDateFrom" name="date-of-service-from" onchange="filterDateFrom();"> 
-                </span>
-                <span>
-                    <label for="date-of-service-to">Date of Service To</label>
-                    <input class="datetimepicker" type="datetime-local" id="FilterDateTo" name="date-of-service-to" onchange="filterDateTo();"> 
-                </span>
-                <span>
-                    <label for="ProviderID">Provider ID</label>
-                    <select class="form-select" name="ProviderID" id="ProviderID" onchange="filterProv();">
-                        {% for i in providerIds %}
-                        <option value="{{i}}">{{i}}</option>
-                        {% endfor %}
-                    </select>
-                </span>
+                <select class="form-select form-select-sm" name="years">
+                    {% for i in range(2020, current_year+1) %}
+                        <option value="{{i}}" {{'selected' if i == current_year }}>{{i}}</option>
+                    {% endfor %}
+                </select>
+                <select class="form-select form-select-sm" name="months">
+                    {% for i in range(1,13) %}
+                        <option value="{{i}}" {{'selected' if i == current_month }}>{{i}}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="center">
                 <table class="table" id="entries">
-                <tr>
-                    {% for i in ['DateTimeFrom (DD/MM/AAAA HH:MM)','DateTimeTo (DD/MM/AAAA HH:MM)','ProviderId','ClientId','ProcedureCodeId','DateOfService (DD/MM/AAAA HH:MM)'] %}
-                    <th>
-                        {{i}}
-                    </th>
-                    {% endfor %}
-                </tr>
+                    <tr>
+                        {% for i in ["DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                        <th>
+                            {{i}}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                    
                 {% for entry in entries %}
                 <tr>
-                    <td>{{ entry['DateTimeFrom'] }}</td>
-                    <td>{{ entry['DateTimeTo'] }}</td>
-                    <td>{{ entry['ProviderId'] }}</td>
-                    <td>{{ entry['ClientId'] }}</td>
-                    <td>{{ entry['ProcedureCodeId'] }}</td>
-                    <td>{{ entry['DateOfService'] }}</td>
-                    <td hidden>{{ entry['_id'] }}</td>
-                    
+                    <td>{{ entry["DateOfService"] }}</td>
+                    <td>{{ entry["MeetingDuration"] }}</td>
+                    <td>{{ entry["Individual"] }}</td>
+                    <td>{{ entry["Group"] }}</td>
+                    <td>{{ entry["ModeofMeeting"] }}</td>
+                    <td>{{ entry["ObservedwithClient"] }}</td>
+                    <td>{{ entry["Supervisor"] }}</td>
                 </tr>
                 {% endfor %}
                 </table>

@@ -5,9 +5,9 @@ from app import db
 
 class SupervisedHours:
 
-    def add_month(self,providerId, month, year, hours):
+    def add_month(self,rbt_entry, supervisor_entry, time):
 
-        if db.SupervisedHours.find_one_and_update({"ProviderId": providerId,"Month":month, "Year":year}, 
+        if db.SupervisedHours.find_one_and_update({"rbt_entry": rbt_entry["id"],"supervisor_entry":supervisor}, 
                                                   {'$set':{"Hours":hours}},
                                                   return_document = ReturnDocument.AFTER
                                                   )
