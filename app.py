@@ -4,6 +4,7 @@ import os
 import pymongo
 import json
 import datetime
+import math
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -41,6 +42,10 @@ def admin_required(f):
             return redirect('/')
     return wrap
 
+
+def round_half_up(n, decimals=0):
+    multiplier = 10 ** decimals
+    return math.floor(n*multiplier + 0.5) / multiplier
 
 #routes
 from user import routes
@@ -121,21 +126,32 @@ def dashboard():
         dates = []
         for entry in entries:
             entry['ProviderId'] = int(entry['ProviderId'])
-            # print(int(session['user']['providerId']))
             if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']) and "ClientId" in entry:
                 clients.append(entry['ClientId'])
                 dates.append(entry['DateOfService'])
                 temp.append(entry)
         entries = temp
         entries = sorted(entries, key=lambda d: d['DateOfService']) 
-    print(len(entries))
     ids = ['all']
+    supervised_time = 0
+    meetings = 0
     for i in entries:
         # print(i)
+        # if i['ProcedureCodeId'] in [194642, 150577]:
+        i['MeetingDuration'] = round_half_up(i['MeetingDuration'], 1)
+        supervised_time+=i['MeetingDuration']
+        
+        #TODO get this condition from other table that gives clinical meeting info
+        condition = True
+        if i['ProcedureCodeId'] == 194641 and condition == True:
+            meetings += 1
+
         if 'ProviderId' in i:
             ids += list(set([i['ProviderId'] for i in entries]))
 
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session = session)
+    total_hours = db.TotalHours.find_one({'ProviderId': session['user']['providerId']})['TotalTime']#, 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
+
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session = session, total_hours=round_half_up(total_hours),minimum_supervised=round_half_up(5/100*total_hours,1), supervised_hours=round_half_up(supervised_time,1), meeting_group=meetings, current_year=int(datetime.datetime.now().year), current_month=int(datetime.datetime.now().month))
 
 ### Config
 

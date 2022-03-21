@@ -1,4 +1,4 @@
-{% macro heading(session, role) %}
+{% macro heading(session, role, total_hours, supervised_hours, meeting_groups, minimum_supervised) %}
 <div class="card">
     <h1 class="center">Dashboard</h1>
      <div class="center">
@@ -33,6 +33,14 @@
          <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
      </form>
  </div>
+ {% else %}
+ <div class="form-group card">
+    <h1>This Month Report Status:</h1>
+    <p>Total Hours: {{total_hours}}</p>
+    <p>Supervised Hours: {{supervised_hours}} / {{minimum_supervised}} </p>
+    <p>Meeting Groups: {{meeting_groups}}/1 </p>
+</div>
+
  {% endif %}
  
  </div>

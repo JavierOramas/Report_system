@@ -36,13 +36,34 @@ class Registry:
             data = pd.read_csv('static/files/data.csv')
         except:
             return {'status' : 500}
+        labels = ['ProviderId', 'TimeWorkedInHours']
+
+        month = datetime.datetime.strptime(data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').month
+        year = datetime.datetime.strptime(data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
+        data = data.drop(data.columns.difference(labels), 1)
+        data['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(lambda x: x.replace(',','.')).astype(float)
+
+        total_time = data.groupby(['ProviderId']).sum()
+
+
+        for name,entry in total_time.iterrows():
+            # entry['ProviderId'] = entry['Name']
+            item = {
+                'ProviderId': name,
+                'Month': month,
+                'Year': year,
+                'TotalTime': entry['TimeWorkedInHours']
+            }
+            
+            if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}):
+                db.TotalHours.insert_one(item)
 
         data = process('static/files/data.csv', 'providers.csv')
-
             # crete the collection entries
         for index,entry in data.iterrows():
             entry = {
-                "ProviderId": entry["Id"],
+                "entryId": entry["Id"],
+                "ProviderId": entry["ProvId"],
                 "ProcedureCodeId": entry["ProcedureCodeId"],
                 "TimeWorkedInHours": entry["TimeWorkedInHours"],
                 "MeetingDuration": entry["MeetingDuration"],
@@ -62,8 +83,8 @@ class Registry:
             entry['DateOfService'] = datetime.datetime.strptime(entry['DateOfService'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
 
         # Insert the data and log to the console the action
-        # if not db.Registry.find_one({"_id":entry['_id']}):
-            db.Registry.insert_one(entry)
+            if not db.Registry.find_one({"ProviderId":entry['ProviderId'], "entryId":entry['entryId']}):
+                db.Registry.insert_one(entry)
             # print('Log: ' + colored('Entry added successfully', 'green'))
         # else:
             # print('Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))

@@ -42,7 +42,7 @@ def get_group_supervisor_ids():
 def get_providers(path):
     return pd.read_csv(path, sep=',')
 
-labels = ['DateTimeFrom', 'DateTimeTo','TimeWorkedInHours','ProviderId', 'ProviderFirstName', 'ProcedureCodeId','DateOfService', 'ClientId']
+labels = ['Id', 'DateTimeFrom', 'DateTimeTo','TimeWorkedInHours','ProviderId', 'ProviderFirstName', 'ProcedureCodeId','DateOfService', 'ClientId']
 
 def get_data(path):
     df = pd.read_csv(path)
@@ -298,7 +298,6 @@ def process(incoming_data, db_providers, fix=False):
         ol = []
         final_labels = labels+['MeetingDuration']
         for j in overlappings[i]:
-            print(j)
             try:
                 d,i_ol,time = j[0]
                 if time.seconds == 0:
@@ -314,7 +313,7 @@ def process(incoming_data, db_providers, fix=False):
             ol = pd.DataFrame(np.stack(ol, axis=0), columns=lab)
             ol = ol[final_labels] 
             # ol = ol.drop(['ClientId'], axis=1)
-            ol["Id"] = i
+            ol["ProvId"] = i
             final_ol = final_ol.append(ol)
             # ol.to_csv(path.join('done',names[i]+' '+str(i)+'.csv'))
 
