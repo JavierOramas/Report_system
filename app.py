@@ -150,8 +150,11 @@ def dashboard():
         if 'ProviderId' in i:
             ids += list(set([i['ProviderId'] for i in entries]))
 
-    total_hours = db.TotalHours.find_one({'ProviderId': session['user']['providerId']})['TotalTime']#, 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
-
+    if role == 'basic':
+        total_hours = db.TotalHours.find_one({'ProviderId': session['user']['providerId']})['TotalTime']#, 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
+    else:
+        total_hours = 0;
+        
     return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session = session, total_hours=round_half_up(total_hours),minimum_supervised=round_half_up(5/100*total_hours,1), supervised_hours=round_half_up(supervised_time,1), meeting_group=meetings, current_year=int(datetime.datetime.now().year), current_month=int(datetime.datetime.now().month))
 
 ### Config
