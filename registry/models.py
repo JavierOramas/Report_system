@@ -76,6 +76,7 @@ class Registry:
                 "ModeofMeeting": self.get_observed(entry)[1],
                 "Group":  self.get_group_individual(entry)[0],
                 "Individual": self.get_group_individual(entry)[1],
+                # "Verified":
             }
 
             entry['DateTimeFrom'] = datetime.datetime.strptime(entry['DateTimeFrom'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')

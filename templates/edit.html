@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="card-wrapper">
+        <div class="card">
+
+            <form name="edit_form" method="POST">
+                <label for="date">Date Of Service (DD/MM/YYYY)</label>
+                <input type="text" name="date" value={{ entry['DateOfService'] }} class="field" required>
+                
+                <label for="meeting_duration">MeetingDuration</label>
+                <input type="number" name="meeting_duration" class="field" required>
+
+                <select id="supervisors" name="supervisors" form="edit_form" class="form-select">
+                    {% for supervisor in supervisors %}
+                        <option value="{{supervisor['ProviderId']}}">
+                            {{supervisor['name']}}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                <label for="supervision">Supervision type</label>
+                <fieldset>
+                    <div id="supervision" class="radio_group">
+                        <input type="radio" id="individual" name="supervision_type" class="radio"/>
+                        <label for="individual">Individual</label>
+                        <input type="radio" id="group" name="supervision_type" class="radio"/>
+                        <label for="group">Group</label>
+                    </div>
+                </fieldset>
+
+                <label for="mode_meeting">Mode Of Meeting</label>
+                <fieldset>
+                    <div id="mode_meeting" class="radio_group">
+                        <input type="radio" id="remote" name="meeting_type" value="remote" class="radio"/>
+                        <label for="remote">Remote</label>
+                        <input type="radio" id="in_person" name="meeting_type" value="in person" class="radio"/>
+                        <label for="in_person">In Person</label>
+                    </div>
+                </fieldset>
+
+                <label for="observed">Observed With Client</label>
+                <fieldset>
+                    <div id="observed" class="radio_group">
+                        <input type="radio" id="yes" name="observed" value="yes" class="radio"/>
+                        <label for="yes">Yes</label>
+                        <input type="radio" id="no" name="observed" value="no" class="radio"/>
+                        <label for="no">No</label>
+                    </div>
+                </fieldset>
+
+
+                <div class="center">
+                    <a href="/" class="btn btn-danger">Cancel</a>
+                    <input style="float:left; margin:auto" type="submit" value="Submit" class="btn btn-primary">
+                </div>
+            </form>
+            
+        </div>
+        </div>
+        {% endblock %}

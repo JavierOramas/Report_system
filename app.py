@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, session, request, url_for, jsonify
+from bson.objectid import ObjectId
 from functools import wraps
 import os
 import pymongo
@@ -162,3 +163,13 @@ def dashboard():
 def config():
     if session['user']['role'] == 'admin':
         return render_template('config.html')
+    
+@app.route('/edit/<id>')
+@login_required
+def edit(id):
+    entry = db.Registry.find_one({"_id":ObjectId(id)})
+    if entry and int(entry["ProviderId"]) == int(session['user']['providerId']):
+        supervisors=[]
+        return render_template('edit.html', entry=entry, supervisors=supervisors)
+    else:
+        return redirect('/')

@@ -5,7 +5,7 @@
 
 
 /* Setup */
-:root {
+:root{
   --black: #000000;
   --almost-black: #263238;
   --white: #ffffff;
@@ -165,21 +165,21 @@ label {
   outline: none;
   cursor: pointer;
   display: inline-block;
-  background: var(--primary);
+  /* background: var(--primary); */
   transition: color .15s ease, background-color .15s ease;
 }
 
 .btn:hover {
-  background: var(--primary-dark);
+  /* background: var(--primary-dark); */
 }
 
 .btn--secondary {
   color: var(--almost-black);
-  background: var(--secondary);
+  /* background: var(--secondary); */
 }
 
 .btn--secondary:hover {
-  background: var(--secondary-dark);
+  /* background: var(--secondary-dark); */
 }
 
 input[type=submit] {
@@ -202,4 +202,27 @@ input[type=submit] {
 
 div {
   word-wrap: break-word;
+}
+
+fieldset {
+  overflow: hidden
+}
+
+.radio_group {
+  float: left;
+  clear: none;
+}
+
+label {
+  float: left;
+  clear: none;
+  display: block;
+  padding: 0px 1em 0px 8px;
+}
+
+input[type=radio],
+input.radio {
+  float: left;
+  clear: none;
+  margin: 2px 0 0 2px;
 }

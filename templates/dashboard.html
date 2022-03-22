@@ -38,6 +38,9 @@
                     <td>{{ entry["ModeofMeeting"] }}</td>
                     <td>{{ entry["ObservedwithClient"] }}</td>
                     <td>{{ entry["Supervisor"] }}</td>
+                    <td>
+                        <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
+                    </td>
                 </tr>
                 {% endfor %}
                 </table>
