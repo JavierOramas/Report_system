@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, request, session, redirect
 import uuid
 from passlib.hash import pbkdf2_sha256
-from app import db
+# from app import db
+
 
 class User:
 
@@ -27,41 +28,45 @@ class User:
         user['password'] = pbkdf2_sha256.encrypt(user['password'])
 
         # Verify uniqueness of the user and insert it in the database if no error
-        if db.users.find_one({"email":user["email"]}): #or db.users.find_one({"providerId":user["providerId"]}):
-            return jsonify({"error": "Email Address or ProviderId Already exists"}),400
+        # or db.users.find_one({"providerId":user["providerId"]}):
+        if db.users.find_one({"email": user["email"]}):
+            return jsonify({"error": "Email Address or ProviderId Already exists"}), 400
 
         if db.users.insert_one(user):
             return self.start_session(user)
 
         # If this is reached something wrong Happened
-        return jsonify({"error":"Sign Up failed"}), 400
+        return jsonify({"error": "Sign Up failed"}), 400
 
-    def login(self):
+    def login(self, db):
 
         # Find user and login
         user = {
-            "email" : request.form.get('email'),
+            "email": request.form.get('email'),
         }
         user = db.users.find_one(user)
         if user and pbkdf2_sha256.verify(request.form.get('password'), user['password']):
             return self.start_session(user)
 
         # If this is reached something wrong Happened
-        return jsonify({"error":"Login failed"}), 401
+        return jsonify({"error": "Login failed"}), 401
 
     def signout(self):
         session.clear()
         return redirect('/')
 
     def add_data(self):
-            # Load data from csv pre-loaded from the client
+        # Load data from csv pre-loaded from the client
         # data = pd.read_csv('static/files/data.csv')
-        
+
         # crete the collection entries
-        for index,entry in data.iterrows():
-            entry['DateTimeFrom'] = datetime.datetime.strptime(entry['DateTimeFrom'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-            entry['DateTimeTo'] = datetime.datetime.strptime(entry['DateTimeTo'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-            entry['DateOfService'] = datetime.datetime.strptime(entry['DateOfService'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
+        for index, entry in data.iterrows():
+            entry['DateTimeFrom'] = datetime.datetime.strptime(
+                entry['DateTimeFrom'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
+            entry['DateTimeTo'] = datetime.datetime.strptime(
+                entry['DateTimeTo'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
+            entry['DateOfService'] = datetime.datetime.strptime(
+                entry['DateOfService'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
             entry = {
                 "_id":                      entry['ProviderId'],
                 "name":                     entry['Name and Credential'],
@@ -80,6 +85,7 @@ class User:
             if db.users.insert_one(entry):
                 print('Log: ' + colored('Entry added successfully', 'green'))
             else:
-                print('Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))
+                print(
+                    'Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))
         # Return success code
         return {'status': 200}

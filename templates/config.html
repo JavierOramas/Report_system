@@ -1,26 +1,35 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
 
-{% block content %}
-
-<div class="card-wrapper" >
-    <div class="card-table">
-      <div class="center">
-        <table class="table" id="entries">
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-          </tr>
-          {% for user in users %}
-          <tr>
-            <td>{{user['name']}}</td>
-            <td>{{user['email']}}</td>
-          </tr>
-          {% endfor %}
-        </table>
-        
-      </div>
-
+<div class="card-wrapper">
+  <div class="card-table">
+    <div class="center">
+      <table class="table" id="entries">
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+          <td>{{ user['name'] }}</td>
+          <td>{{ user['email'] }}</td>
+          <td>{{ user["first_name"] }}</td>
+          <td>{{ user["last_name"] }}</td>
+          <td>{{ user["BACB_id"] }}</td>
+          <td>{{ user["credential"] }}</td>
+          <td>{{ user["role"] }}</td>
+          <td>{{ user["hired_date"] }}</td>
+          <td>{{ user["fingerprint_background"] }}</td>
+          <td>{{ user["background_date"] }}</td>
+          <td>{{ user["background_exp_date"] }}</td>
+          <td><a class="btn btn-primary" href='/del/{{user["_id"]}}'>🗑️</a></td>
+          <td>
+            <a class="btn btn-primary" href='/user/edit/{{user["_id"]}}'>✏️</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
     </div>
   </div>
+</div>
 
 {% endblock %}
