@@ -48,6 +48,31 @@ $("form[name=login_form]").submit(function(e){
     e.preventDefault();
 });
 
+// $("form[name=edit_form]").submit(function(e){
+
+//     var $form =  $(this);
+//     var $error = $form.find(".error");
+//     var data = $form.serialize();
+
+//     $.ajax({
+//         url: "/edit/*",
+//         type: "POST",
+//         data: data,
+//         dataType: "json",
+//         success: function(resp){
+//             console.log(resp);
+//             $error.text(" ").addClass("error--hidden");
+//             window.location.href = "/dashboard/"
+//         },
+//         error:function(resp){
+//             console.log(resp);
+//             console.log(resp.responseJSON.error)
+//             $error.text(resp.responseJSON.error).removeClass("error--hidden");
+//         },
+//     });
+//     e.preventDefault();
+// });
+
 function filterProv() {
     // Declare variables
     var input, filter, table, tr, td, i, txtValue;

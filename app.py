@@ -6,6 +6,7 @@ import pymongo
 import json
 import datetime
 import math
+import datetime_format
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -46,7 +47,7 @@ def admin_required(f):
 
 def round_half_up(n, decimals=0):
     multiplier = 10 ** decimals
-    return math.floor(n*multiplier + 0.5) / multiplier
+    return math.floor(int(n)*multiplier + 0.5) / multiplier
 
 #routes
 from user import routes
@@ -136,12 +137,14 @@ def dashboard():
     ids = ['all']
     supervised_time = 0
     meetings = 0
+    min_year = int(datetime.datetime.now().year)
     for i in entries:
-        # print(i)
-        # if i['ProcedureCodeId'] in [194642, 150577]:
+
+        min_year = min(min_year, int(datetime_format.get_date(i["DateOfService"]).year))
+
         i['MeetingDuration'] = round_half_up(i['MeetingDuration'], 1)
         supervised_time+=i['MeetingDuration']
-        
+
         #TODO get this condition from other table that gives clinical meeting info
         condition = True
         if i['ProcedureCodeId'] == 194641 and condition == True:
@@ -149,30 +152,86 @@ def dashboard():
 
         if 'ProviderId' in i:
             ids += list(set([i['ProviderId'] for i in entries]))
-
     if role == 'basic':
         total_hours = db.TotalHours.find_one({'ProviderId': session['user']['providerId']})['TotalTime']#, 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
     else:
         total_hours = 0;
-        
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session = session, total_hours=round_half_up(total_hours),minimum_supervised=round_half_up(5/100*total_hours,1), supervised_hours=round_half_up(supervised_time,1), meeting_group=meetings, current_year=int(datetime.datetime.now().year), current_month=int(datetime.datetime.now().month))
+
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session = session, total_hours=round_half_up(total_hours),minimum_supervised=round_half_up(5/100*total_hours,1), supervised_hours=round_half_up(supervised_time,1), meeting_group=meetings, current_year=int(datetime.datetime.now().year), min_year=min_year, current_month=int(datetime.datetime.now().month))
 
 ### Config
 
 # Onlyadmins will see this page and it will let edit users and provider ids
 # For now it blank
-@app.route('/config/')
+@app.route('/users/')
 @login_required
 def config():
     if session['user']['role'] == 'admin':
-        return render_template('config.html')
+        users = db.users.find()
+        return render_template('config.html', users = users)
     
-@app.route('/edit/<id>')
+@app.route('/edit/new', methods=('GET', 'POST'))
+@login_required
+def add():
+    # entry = db.Registry.find_one({"_id":ObjectId(id)})
+    if request.method == 'GET':
+            entry = {
+                # "entryId": entry["Id"],
+                "ProviderId": session['user']['providerId'],
+                "ProcedureCodeId": '',
+                "TimeWorkedInHours": 0,
+                "MeetingDuration": 0,
+                "DateOfService": '',
+                "DateTimeFrom": '',
+                "DateTimeTo": '',
+                "Supervisor": '',
+                "ClientId": '',
+                "ObservedwithClient": '',
+                "ModeofMeeting": '',
+                "Group":  '',
+                "Individual": '',
+                "Verified": False
+            }
+            supervisors = [1]
+            return render_template('edit.html', entry=entry, supervisors=supervisors)
+            # return redirect(url_for('/', message={'error':'you cant edit that entry'}))
+    else:
+        db.Registry.insert_one({
+                "ProcedureCodeId" :int(request.form.get('ProcedureCodeId')),
+                "MeetingDuration" :int(request.form.get("MeetingDuration")),
+                "DateOfService"   :request.form.get('DateOfService'),
+                "Verified" : False
+                })
+        
+        return redirect('/')
+
+@app.route('/edit/<id>', methods=('GET', 'POST'))
 @login_required
 def edit(id):
     entry = db.Registry.find_one({"_id":ObjectId(id)})
-    if entry and int(entry["ProviderId"]) == int(session['user']['providerId']):
-        supervisors=[]
-        return render_template('edit.html', entry=entry, supervisors=supervisors)
+    if request.method == 'GET':
+        if entry and 'providerId' in session['user'] and int(entry["ProviderId"]) == int(session['user']['providerId']):
+            # print(entry)
+            supervisors=[entry['Supervisor']]
+            return render_template('edit.html', entry=entry, supervisors=supervisors)
+        else:
+            return redirect(url_for('/', message={'error':'you cant edit that entry'}))
     else:
+        # print(reques
+        if entry["ProcedureCodeId"] != request.form.get('ProcedureCodeId') or entry["DateOfService"] != request.form.get('DateOfService') or entry["MeetingDuration"] != request.form.get('MeetingDuration'):
+            # "Supervisor": request.form["Supervisor"],
+            # "ObservedwithClient": self.get_observed(entry)[0],
+            # "ModeofMeeting": self.get_observed(entry)[1],
+            # "Group":  self.get_group_individual(entry)[0],
+            # "Individual": self.get_group_individual(entry)[1],
+            # "Verified":
+
+        # print(entry)
+            db.Registry.update_one({"_id":ObjectId(id)}, {"$set":{
+                "ProcedureCodeId" :int(request.form.get('ProcedureCodeId')),
+                "MeetingDuration" :int(request.form.get("MeetingDuration")),
+                "DateOfService"   :request.form.get('DateOfService'),
+                "Verified" : False
+                }})
+
         return redirect('/')

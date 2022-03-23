@@ -2,14 +2,24 @@
 
 {% block content %}
 
-<div class="card" style="width: 18rem;">
-    <div class="card-body">
-      <!-- {% for i in user %} -->
-      <input type="text" value="{{user.name}}">
-      <input type="email" value="{{user.email}}">
-      <input type="text" value="{{user.providerId}}">
-      <input type="password" value="{{user.password}}">
-      <!-- {% endfor %} -->
+<div class="card-wrapper" >
+    <div class="card-table">
+      <div class="center">
+        <table class="table" id="entries">
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+          </tr>
+          {% for user in users %}
+          <tr>
+            <td>{{user['name']}}</td>
+            <td>{{user['email']}}</td>
+          </tr>
+          {% endfor %}
+        </table>
+        
+      </div>
+
     </div>
   </div>
 

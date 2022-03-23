@@ -7,7 +7,7 @@ import pandas as pd
 from app import db
 import datetime
 import os
-
+import datetime_format
 
 class Registry:
     
@@ -76,12 +76,12 @@ class Registry:
                 "ModeofMeeting": self.get_observed(entry)[1],
                 "Group":  self.get_group_individual(entry)[0],
                 "Individual": self.get_group_individual(entry)[1],
-                # "Verified":
+                "Verified": True
             }
 
-            entry['DateTimeFrom'] = datetime.datetime.strptime(entry['DateTimeFrom'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-            entry['DateTimeTo'] = datetime.datetime.strptime(entry['DateTimeTo'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-            entry['DateOfService'] = datetime.datetime.strptime(entry['DateOfService'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
+            entry['DateTimeFrom'] = datetime_format.format(entry['DateTimeFrom'])
+            entry['DateTimeTo'] = datetime_format.format(entry['DateTimeTo'])
+            entry['DateOfService'] = datetime_format.format(entry['DateOfService'])
 
         # Insert the data and log to the console the action
             if not db.Registry.find_one({"ProviderId":entry['ProviderId'], "entryId":entry['entryId']}):

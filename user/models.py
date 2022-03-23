@@ -15,16 +15,6 @@ class User:
 
     # create new user
     def signup(self):
-
-            # "_id":                      request.form.get('id'),
-            # "first_name":               request.form.get('first_name'),
-            # "last_name":                request.form.get('last_name'),
-            # "credential":               request.form.get('credential'),
-            # "BACB_id":                  request.form.get('bacb_id'),
-            # "hired_date":               request.form.get('hired_date'),
-            # "fingerprint_background":   request.form.get('fingerprint_background'),
-            # "background_date":          request.form.get('background_date'),
-            # "background_exp_date":      request.form.get('background_exp_date')
         user = {
             "name":                     request.form.get('name'),
             "role":                     'basic',
@@ -65,7 +55,7 @@ class User:
 
     def add_data(self):
             # Load data from csv pre-loaded from the client
-        data = pd.read_csv('static/files/data.csv')
+        # data = pd.read_csv('static/files/data.csv')
         
         # crete the collection entries
         for index,entry in data.iterrows():
@@ -87,7 +77,7 @@ class User:
             }
 
             # Insert the data and log to the console the action
-            if db.Registry.insert_one(entry):
+            if db.users.insert_one(entry):
                 print('Log: ' + colored('Entry added successfully', 'green'))
             else:
                 print('Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))
