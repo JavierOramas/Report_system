@@ -10,6 +10,7 @@ import json
 import datetime
 import math
 import datetime_format
+import pdfkit
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -55,8 +56,51 @@ def round_half_up(n, decimals=0):
     multiplier = 10 ** decimals
     return math.floor(int(n)*multiplier + 0.5) / multiplier
 
+def get_entries(role,year, month):
+    entries = db.Registry.find()
+    entries = [entry for entry in entries]
 
-# routes
+    temp = []
+    clients = []
+    dates = []
+    
+    for entry in entries:
+        if datetime_format.get_date(entry["DateOfService"]).year == year and datetime_format.get_date(entry["DateOfService"]).month == month:
+            entry['ProviderId'] = int(entry['ProviderId'])
+            if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']) and "ClientId" in entry:
+                clients.append(entry['ClientId'])
+                dates.append(entry['DateOfService'])
+                temp.append(entry)
+    entries = temp
+    entries = sorted(entries, key=lambda d: d['DateOfService'])
+    
+    ids = ['all']
+    supervised_time = 0
+    meetings = 0
+    min_year = int(datetime.datetime.now().year)
+    for i in entries:
+        min_year = min(min_year, int(
+            datetime_format.get_date(i["DateOfService"]).year))
+
+        i['MeetingDuration'] = round_half_up(i['MeetingDuration'], 1)
+        supervised_time += i['MeetingDuration']
+
+        # TODO get this condition from other table that gives clinical meeting info
+        condition = True
+        if i['ProcedureCodeId'] == 194641 and condition == True:
+            meetings += 1
+
+        if 'ProviderId' in i:
+            ids += list(set([i['ProviderId'] for i in entries]))
+    if role == 'basic':
+        # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
+        total_hours = db.TotalHours.find_one({'ProviderId': int(session['user']['providerId']),'Month': month, 'Year': year})['TotalTime']
+    else:
+        total_hours = 0
+    
+    return entries,total_hours,supervised_time,ids,meetings,min_year
+
+# routes.
 
 # Home Page
 
@@ -123,6 +167,7 @@ def providers():
 def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year):
     if 'providerId' in session['user']:
         session['user']['providerId'] = int(session['user']['providerId'])
+
     # Find all the entries
     entries = db.Registry.find()
     entries = [entry for entry in entries]
@@ -135,45 +180,9 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 
     # If user is not admin, remove the entries that dont belong to him/her
     if role == 'basic':
-        temp = []
-        clients = []
-        dates = []
-        for entry in entries:
-            if datetime_format.get_date(entry["DateOfService"]).year == year and datetime_format.get_date(entry["DateOfService"]).month == month:
-                entry['ProviderId'] = int(entry['ProviderId'])
-                if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']) and "ClientId" in entry:
-                    clients.append(entry['ClientId'])
-                    dates.append(entry['DateOfService'])
-                    temp.append(entry)
-        entries = temp
-        entries = sorted(entries, key=lambda d: d['DateOfService'])
-    ids = ['all']
-    supervised_time = 0
-    meetings = 0
-    min_year = int(datetime.datetime.now().year)
-    for i in entries:
+        entries,total_hours,supervised_time,ids, meetings, min_year = get_entries(role,year, month)
 
-        min_year = min(min_year, int(
-            datetime_format.get_date(i["DateOfService"]).year))
-
-        i['MeetingDuration'] = round_half_up(i['MeetingDuration'], 1)
-        supervised_time += i['MeetingDuration']
-
-        # TODO get this condition from other table that gives clinical meeting info
-        condition = True
-        if i['ProcedureCodeId'] == 194641 and condition == True:
-            meetings += 1
-
-        if 'ProviderId' in i:
-            ids += list(set([i['ProviderId'] for i in entries]))
-    if role == 'basic':
-        # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
-        total_hours = db.TotalHours.find_one(
-            {'ProviderId': session['user']['providerId']})['TotalTime']
-    else:
-        total_hours = 0
-    print(month)
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, current_year=year, min_year=min_year, current_month=month)
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month)
 
 # Config
 
@@ -296,3 +305,27 @@ def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
     return dashboard(int(month), int(year))
+
+@app.route("/report/<year>/<month>/")
+def get_report(year,month):
+
+    # Detect the role of the loged user to determine the permissions
+    if 'role' in session['user'] and session['user']['role'] != None:
+        role = session['user']['role']
+    else:
+        role = 'basic'
+
+    year = int(year)
+    month = int(month)
+    user = session['user']
+    entries,total_hours,supervised_time,ids, meetings, min_year = get_entries(role, year, month)
+
+    if user and entries:
+        user['hired_date'] = ' '
+        month_year = f'{month} {year}'
+        template = render_template('report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=total_hours)
+        pdfkit.from_string(template, "report.pdf")
+        return redirect('/')
+    else:
+        print("Something went Wrong!")
+        return dashboard(year, month)
