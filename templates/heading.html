@@ -18,11 +18,16 @@
          Your Info
      </h2>
      <p>
-         <strong>ID:</strong>{{ session['user']['_id'] }} <br>
-         <strong>Name:</strong>{{ session['user']['name'] }} <br>
-         <strong>Email:</strong>{{ session['user']['email'] }} <br>
-         <strong>ProviderId:</strong>{{ session['user']['providerId'] }} <br>
 
+        <strong>Name:</strong>{{ session['user']['name'] }} <br>
+        <strong>Email:</strong>{{ session['user']['email'] }} <br>
+        <strong>ProviderId:</strong>{{ session['user']['providerId'] }} <br>
+        
+        {% if True %}
+        <div class="center">
+            <a href="/report/" class="btn btn-success">Export PDF</a>
+        </div>
+        {% endif %}
      </p>
  </div>
  {% if role == 'admin' %}
@@ -36,10 +41,11 @@
  {% else %}
  <div class="form-group card">
     <h1>This Month Report Status:</h1>
-    <p>Total Hours: {{total_hours}}</p>
-    <p>Supervised Hours: {{supervised_hours}} / {{minimum_supervised}} </p>
-    <p>Meeting Groups: {{meeting_groups}}/1 </p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours: {{total_hours}}</p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed ">Supervised Hours: {{supervised_hours}} / {{minimum_supervised}} </p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one group supervision meeting">Group Supervision Meetings: {{meeting_groups}}/1 </p>
 </div>
+
 
  {% endif %}
  

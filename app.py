@@ -1,5 +1,4 @@
 from registry.models import Registry
-# from registry import routes
 from user import routes
 from user.models import User
 from flask import Flask, render_template, redirect, session, request, url_for, jsonify
@@ -29,9 +28,8 @@ client = pymongo.MongoClient(
     config['database']['addr'], config['database']['port'])
 db = client.abs_tracking_db
 
+
 # Decorators
-
-
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -122,7 +120,7 @@ def providers():
 
 @app.route('/dashboard/')
 @login_required
-def dashboard():
+def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year):
     if 'providerId' in session['user']:
         session['user']['providerId'] = int(session['user']['providerId'])
     # Find all the entries
@@ -141,11 +139,12 @@ def dashboard():
         clients = []
         dates = []
         for entry in entries:
-            entry['ProviderId'] = int(entry['ProviderId'])
-            if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']) and "ClientId" in entry:
-                clients.append(entry['ClientId'])
-                dates.append(entry['DateOfService'])
-                temp.append(entry)
+            if datetime_format.get_date(entry["DateOfService"]).year == year and datetime_format.get_date(entry["DateOfService"]).month == month:
+                entry['ProviderId'] = int(entry['ProviderId'])
+                if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']) and "ClientId" in entry:
+                    clients.append(entry['ClientId'])
+                    dates.append(entry['DateOfService'])
+                    temp.append(entry)
         entries = temp
         entries = sorted(entries, key=lambda d: d['DateOfService'])
     ids = ['all']
@@ -173,8 +172,8 @@ def dashboard():
             {'ProviderId': session['user']['providerId']})['TotalTime']
     else:
         total_hours = 0
-
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, current_year=int(datetime.datetime.now().year), min_year=min_year, current_month=int(datetime.datetime.now().month))
+    print(month)
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, current_year=year, min_year=min_year, current_month=month)
 
 # Config
 
@@ -193,7 +192,6 @@ def config():
 @app.route('/edit/new', methods=('GET', 'POST'))
 @login_required
 def add():
-    # entry = db.Registry.find_one({"_id":ObjectId(id)})
     if request.method == 'GET':
         entry = {
             # "entryId": entry["Id"],
@@ -261,9 +259,8 @@ def edit(id):
 @app.route('/del/<id>', methods=('GET', 'POST'))
 @login_required
 def delete(id):
-    if session['user']['role'] == 'admin':
-        if db.users.find_one({"_id": ObjectId(id)}):
-            db.users.delete_one({"_id": ObjectId(id)})
+    if session['user']['role'] == 'admin' and db.users.find_one({"_id": ObjectId(id)}):
+        db.users.delete_one({"_id": ObjectId(id)})
 
     return redirect('/users/')
 
@@ -292,3 +289,10 @@ def logout():
 def upload():
     Registry().add_data()
     return redirect('/')
+
+
+@app.route("/filter/", methods=['POST', 'GET'])
+def filter_data():
+    month = request.form.get('month')
+    year = request.form.get('year')
+    return dashboard(int(month), int(year))
