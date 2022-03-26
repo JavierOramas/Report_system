@@ -1,3 +1,4 @@
 static/files/*
 __pycache__/*
 done/*
+report.pdf

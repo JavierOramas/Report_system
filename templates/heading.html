@@ -1,4 +1,4 @@
-{% macro heading(session, role, total_hours, supervised_hours, meeting_groups, minimum_supervised) %}
+{% macro heading(session, role, total_hours, supervised_hours, meeting_groups, minimum_supervised, year, month) %}
 <div class="card">
     <h1 class="center">Dashboard</h1>
      <div class="center">
@@ -25,7 +25,7 @@
         
         {% if True %}
         <div class="center">
-            <a href="/report/" class="btn btn-success">Export PDF</a>
+            <a href="/report/{{year}}/{{month}}" class="btn btn-success">Export PDF</a>
         </div>
         {% endif %}
      </p>
@@ -42,7 +42,7 @@
  <div class="form-group card">
     <h1>This Month Report Status:</h1>
     <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours: {{total_hours}}</p>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed ">Supervised Hours: {{supervised_hours}} / {{minimum_supervised}} </p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours: {{supervised_hours}} / {{minimum_supervised}} </p>
     <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one group supervision meeting">Group Supervision Meetings: {{meeting_groups}}/1 </p>
 </div>
 

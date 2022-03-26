@@ -94,7 +94,12 @@ def get_entries(role,year, month):
             ids += list(set([i['ProviderId'] for i in entries]))
     if role == 'basic':
         # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
-        total_hours = db.TotalHours.find_one({'ProviderId': int(session['user']['providerId']),'Month': month, 'Year': year})['TotalTime']
+        total_hours = db.TotalHours.find_one({'ProviderId': int(session['user']['providerId']),'Month': month, 'Year': year})
+        if total_hours == None:
+            total_hours = 0
+        else:
+        # print(total_hours, year ,month)
+            total_hours = total_hours['TotalTime']
     else:
         total_hours = 0
     
@@ -325,7 +330,7 @@ def get_report(year,month):
         month_year = f'{month} {year}'
         template = render_template('report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=total_hours)
         pdfkit.from_string(template, "report.pdf")
-        return redirect('/')
+        return dashboard(year, month)
     else:
         print("Something went Wrong!")
         return dashboard(year, month)
