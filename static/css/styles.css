@@ -226,3 +226,13 @@ input.radio {
   clear: none;
   margin: 2px 0 0 2px;
 }
+
+.user-edit, .user-edit input{
+  margin: 1%;
+  /* margin-right: 20px; */
+  /* padding: 1%; */
+}
+
+.col-sm-4{
+  margin-right: 20px;
+}

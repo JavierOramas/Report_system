@@ -56,14 +56,15 @@ def round_half_up(n, decimals=0):
     multiplier = 10 ** decimals
     return math.floor(int(n)*multiplier + 0.5) / multiplier
 
-def get_entries(role,year, month):
+
+def get_entries(role, year, month):
     entries = db.Registry.find()
     entries = [entry for entry in entries]
 
     temp = []
     clients = []
     dates = []
-    
+
     for entry in entries:
         if datetime_format.get_date(entry["DateOfService"]).year == year and datetime_format.get_date(entry["DateOfService"]).month == month:
             entry['ProviderId'] = int(entry['ProviderId'])
@@ -73,7 +74,7 @@ def get_entries(role,year, month):
                 temp.append(entry)
     entries = temp
     entries = sorted(entries, key=lambda d: d['DateOfService'])
-    
+
     ids = ['all']
     supervised_time = 0
     meetings = 0
@@ -94,22 +95,24 @@ def get_entries(role,year, month):
             ids += list(set([i['ProviderId'] for i in entries]))
     if role == 'basic':
         # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
-        total_hours = db.TotalHours.find_one({'ProviderId': int(session['user']['providerId']),'Month': month, 'Year': year})
+        total_hours = db.TotalHours.find_one({'ProviderId': int(
+            session['user']['providerId']), 'Month': month, 'Year': year})
         if total_hours == None:
             total_hours = 0
         else:
-        # print(total_hours, year ,month)
+            # print(total_hours, year ,month)
             total_hours = total_hours['TotalTime']
     else:
         total_hours = 0
-    
-    return entries,total_hours,supervised_time,ids,meetings,min_year
+
+    return entries, total_hours, supervised_time, ids, meetings, min_year
 
 # routes.
 
 # Home Page
 
 # Home Route with login form
+
 
 @app.route('/')
 def home():
@@ -173,10 +176,6 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
     if 'providerId' in session['user']:
         session['user']['providerId'] = int(session['user']['providerId'])
 
-    # Find all the entries
-    entries = db.Registry.find()
-    entries = [entry for entry in entries]
-
     # Detect the role of the loged user to determine the permissions
     if 'role' in session['user'] and session['user']['role'] != None:
         role = session['user']['role']
@@ -185,22 +184,27 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 
     # If user is not admin, remove the entries that dont belong to him/her
     if role == 'basic':
-        entries,total_hours,supervised_time,ids, meetings, min_year = get_entries(role,year, month)
+        entries, total_hours, supervised_time, ids, meetings, min_year = get_entries(
+            role, year, month)
+        return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month)
 
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month)
-
+    if role == 'admin':
+        users = db.users.find()
+        return render_template('config.html', users=users)
 # Config
 
 # Onlyadmins will see this page and it will let edit users and provider ids
 # For now it blank
 
 
-@app.route('/users/')
+@app.route('/user/edit/<id>/')
 @login_required
-def config():
-    if session['user']['role'] == 'admin':
-        users = db.users.find()
-        return render_template('config.html', users=users)
+@admin_required
+def config(id):
+    user = db.users.find_one({'_id': str(id)})
+    print(user)
+    if user:
+        return render_template('edit_user.html', user=user)
 
 
 @app.route('/edit/new', methods=('GET', 'POST'))
@@ -311,8 +315,9 @@ def filter_data():
     year = request.form.get('year')
     return dashboard(int(month), int(year))
 
+
 @app.route("/report/<year>/<month>/")
-def get_report(year,month):
+def get_report(year, month):
 
     # Detect the role of the loged user to determine the permissions
     if 'role' in session['user'] and session['user']['role'] != None:
@@ -323,12 +328,14 @@ def get_report(year,month):
     year = int(year)
     month = int(month)
     user = session['user']
-    entries,total_hours,supervised_time,ids, meetings, min_year = get_entries(role, year, month)
+    entries, total_hours, supervised_time, ids, meetings, min_year = get_entries(
+        role, year, month)
 
     if user and entries:
         user['hired_date'] = ' '
         month_year = f'{month} {year}'
-        template = render_template('report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=total_hours)
+        template = render_template(
+            'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=total_hours)
         pdfkit.from_string(template, "report.pdf")
         return dashboard(year, month)
     else:
