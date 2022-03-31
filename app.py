@@ -190,7 +190,7 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 
     if role == 'admin':
         users = db.users.find()
-        return render_template('config.html', users=users)
+        return render_template('config.html', users=users, session=session, role=role, total_hours=0, supervised_hours=0, meeting_group=0, minimum_supervised=0, year=year, month=month)
 # Config
 
 # Onlyadmins will see this page and it will let edit users and provider ids
@@ -305,7 +305,7 @@ def logout():
 
 @app.route('/upload/', methods=['POST', 'GET'])
 def upload():
-    Registry().add_data()
+    Registry().add_data(db)
     return redirect('/')
 
 

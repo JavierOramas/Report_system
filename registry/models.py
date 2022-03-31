@@ -32,7 +32,7 @@ class Registry:
         else:
             return 'no', 'yes'
 
-    def add_data(self):
+    def add_data(self, db):
         # Load data from csv pre-loaded from the client
         try:
             data = pd.read_csv('static/files/data.csv')
