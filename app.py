@@ -308,7 +308,6 @@ def upload():
     Registry().add_data(db)
     return redirect('/')
 
-
 @app.route("/filter/", methods=['POST', 'GET'])
 def filter_data():
     month = request.form.get('month')
@@ -318,7 +317,6 @@ def filter_data():
 
 @app.route("/report/<year>/<month>/")
 def get_report(year, month):
-
     # Detect the role of the loged user to determine the permissions
     if 'role' in session['user'] and session['user']['role'] != None:
         role = session['user']['role']
@@ -330,13 +328,23 @@ def get_report(year, month):
     user = session['user']
     entries, total_hours, supervised_time, ids, meetings, min_year = get_entries(
         role, year, month)
-
     if user and entries:
         user['hired_date'] = ' '
         month_year = f'{month} {year}'
         template = render_template(
             'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=total_hours)
-        pdfkit.from_string(template, "report.pdf")
+        options = {
+        'page-size': 'A4',
+        'enable-local-file-access': None, # to avoid blanks
+        'javascript-delay': 1000,
+        'no-stop-slow-scripts': None,
+        'debug-javascript': None,
+        'enable-javascript': None
+    }
+
+        print('ready')
+        pdfkit.from_string(template,'report.pdf')
+        print(template)
         return dashboard(year, month)
     else:
         print("Something went Wrong!")
