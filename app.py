@@ -64,12 +64,14 @@ def get_entries(role, year, month):
     temp = []
     clients = []
     dates = []
+    supervisors = []
 
     for entry in entries:
         if datetime_format.get_date(entry["DateOfService"]).year == year and datetime_format.get_date(entry["DateOfService"]).month == month:
             entry['ProviderId'] = int(entry['ProviderId'])
             if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']) and "ClientId" in entry:
                 clients.append(entry['ClientId'])
+                supervisors.append(entry['Supervisor'])
                 dates.append(entry['DateOfService'])
                 temp.append(entry)
     entries = temp
@@ -105,7 +107,7 @@ def get_entries(role, year, month):
     else:
         total_hours = 0
 
-    return entries, total_hours, supervised_time, ids, meetings, min_year
+    return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors)
 
 # routes.
 
@@ -184,7 +186,7 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 
     # If user is not admin, remove the entries that dont belong to him/her
     if role == 'basic':
-        entries, total_hours, supervised_time, ids, meetings, min_year = get_entries(
+        entries, total_hours, supervised_time, ids, meetings, min_year,supervisors = get_entries(
             role, year, month)
         return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month)
 
@@ -254,16 +256,8 @@ def edit(id):
         else:
             return redirect(url_for('/', message={'error': 'you cant edit that entry'}))
     else:
-        # print(reques
         if entry["ProcedureCodeId"] != request.form.get('ProcedureCodeId') or entry["DateOfService"] != request.form.get('DateOfService') or entry["MeetingDuration"] != request.form.get('MeetingDuration'):
-            # "Supervisor": request.form["Supervisor"],
-            # "ObservedwithClient": self.get_observed(entry)[0],
-            # "ModeofMeeting": self.get_observed(entry)[1],
-            # "Group":  self.get_group_individual(entry)[0],
-            # "Individual": self.get_group_individual(entry)[1],
-            # "Verified":
 
-            # print(entry)
             db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
                 "ProcedureCodeId": int(request.form.get('ProcedureCodeId')),
                 "MeetingDuration": int(request.form.get("MeetingDuration")),
@@ -312,8 +306,13 @@ def upload():
 def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
+    # return redirect(url_for('dashboard', year=year, month=month))
     return dashboard(int(month), int(year))
 
+@app.route("/filter/<year>/<month>", methods=['POST', 'GET'])
+def filter_data_args(year,month):
+    # return redirect(url_for('dashboard', year=year, month=month))
+    return dashboard(int(month), int(year))
 
 @app.route("/report/<year>/<month>/")
 def get_report(year, month):
@@ -326,13 +325,18 @@ def get_report(year, month):
     year = int(year)
     month = int(month)
     user = session['user']
-    entries, total_hours, supervised_time, ids, meetings, min_year = get_entries(
+    entries, total_hours, supervised_time, ids, meetings, min_year,supervisors = get_entries(
         role, year, month)
     if user and entries:
         user['hired_date'] = ' '
         month_year = f'{month} {year}'
+
+        # supervisors = list(supervisors)
+        # print(supervisors)
+        supervisors = list(db.user.find({'ProviderId':{'$in': supervisors}}))
+        # print(supervisors)
         template = render_template(
-            'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=total_hours)
+            'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours,2),minimum_supervision_hours=round(total_hours*0.05,1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors)
         options = {
         'page-size': 'A4',
         'enable-local-file-access': None, # to avoid blanks
@@ -342,10 +346,10 @@ def get_report(year, month):
         'enable-javascript': None
     }
 
-        print('ready')
+        # print('ready')
         pdfkit.from_string(template,'report.pdf')
-        print(template)
-        return dashboard(year, month)
+        # print(template)
+        return redirect(f'/filter/{year}/{month}')
     else:
         print("Something went Wrong!")
         return dashboard(year, month)
