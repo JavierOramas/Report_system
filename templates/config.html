@@ -10,9 +10,13 @@
       <div class="center">
         <table class="table" id="entries">
           <tr>
-            <th>Name</th>
-            <th>Email</th>
+            {% for i in ['Name','Email','First Name', 'Last Name', 'BACB ID', 'Credential', 'Role', 'Hired Date', 'Fingerprint Background', 'Background Date', 'Background Exp Date' ]%}
+            <th>
+              {{i}}
+            </th>
+            {% endfor %}
           </tr>
+          
           {% for user in users %}
           <tr>
             <td>{{ user['name'] }}</td>

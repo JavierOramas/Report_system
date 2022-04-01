@@ -3,7 +3,7 @@
 <div class="card-wrapper">
   <div class="card-table">
     <div class="center">
-        <form action="/edit/user/{{user[_id]}}">
+        <form method="POST">
         <div class="user-edit">
 
             <div class="form-horizontal">
@@ -36,6 +36,10 @@
             <input class='form-control ' type='text' name='background_date'     value={{ user["background_date"] }}>
             <label class='form-label ' for='background_exp_date'>background_exp_date</label>
             <input class='form-control ' type='text' name='background_exp_date' value={{ user["background_exp_date"] }}>
+        </div>
+        <div class="center">
+            <a href="/" class="btn btn-danger">Cancel</a>
+            <input style="float:left; margin:auto" type="submit" value="Submit" class="btn btn-primary">
         </div>
         </form>
     </div>

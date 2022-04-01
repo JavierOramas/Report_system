@@ -199,14 +199,33 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 # For now it blank
 
 
-@app.route('/user/edit/<id>/')
+@app.route('/user/edit/<id>/', methods=('GET', 'POST'))
 @login_required
 @admin_required
 def config(id):
-    user = db.users.find_one({'_id': str(id)})
-    print(user)
-    if user:
-        return render_template('edit_user.html', user=user)
+    if request.method == 'POST':
+        print(request.form.get('first_name'))
+        db.users.update_one({"_id": id},{ '$set':{
+        "name"                   : request.form.get('name'),
+        "first_name"             : request.form.get('first_name'),
+        "last_name"              : request.form.get('last_name'),
+        "BACB_id"                : request.form.get('BACB_id'),
+        "credential"             : request.form.get('credential'),
+        "role"                   : request.form.get('role'),
+        "hired_date"             : request.form.get('hired_date'),
+        "fingerprint_background" : request.form.get('fingerprint'),
+        "background_date"        : request.form.get('background_date'),
+        "background_exp_date"    : request.form.get('background_exp_date'),
+        }})
+        
+        return redirect("/")
+
+
+    if request.method == 'GET':
+        user = db.users.find_one({'_id': str(id)})
+        print(user)
+        if user:
+            return render_template('edit_user.html', user=user)
 
 
 @app.route('/edit/new', methods=('GET', 'POST'))
@@ -271,10 +290,10 @@ def edit(id):
 @app.route('/del/<id>', methods=('GET', 'POST'))
 @login_required
 def delete(id):
-    if session['user']['role'] == 'admin' and db.users.find_one({"_id": ObjectId(id)}):
-        db.users.delete_one({"_id": ObjectId(id)})
+    if session['user']['role'] == 'admin' and db.users.find_one({"_id": id}):
+        db.users.delete_one({"_id": id})
 
-    return redirect('/users/')
+    return redirect('/')
 
 
 @app.route('/user/signup/', methods=['POST'])
