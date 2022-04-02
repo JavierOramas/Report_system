@@ -158,7 +158,7 @@ def upload_file():
        # set the file path
         uploaded_file.save(file_path)
        # save the file
-    return redirect(url_for('upload-providers'))
+    return redirect(url_for('upload_provider'))
 
 
 @app.route('/providers/')
@@ -198,7 +198,6 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 # Onlyadmins will see this page and it will let edit users and provider ids
 # For now it blank
 
-
 @app.route('/user/edit/<id>/', methods=('GET', 'POST'))
 @login_required
 @admin_required
@@ -206,6 +205,43 @@ def config(id):
     if request.method == 'POST':
         print(request.form.get('first_name'))
         db.users.update_one({"_id": id},{ '$set':{
+        "name"                   : request.form.get('name'),
+        "first_name"             : request.form.get('first_name'),
+        "last_name"              : request.form.get('last_name'),
+        "BACB_id"                : request.form.get('BACB_id'),
+        "credential"             : request.form.get('credential'),
+        "role"                   : request.form.get('role'),
+        "hired_date"             : request.form.get('hired_date'),
+        "fingerprint_background" : request.form.get('fingerprint'),
+        "background_date"        : request.form.get('background_date'),
+        "background_exp_date"    : request.form.get('background_exp_date'),
+        }})
+        
+        return redirect("/")
+
+
+@app.route('/user/new', methods=('GET', 'POST'))
+@login_required
+@admin_required
+def new_user():
+    if request.method == 'GET':
+        user = {
+            "name"                   : '',
+            "first_name"             : '',
+            "last_name"              : '',
+            "BACB_id"                : '',
+            "credential"             : '',
+            "role"                   : '',
+            "hired_date"             : '',
+            "fingerprint_background" : '',
+            "background_date"        : '',
+            "background_exp_date"    : '',
+        }
+        return render_template('edit_user.html', user=user)
+
+    if request.method == 'POST':
+        print(request.form.get('first_name'))
+        db.users.insert_one({"_id": id},{ '$set':{
         "name"                   : request.form.get('name'),
         "first_name"             : request.form.get('first_name'),
         "last_name"              : request.form.get('last_name'),
@@ -315,10 +351,14 @@ def signout():
 def logout():
     pass
 
-
 @app.route('/upload/', methods=['POST', 'GET'])
 def upload():
     Registry().add_data(db)
+    return redirect('/')
+
+@app.route('/upload-providers/', methods=['POST', 'GET'])
+def upload_provider():
+    User().add_data(db)
     return redirect('/')
 
 @app.route("/filter/", methods=['POST', 'GET'])
@@ -347,12 +387,12 @@ def get_report(year, month):
     entries, total_hours, supervised_time, ids, meetings, min_year,supervisors = get_entries(
         role, year, month)
     if user and entries:
-        user['hired_date'] = ' '
         month_year = f'{month} {year}'
 
         # supervisors = list(supervisors)
-        # print(supervisors)
-        supervisors = list(db.user.find({'ProviderId':{'$in': supervisors}}))
+            
+            print(i)
+        supervisors = list(db.user.find({'ProviderId':{'$in': list(supervisors)}}))
         # print(supervisors)
         template = render_template(
             'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours,2),minimum_supervision_hours=round(total_hours*0.05,1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors)

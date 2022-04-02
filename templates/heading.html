@@ -32,12 +32,21 @@
  </div>
  {% if role == 'admin' %}
  <div class="form-group card">
-     <h1>Upload your CSV file</h1>
-     <form method="POST" action="" enctype="multipart/form-data">
-         <p><input class='form-control' type="file" accept=".csv" name="file"></p>
-         <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
-     </form>
- </div>
+
+            <h1>Upload your CSV file</h1>
+            <form method="POST" action="/dashboard/" enctype="multipart/form-data">
+                <p><input class='form-control' type="file" accept=".csv" name="file"></p>
+                <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
+            </form>
+       
+            <h1>Upload Users CSV</h1>
+            <form method="POST" action="/dashboard/providers/" enctype="multipart/form-data">
+                <p><input class='form-control' type="file" accept=".csv" name="file"></p>
+                <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
+            </form>
+      
+    </div>
+
  {% else %}
  <div class="form-group card">
     <h1>This Month Report Status:</h1>
