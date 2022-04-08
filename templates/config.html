@@ -7,65 +7,7 @@
   {{ heading(session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month) }}
   <div class="card-wrapper">
     <div class="card-table">
-      <div class="center">
-        <div class="table-preferences">
-          <form method="POST" action="/filter/" method="POST" enctype="multipart/form-data">
-              <div class="row">
-                  <div class="col-sm-3">
-                      <div class="form-group">
-                          <label for="sel_year">Role</label>
-                          <select class="form-select form-control form-select-sm" style="width:25%" id="sel_role" name="role">
-                              {% for i in roles %}
-                              <option value="{{i}}">{{i}}</option>
-                              {% endfor %}
-                          </select>
-                      </div>
-                  </div>
-
-                  <div class="col-sm-3">
-                      <div class="form-group">
-                          <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-                      </div>
-                  </div>
-
-                  <div class="col-sm-3">
-                      <div class="form-group">
-                          <a type="button" class="btn btn-primary btn-sm" href="/user/new">Add New</a>
-                      </div>
-                  </div>
-              </div>
-          </form>
-      </div>
-        <table class="table" id="entries">
-          <tr>
-            {% for i in ['Name','Email','First Name', 'Last Name', 'BACB ID', 'Credential', 'Role', 'Hired Date', 'Fingerprint Background', 'Background Date', 'Background Exp Date' ]%}
-            <th>
-              {{i}}
-            </th>
-            {% endfor %}
-          </tr>
-          
-          {% for user in users %}
-          <tr>
-            <td>{{ user['name'] }}</td>
-            <td>{{ user['email'] }}</td>
-            <td>{{ user["first_name"] }}</td>
-            <td>{{ user["last_name"] }}</td>
-            <td>{{ user["BACB_id"] }}</td>
-            <td>{{ user["credential"] }}</td>
-            <td>{{ user["role"] }}</td>
-            <td>{{ user["hired_date"] }}</td>
-            <td>{{ user["fingerprint_background"] }}</td>
-            <td>{{ user["background_date"] }}</td>
-            <td>{{ user["background_exp_date"] }}</td>
-            <td><a class="btn btn-primary" href='/del/{{user["_id"]}}'>🗑️</a></td>
-            <td>
-              <a class="btn btn-primary" href='/user/edit/{{user["_id"]}}'>✏️</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </table>
-      </div>
+      
   </div>
 </div>
 </div>

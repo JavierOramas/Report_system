@@ -5,77 +5,165 @@
 
 <div class="card-wrapper">
     {{ heading(session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month) }}
-    <div class="card-wrapper">
-        <div class="card-table">
-            <div class="table-preferences">
-                <form method="POST" action="/filter/" method="POST" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label for="sel_year">Year</label>
-                                <select class="form-select form-control form-select-sm" style="width:25%" id="sel_year" name="year">
-                                    {% for i in range(min_year, year+1) %}
-                                    <option value="{{i}}" {{'selected' if i == year }}>{{i}}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
 
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label for="sel_month">Month</label>
-                                <select class="form-select form-control form-select-sm" style="width:25%" id="sel_month" name="month">
-                                    {% for i in range(1,13) %}
-                                    <option value="{{i}}" {{'selected' if i == month }}>{{i}}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
+    <div class="center card-wrapper">
 
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-                            </div>
-                        </div>
+    <ul class="nav nav-tabs card-table" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="olv-tab" data-bs-toggle="tab" data-bs-target="#ovl" type="button" role="tab" aria-controls="ovl" aria-selected="true">Overlappings</button>
+        </li>
+        {% if role == 'admin' %}
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="false">Users</button>
+        </li>
+        {% endif %}
+        <!-- <li class="nav-item" role="presentation">
+          <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="none" aria-selected="false">Disabled</button>
+        </li> -->
+      </ul>
+      <div class="tab-content card-table" id="myTabContent">
+        <div class="tab-pane fade show active" id="ovl" role="tabpanel" aria-labelledby="home-tab">
 
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <a type="button" class="btn btn-primary btn-sm" href="/edit/new">Add New</a>
+                <div class="table-preferences">
+                    <form method="POST" action="/filter/" method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="sel_year">Year</label>
+                                    <select class="form-select form-control form-select-sm" style="width:25%" id="sel_year" name="year">
+                                        {% for i in range(min_year, year+1) %}
+                                        <option value="{{i}}" {{'selected' if i == year }}>{{i}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+    
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="sel_month">Month</label>
+                                    <select class="form-select form-control form-select-sm" style="width:25%" id="sel_month" name="month">
+                                        {% for i in range(1,13) %}
+                                        <option value="{{i}}" {{'selected' if i == month }}>{{i}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+    
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                                </div>
+                            </div>
+    
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <a type="button" class="btn btn-primary btn-sm" href="/edit/new">Add New</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-            </div>
-            <div class="center">
-                <table class="table" id="entries">
+                    </form>
+                </div>
+                <div class="center">
+                    <table class="table" id="entries">
+                        <tr>
+                            {% for i in ["Confirmed ","DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                            <th>
+                                {{i}}
+                            </th>
+                            {% endfor %}
+                        </tr>
+    
+                    {% for entry in entries %}
                     <tr>
-                        {% for i in ["Confirmed ","DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
-                        <th>
-                            {{i}}
-                        </th>
-                        {% endfor %}
+                        <td> {% if entry['Verified'] == False %} ❌ {% else %} ✅ {% endif %}</td>
+                        <td>{{ entry["DateOfService"] }}</td>
+                        <td>{{ entry["MeetingDuration"] }}</td>
+                        <td>{{ entry["Individual"] }}</td>
+                        <td>{{ entry["Group"] }}</td>
+                        <td>{{ entry["ModeofMeeting"] }}</td>
+                        <td>{{ entry["ObservedwithClient"] }}</td>
+                        <td>{{ entry["Supervisor"] }}</td>
+                        {% if 'providerId' in session['user'] and entry["ProviderId"] == session['user']['providerId'] %}
+                        <td>
+                            <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
+                        </td>
+                        {% endif %}
                     </tr>
+                    {% endfor %}
+                    </table>
+                </div>
 
-                {% for entry in entries %}
-                <tr>
-                    <td> {% if entry['Verified'] == False %} ❌ {% else %} ✅ {% endif %}</td>
-                    <td>{{ entry["DateOfService"] }}</td>
-                    <td>{{ entry["MeetingDuration"] }}</td>
-                    <td>{{ entry["Individual"] }}</td>
-                    <td>{{ entry["Group"] }}</td>
-                    <td>{{ entry["ModeofMeeting"] }}</td>
-                    <td>{{ entry["ObservedwithClient"] }}</td>
-                    <td>{{ entry["Supervisor"] }}</td>
-                    {% if 'providerId' in session['user'] and entry["ProviderId"] == session['user']['providerId'] %}
-                    <td>
-                        <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
-                    </td>
-                    {% endif %}
-                </tr>
-                {% endfor %}
-                </table>
-            </div>
         </div>
+       
+        {% if role == 'admin' %}        
+        <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="center">
+                <div class="table-preferences">
+                  <form method="POST" action="/filter/" method="POST" enctype="multipart/form-data">
+                      <div class="row">
+                          <div class="col-sm-3">
+                              <div class="form-group">
+                                  <label for="sel_year">Role</label>
+                                  <select class="form-select form-control form-select-sm" style="width:25%" id="sel_role" name="role">
+                                      {% for i in roles %}
+                                      <option value="{{i}}">{{i}}</option>
+                                      {% endfor %}
+                                  </select>
+                              </div>
+                          </div>
+        
+                          <div class="col-sm-3">
+                              <div class="form-group">
+                                  <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                              </div>
+                          </div>
+        
+                          <div class="col-sm-3">
+                              <div class="form-group">
+                                  <a type="button" class="btn btn-primary btn-sm" href="/user/new">Add New</a>
+                              </div>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+                <table class="table" id="entries">
+                  <tr>
+                    {% for i in ['Name','Email','First Name', 'Last Name', 'BACB ID', 'Credential', 'Role', 'Hired Date', 'Fingerprint Background', 'Background Date', 'Background Exp Date' ]%}
+                    <th>
+                      {{i}}
+                    </th>
+                    {% endfor %}
+                  </tr>
+                  
+                  {% for user in users %}
+                  <tr>
+                    <td>{{ user['name'] }}</td>
+                    <td>{{ user['email'] }}</td>
+                    <td>{{ user["first_name"] }}</td>
+                    <td>{{ user["last_name"] }}</td>
+                    <td>{{ user["BACB_id"] }}</td>
+                    <td>{{ user["credential"] }}</td>
+                    <td>{{ user["role"] }}</td>
+                    <td>{{ user["hired_date"] }}</td>
+                    <td>{{ user["fingerprint_background"] }}</td>
+                    <td>{{ user["background_date"] }}</td>
+                    <td>{{ user["background_exp_date"] }}</td>
+                    <td><a class="" href='/del/{{user["_id"]}}'>🗑️</a></td>
+                    <td>
+                      <a class="" href='/user/edit/{{user["_id"]}}'>✏️</a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </table>
+              </div>
+
+
+        </div>
+        {% endif %}
+
+        <!-- <div class="tab-pane fade" id="none" role="tabpanel" aria-labelledby="contact-tab">3</div> -->
+      </div>
+
     </div>
 
 {% endblock %}

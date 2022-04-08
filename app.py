@@ -185,16 +185,13 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
         role = 'basic'
 
     # If user is not admin, remove the entries that dont belong to him/her
-    if role == 'basic':
-        entries, total_hours, supervised_time, ids, meetings, min_year,supervisors = get_entries(
-            role, year, month)
-        return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month)
+    # if role == 'basic':
+    users = db.users.find()
+    entries, total_hours, supervised_time, ids, meetings, min_year,supervisors = get_entries(
+        role, year, month)
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users)
 
-    if role == 'admin':
-        users = db.users.find()
-        return render_template('config.html', users=users, session=session, role=role, total_hours=0, supervised_hours=0, meeting_group=0, minimum_supervised=0, year=year, month=month)
-# Config
-
+    
 # Onlyadmins will see this page and it will let edit users and provider ids
 # For now it blank
 
@@ -389,10 +386,10 @@ def get_report(year, month):
     if user and entries:
         month_year = f'{month} {year}'
 
-        # supervisors = list(supervisors)
-            
+        supervisors = list(supervisors)
+        for i in supervisors:
             print(i)
-        supervisors = list(db.user.find({'ProviderId':{'$in': list(supervisors)}}))
+        supervisors = list(db.user.find({'ProviderId':{'$in': supervisors}}))
         # print(supervisors)
         template = render_template(
             'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours,2),minimum_supervision_hours=round(total_hours*0.05,1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors)
