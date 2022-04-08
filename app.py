@@ -109,6 +109,16 @@ def get_entries(role, year, month):
 
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors)
 
+def get_pending(role):
+    if role == 'admin':
+        entries = db.Registry.find({'Verified': False})
+    elif role != 'basic' or role == 'RBT':
+        entries = db.Registry.find({'Verified': False, 'ProviderId': int(session['user']['providerId'])})
+    else:
+        entries = []
+
+    return entries
+
 # routes.
 
 # Home Page
@@ -189,10 +199,14 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
     users = db.users.find()
     entries, total_hours, supervised_time, ids, meetings, min_year,supervisors = get_entries(
         role, year, month)
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users)
+    if role == 'admin':
+        verify = db.Registry.find({'year':year})
+    pending = get_pending(role)
+    print(pending)
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending)
 
     
-# Onlyadmins will see this page and it will let edit users and provider ids
+# Only admins will see this page and it will let edit users and provider ids
 # For now it blank
 
 @app.route('/user/edit/<id>/', methods=('GET', 'POST'))
@@ -302,7 +316,6 @@ def edit(id):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     if request.method == 'GET':
         if entry and 'providerId' in session['user'] and int(entry["ProviderId"]) == int(session['user']['providerId']):
-            # print(entry)
             supervisors = [entry['Supervisor']]
             return render_template('edit.html', entry=entry, supervisors=supervisors)
         else:
