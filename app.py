@@ -110,10 +110,11 @@ def get_entries(role, year, month):
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors)
 
 def get_pending(role):
+
     if role == 'admin':
-        entries = db.Registry.find({'Verified': False})
-    elif role != 'basic' or role == 'RBT':
-        entries = db.Registry.find({'Verified': False, 'ProviderId': int(session['user']['providerId'])})
+        entries = list(db.Registry.find({'Verified': False}))
+    elif role != 'basic' or role != 'RBT':
+        entries = list(db.Registry.find({'Verified': False, 'ProviderId': int(session['user']['providerId'])}))
     else:
         entries = []
 
@@ -199,13 +200,22 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
     users = db.users.find()
     entries, total_hours, supervised_time, ids, meetings, min_year,supervisors = get_entries(
         role, year, month)
-    if role == 'admin':
-        verify = db.Registry.find({'year':year})
     pending = get_pending(role)
-    print(pending)
+    
+    for entry in entries:
+        name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
+        print(name)
+        if name:
+            entry['Supervisor'] = name['first_name']
+
+    for entry in pending:
+        name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
+        print(name)
+        if name:
+            entry['Supervisor'] = name['first_name']
+
     return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending)
 
-    
 # Only admins will see this page and it will let edit users and provider ids
 # For now it blank
 
@@ -309,6 +319,18 @@ def add():
 
         return redirect('/')
 
+@app.route('/verify/<id>', methods=('GET', 'POST'))
+@login_required
+def verify(id):
+    print('verifying')
+    entry = db.Registry.find_one({"_id": ObjectId(id)})
+    if session['user']['role'] == 'admin' or session[user]['providerId'] == entry['Supervisor']:
+        print('here')
+        db.Registry.update_one({"_id": ObjectId(id)}, {"$set":{
+            "Verified": True,
+        }})
+    print(db.Registry.find_one({"_id": ObjectId(id)}))
+    return redirect('/')
 
 @app.route('/edit/<id>', methods=('GET', 'POST'))
 @login_required
@@ -330,7 +352,7 @@ def edit(id):
                 "Verified": False
             }})
 
-        return redirect('/')
+        return
 
 
 @app.route('/del/<id>', methods=('GET', 'POST'))

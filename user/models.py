@@ -26,7 +26,7 @@ class User:
             "role":                     'basic',
             "password":                 request.form.get('password'),
             "email":                    request.form.get('email'),
-            "providerId":               request.form.get('providerId'),
+            "ProviderId":               request.form.get('providerId'),
         }
 
         # encrypt the password
@@ -69,6 +69,7 @@ class User:
         for index, entry in data.iterrows():
 
             entry = {
+                "ProviderId": entry['ProviderId'],
                 "name" : entry["Name and Credential"],
                 "first_name" : entry["ProviderFirstName"],
                 "last_name" : entry["ProviderLastName"],
