@@ -109,12 +109,14 @@ def get_entries(role, year, month):
 
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors)
 
+
 def get_pending(role):
 
     if role == 'admin':
         entries = list(db.Registry.find({'Verified': False}))
     elif role != 'basic' or role != 'RBT':
-        entries = list(db.Registry.find({'Verified': False, 'ProviderId': int(session['user']['providerId'])}))
+        entries = list(db.Registry.find(
+            {'Verified': False, 'ProviderId': int(session['user']['providerId'])}))
     else:
         entries = []
 
@@ -130,12 +132,12 @@ def get_pending(role):
 @app.route('/')
 def home():
     if 'logged_in' in session:
-        return redirect('/dashboard/')
+        return redirect('/dashboard')
     return render_template('home.html', register=False)
 # Home Route With Regiter form
 
 
-@app.route('/register/')
+@app.route('/register')
 def register():
     types = ['None'] + [i['type'] for i in db.providerType.find()]
     return render_template('home.html', register=True, types=types)
@@ -144,7 +146,7 @@ def register():
 # Dashboard
 
 # Post endpoint to upoad file
-@app.route("/dashboard/", methods=['POST'])
+@app.route("/dashboard", methods=['POST'])
 @login_required
 @admin_required
 def upload_files():
@@ -158,7 +160,7 @@ def upload_files():
     return redirect(url_for('upload'))
 
 
-@app.route("/dashboard/providers/", methods=['POST'])
+@app.route("/dashboard/providers", methods=['POST'])
 @login_required
 @admin_required
 def upload_file():
@@ -172,7 +174,7 @@ def upload_file():
     return redirect(url_for('upload_provider'))
 
 
-@app.route('/providers/')
+@app.route('/providers')
 @login_required
 @admin_required
 def providers():
@@ -183,7 +185,7 @@ def providers():
 # Dashoard for client (login Needed)
 
 
-@app.route('/dashboard/')
+@app.route('/dashboard')
 @login_required
 def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year):
     if 'providerId' in session['user']:
@@ -198,10 +200,10 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
     # If user is not admin, remove the entries that dont belong to him/her
     # if role == 'basic':
     users = db.users.find()
-    entries, total_hours, supervised_time, ids, meetings, min_year,supervisors = get_entries(
+    entries, total_hours, supervised_time, ids, meetings, min_year, supervisors = get_entries(
         role, year, month)
     pending = get_pending(role)
-    
+
     for entry in entries:
         name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
         print(name)
@@ -219,26 +221,34 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 # Only admins will see this page and it will let edit users and provider ids
 # For now it blank
 
-@app.route('/user/edit/<id>/', methods=('GET', 'POST'))
+
+@app.route('/user/edit/<id>', methods=('GET', 'POST'))
 @login_required
 @admin_required
 def config(id):
     if request.method == 'POST':
-        print(request.form.get('first_name'))
-        db.users.update_one({"_id": id},{ '$set':{
-        "name"                   : request.form.get('name'),
-        "first_name"             : request.form.get('first_name'),
-        "last_name"              : request.form.get('last_name'),
-        "BACB_id"                : request.form.get('BACB_id'),
-        "credential"             : request.form.get('credential'),
-        "role"                   : request.form.get('role'),
-        "hired_date"             : request.form.get('hired_date'),
-        "fingerprint_background" : request.form.get('fingerprint'),
-        "background_date"        : request.form.get('background_date'),
-        "background_exp_date"    : request.form.get('background_exp_date'),
+        # print(id)
+        db.users.update_one({"_id": id}, {'$set': {
+            "name": request.form.get('name'),
+            "first_name": request.form.get('first_name'),
+            "last_name": request.form.get('last_name'),
+            "BACB_id": request.form.get('BACB_id'),
+            "credential": request.form.get('credential'),
+            "role": request.form.get('role'),
+            "hired_date": request.form.get('hired_date'),
+            "fingerprint_background": request.form.get('fingerprint'),
+            "background_date": request.form.get('background_date'),
+            "background_exp_date": request.form.get('background_exp_date'),
         }})
-        
+
         return redirect("/")
+
+    if request.method == 'GET':
+        print(f"here {id}\n\n")
+        user = db.users.find_one({'_id': ObjectId(id)})
+        print(user)
+        if user:
+            return render_template('edit_user.html', user=user)
 
 
 @app.route('/user/new', methods=('GET', 'POST'))
@@ -247,36 +257,35 @@ def config(id):
 def new_user():
     if request.method == 'GET':
         user = {
-            "name"                   : '',
-            "first_name"             : '',
-            "last_name"              : '',
-            "BACB_id"                : '',
-            "credential"             : '',
-            "role"                   : '',
-            "hired_date"             : '',
-            "fingerprint_background" : '',
-            "background_date"        : '',
-            "background_exp_date"    : '',
+            "name": '',
+            "first_name": '',
+            "last_name": '',
+            "BACB_id": '',
+            "credential": '',
+            "role": '',
+            "hired_date": '',
+            "fingerprint_background": '',
+            "background_date": '',
+            "background_exp_date": '',
         }
         return render_template('edit_user.html', user=user)
 
     if request.method == 'POST':
         print(request.form.get('first_name'))
-        db.users.insert_one({"_id": id},{ '$set':{
-        "name"                   : request.form.get('name'),
-        "first_name"             : request.form.get('first_name'),
-        "last_name"              : request.form.get('last_name'),
-        "BACB_id"                : request.form.get('BACB_id'),
-        "credential"             : request.form.get('credential'),
-        "role"                   : request.form.get('role'),
-        "hired_date"             : request.form.get('hired_date'),
-        "fingerprint_background" : request.form.get('fingerprint'),
-        "background_date"        : request.form.get('background_date'),
-        "background_exp_date"    : request.form.get('background_exp_date'),
+        db.users.insert_one({"_id": id}, {'$set': {
+            "name": request.form.get('name'),
+            "first_name": request.form.get('first_name'),
+            "last_name": request.form.get('last_name'),
+            "BACB_id": request.form.get('BACB_id'),
+            "credential": request.form.get('credential'),
+            "role": request.form.get('role'),
+            "hired_date": request.form.get('hired_date'),
+            "fingerprint_background": request.form.get('fingerprint'),
+            "background_date": request.form.get('background_date'),
+            "background_exp_date": request.form.get('background_exp_date'),
         }})
-        
-        return redirect("/")
 
+        return redirect("/")
 
     if request.method == 'GET':
         user = db.users.find_one({'_id': str(id)})
@@ -319,6 +328,7 @@ def add():
 
         return redirect('/')
 
+
 @app.route('/verify/<id>', methods=('GET', 'POST'))
 @login_required
 def verify(id):
@@ -326,11 +336,12 @@ def verify(id):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     if session['user']['role'] == 'admin' or session[user]['providerId'] == entry['Supervisor']:
         print('here')
-        db.Registry.update_one({"_id": ObjectId(id)}, {"$set":{
+        db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
             "Verified": True,
         }})
     print(db.Registry.find_one({"_id": ObjectId(id)}))
     return redirect('/')
+
 
 @app.route('/edit/<id>', methods=('GET', 'POST'))
 @login_required
@@ -358,54 +369,59 @@ def edit(id):
 @app.route('/del/<id>', methods=('GET', 'POST'))
 @login_required
 def delete(id):
-    if session['user']['role'] == 'admin' and db.users.find_one({"_id": id}):
-        db.users.delete_one({"_id": id})
+    if session['user']['role'] == 'admin' and db.users.find_one({"_id": ObjectId(id)}):
+        db.users.delete_one({"_id": ObjectId(id)})
 
     return redirect('/')
 
 
-@app.route('/user/signup/', methods=['POST'])
+@app.route('/user/signup', methods=['POST'])
 def signup():
     return User().signup()
 
 
-@app.route('/user/login/', methods=['POST'])
+@app.route('/user/login', methods=['POST'])
 def login():
     return User().login(db)
 
 
-@app.route('/user/signout/')
+@app.route('/user/signout')
 def signout():
     return User().signout()
 
 
-@app.route('/user/logout/')
+@app.route('/user/logout')
 def logout():
     pass
 
-@app.route('/upload/', methods=['POST', 'GET'])
+
+@app.route('/upload', methods=['POST', 'GET'])
 def upload():
     Registry().add_data(db)
     return redirect('/')
 
-@app.route('/upload-providers/', methods=['POST', 'GET'])
+
+@app.route('/upload-providers', methods=['POST', 'GET'])
 def upload_provider():
     User().add_data(db)
     return redirect('/')
 
-@app.route("/filter/", methods=['POST', 'GET'])
+
+@app.route("/filter", methods=['POST', 'GET'])
 def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
     # return redirect(url_for('dashboard', year=year, month=month))
     return dashboard(int(month), int(year))
 
+
 @app.route("/filter/<year>/<month>", methods=['POST', 'GET'])
-def filter_data_args(year,month):
+def filter_data_args(year, month):
     # return redirect(url_for('dashboard', year=year, month=month))
     return dashboard(int(month), int(year))
 
-@app.route("/report/<year>/<month>/")
+
+@app.route("/report/<year>/<month>")
 def get_report(year, month):
     # Detect the role of the loged user to determine the permissions
     if 'role' in session['user'] and session['user']['role'] != None:
@@ -416,7 +432,7 @@ def get_report(year, month):
     year = int(year)
     month = int(month)
     user = session['user']
-    entries, total_hours, supervised_time, ids, meetings, min_year,supervisors = get_entries(
+    entries, total_hours, supervised_time, ids, meetings, min_year, supervisors = get_entries(
         role, year, month)
     if user and entries:
         month_year = f'{month} {year}'
@@ -424,21 +440,21 @@ def get_report(year, month):
         supervisors = list(supervisors)
         for i in supervisors:
             print(i)
-        supervisors = list(db.user.find({'ProviderId':{'$in': supervisors}}))
+        supervisors = list(db.user.find({'ProviderId': {'$in': supervisors}}))
         # print(supervisors)
         template = render_template(
-            'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours,2),minimum_supervision_hours=round(total_hours*0.05,1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors)
+            'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervision_hours=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors)
         options = {
-        'page-size': 'A4',
-        'enable-local-file-access': None, # to avoid blanks
-        'javascript-delay': 1000,
-        'no-stop-slow-scripts': None,
-        'debug-javascript': None,
-        'enable-javascript': None
-    }
+            'page-size': 'A4',
+            'enable-local-file-access': None,  # to avoid blanks
+            'javascript-delay': 1000,
+            'no-stop-slow-scripts': None,
+            'debug-javascript': None,
+            'enable-javascript': None
+        }
 
         # print('ready')
-        pdfkit.from_string(template,'report.pdf')
+        pdfkit.from_string(template, 'report.pdf')
         # print(template)
         return redirect(f'/filter/{year}/{month}')
     else:

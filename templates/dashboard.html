@@ -160,9 +160,9 @@
                         <td>{{ user["fingerprint_background"] }}</td>
                         <td>{{ user["background_date"] }}</td>
                         <td>{{ user["background_exp_date"] }}</td>
-                        <td><a class="" href='/del/{{user["_id"]}}'>🗑️</a></td>
+                        <td><a class="icon" href='/del/{{user["_id"]}}'>🗑️</a></td>
                         <td>
-                            <a class="" href='/user/edit/{{user["_id"]}}'>✏️</a>
+                            <a class="icon" href='/user/edit/{{user["_id"]}}'>✏️</a>
                         </td>
                     </tr>
                     {% endfor %}

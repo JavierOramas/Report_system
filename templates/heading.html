@@ -3,10 +3,10 @@
     <h1 class="center">Dashboard</h1>
      <div class="center">
          <p>You are currently logged In</p>
-         <a class="btn btn-secondary" href="/user/signout/">Sign Out</a>
+         <a class="btn btn-secondary" href="/user/signout">Sign Out</a>
 
          {% if role == 'admin' %}
-         <a class="btn btn-secondary" href="/users/">Edit Users</a>
+         <a class="btn btn-secondary" href="/users">Edit Users</a>
          <!-- <a class="btn btn-secondary" href="/users/">Edit Users</a> -->
          {% endif %}
 
@@ -34,13 +34,13 @@
  <div class="form-group card">
 
             <h1>Upload your CSV file</h1>
-            <form method="POST" action="/dashboard/" enctype="multipart/form-data">
+            <form method="POST" action="/dashboard" enctype="multipart/form-data">
                 <p><input class='form-control' type="file" accept=".csv" name="file"></p>
                 <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
             </form>
        
             <h1>Upload Users CSV</h1>
-            <form method="POST" action="/dashboard/providers/" enctype="multipart/form-data">
+            <form method="POST" action="/dashboard/providers" enctype="multipart/form-data">
                 <p><input class='form-control' type="file" accept=".csv" name="file"></p>
                 <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
             </form>

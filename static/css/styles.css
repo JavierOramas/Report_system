@@ -236,3 +236,7 @@ input.radio {
 .col-sm-4{
   margin-right: 20px;
 }
+
+.icon{
+  text-decoration: none;
+}

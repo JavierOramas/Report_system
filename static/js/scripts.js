@@ -12,7 +12,7 @@ $("form[name=signup_form]").submit(function(e){
         success: function(resp){
             console.log(resp);
             $error.text(" ").addClass("error--hidden");
-            window.location.href = "/dashboard/"
+            window.location.href = "/dashboard"
         },
         error:function(resp){
             console.log(resp);
@@ -37,7 +37,7 @@ $("form[name=login_form]").submit(function(e){
         success: function(resp){
             console.log(resp);
             $error.text(" ").addClass("error--hidden");
-            window.location.href = "/dashboard/"
+            window.location.href = "/dashboard"
         },
         error:function(resp){
             console.log(resp);
