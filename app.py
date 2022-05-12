@@ -219,7 +219,6 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
     return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending)
 
 # Only admins will see this page and it will let edit users and provider ids
-# For now it blank
 
 
 @app.route('/user/edit/<id>', methods=('GET', 'POST'))
@@ -228,23 +227,41 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 def config(id):
     if request.method == 'POST':
         # print(id)
-        db.users.update_one({"_id": id}, {'$set': {
-            "name": request.form.get('name'),
-            "first_name": request.form.get('first_name'),
-            "last_name": request.form.get('last_name'),
-            "BACB_id": request.form.get('BACB_id'),
-            "credential": request.form.get('credential'),
-            "role": request.form.get('role'),
-            "hired_date": request.form.get('hired_date'),
-            "fingerprint_background": request.form.get('fingerprint'),
-            "background_date": request.form.get('background_date'),
-            "background_exp_date": request.form.get('background_exp_date'),
-        }})
+        try:
+            db.users.update_one({"_id": ObjectId(id)}, {'$set': {
+                "name": request.form.get('name'),
+                "first_name": request.form.get('first_name'),
+                "last_name": request.form.get('last_name'),
+                "BACB_id": request.form.get('BACB_id'),
+                "credential": request.form.get('credential'),
+                "role": request.form.get('role'),
+                "hired_date": request.form.get('hired_date'),
+                "fingerprint_background": request.form.get('fingerprint'),
+                "background_date": request.form.get('background_date'),
+                "background_exp_date": request.form.get('background_exp_date'),
+            }})
+        except:
+            db.users.update_one({"_id": id}, {'$set': {
+                "name": request.form.get('name'),
+                "first_name": request.form.get('first_name'),
+                "last_name": request.form.get('last_name'),
+                "BACB_id": request.form.get('BACB_id'),
+                "credential": request.form.get('credential'),
+                "role": request.form.get('role'),
+                "hired_date": request.form.get('hired_date'),
+                "fingerprint_background": request.form.get('fingerprint'),
+                "background_date": request.form.get('background_date'),
+                "background_exp_date": request.form.get('background_exp_date'),
+            }})
 
         return redirect("/")
 
     if request.method == 'GET':
-        user = db.users.find_one({'_id': ObjectId(id)})
+        try:
+            user = db.users.find_one({'_id': ObjectId(id)})
+        except:
+            user = db.users.find_one({'_id': id})
+
         if user:
             return render_template('edit_user.html', user=user)
 

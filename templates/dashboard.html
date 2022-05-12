@@ -139,7 +139,7 @@
                 </div>
                 <table class="table" id="entries">
                     <tr>
-                        {% for i in ['ProviderId','Name','Email','First Name', 'Last Name', 'BACB ID', 'Credential', 'Role', 'Hired Date', 'Fingerprint Background', 'Background Date', 'Background Exp Date' ]%}
+                        {% for i in ['ProviderId', 'Name' ,'Email','First Name', 'Last Name', 'BACB ID', 'Role']%}
                         <th>
                             {{i}}
                         </th>
@@ -154,12 +154,7 @@
                         <td>{{ user["first_name"] }}</td>
                         <td>{{ user["last_name"] }}</td>
                         <td>{{ user["BACB_id"] }}</td>
-                        <td>{{ user["credential"] }}</td>
                         <td>{{ user["role"] }}</td>
-                        <td>{{ user["hired_date"] }}</td>
-                        <td>{{ user["fingerprint_background"] }}</td>
-                        <td>{{ user["background_date"] }}</td>
-                        <td>{{ user["background_exp_date"] }}</td>
                         <td><a class="icon" href='/del/{{user["_id"]}}'>🗑️</a></td>
                         <td>
                             <a class="icon" href='/user/edit/{{user["_id"]}}'>✏️</a>
