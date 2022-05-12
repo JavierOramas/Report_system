@@ -244,9 +244,7 @@ def config(id):
         return redirect("/")
 
     if request.method == 'GET':
-        print(f"here {id}\n\n")
         user = db.users.find_one({'_id': ObjectId(id)})
-        print(user)
         if user:
             return render_template('edit_user.html', user=user)
 
