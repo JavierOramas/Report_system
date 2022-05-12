@@ -182,6 +182,12 @@ def providers():
     entries = db.user.find()
     return render_template('dashboard.html', role='admin', entries=entries, providerIds=ids, session=session)
 
+
+@app.route('/user_report/<id>')
+@login_required
+def report(id):
+    return render_template("user_work.html", session=session)
+
 # Dashoard for client (login Needed)
 
 
@@ -287,7 +293,8 @@ def new_user():
 
     if request.method == 'POST':
         print(request.form.get('first_name'))
-        db.users.insert_one({"_id": id}, {'$set': {
+
+        db.users.insert_one({
             "name": request.form.get('name'),
             "first_name": request.form.get('first_name'),
             "last_name": request.form.get('last_name'),
@@ -298,7 +305,7 @@ def new_user():
             "fingerprint_background": request.form.get('fingerprint'),
             "background_date": request.form.get('background_date'),
             "background_exp_date": request.form.get('background_exp_date'),
-        }})
+        })
 
         return redirect("/")
 
@@ -328,7 +335,7 @@ def add():
             "ModeofMeeting": '',
             "Group":  '',
             "Individual": '',
-            "Verified": False
+            "Verified": True
         }
         supervisors = [1]
         return render_template('edit.html', entry=entry, supervisors=supervisors)

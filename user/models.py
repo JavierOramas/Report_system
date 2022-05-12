@@ -61,7 +61,7 @@ class User:
         session.clear()
         return redirect('/')
 
-    def add_data(self,db):
+    def add_data(self, db):
         # Load data from csv pre-loaded from the client
         data = pd.read_csv('static/files/data.csv')
 
@@ -70,27 +70,28 @@ class User:
 
             entry = {
                 "ProviderId": entry['ProviderId'],
-                "name" : entry["Name and Credential"],
-                "first_name" : entry["ProviderFirstName"],
-                "last_name" : entry["ProviderLastName"],
-                "BACB_id" : entry["BACB Account ID"],
+                "name": entry["Name and Credential"],
+                "email": entry["Email"],
+                "first_name": entry["ProviderFirstName"],
+                "last_name": entry["ProviderLastName"],
+                "BACB_id": entry["BACB Account ID"],
                 "credential": entry["Credential"],
-                "role" : entry["Status"],
-                }
-            
+                "role": entry["Status"],
+            }
+
             print(entry)
-            if 'Hired Date' in entry and entry['Hired Date'] != None and entry['Hired Date'] != '' :
-                entry["hired_date"] : datetime.datetime.strptime(
-            entry['Hired Date'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-            
-            if 'Background Screening Date' in entry and entry['Background Screening Date'] != None and entry['Background Screening Date'] != '' :
-                entry["background_date"] : datetime.datetime.strptime(
-            entry[''], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-                
-            if 'Background Screening' in entry and entry['Background Screening'] != None and entry['Background Screening'] != '' :
-                entry["background_exp_date"] : datetime.datetime.strptime(
-            entry[''], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-            
+            if 'Hired Date' in entry and entry['Hired Date'] != None and entry['Hired Date'] != '':
+                entry["hired_date"]: datetime.datetime.strptime(
+                    entry['Hired Date'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
+
+            if 'Background Screening Date' in entry and entry['Background Screening Date'] != None and entry['Background Screening Date'] != '':
+                entry["background_date"]: datetime.datetime.strptime(
+                    entry[''], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
+
+            if 'Background Screening' in entry and entry['Background Screening'] != None and entry['Background Screening'] != '':
+                entry["background_exp_date"]: datetime.datetime.strptime(
+                    entry[''], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
+
             # Insert the data and log to the console the action
             if db.users.insert_one(entry):
                 print('Log: ' + colored('Entry added successfully', 'green'))
@@ -99,4 +100,3 @@ class User:
                     'Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))
         # Return success code
         return {'status': 200}
-
