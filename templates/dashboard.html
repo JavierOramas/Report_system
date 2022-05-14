@@ -3,21 +3,26 @@
 
 {% block content %}
 
+{%if alert and alert != '' %}
+    <div class="alert alert-warning" role="alert">{{alert}}</div>
+{% endif %}
+
+
 <div class="card-wrapper">
-    {{ heading(session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month) }}
+    
+    {{ heading(session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month,id) }}
 
     <div class="center card-wrapper">
-    
+
     <div class="card-table">
 
-        
         <ul class="nav nav-tabs" id="myTab" role="tablist">
-        {% if role != 'admin' %}
+        {% if not role in ['admin', 'BCBA'] %}
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="olv-tab" data-bs-toggle="tab" data-bs-target="#ovl" type="button" role="tab" aria-controls="ovl" aria-selected="true">Overlappings</button>
             </li>
         {% endif %}
-        {% if role == 'admin' %}
+        {% if role in ['admin','BCBA'] %}
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="true">Users</button>
         </li>
@@ -31,7 +36,7 @@
     </ul>
 
     <div class="tab-content" style="margin-top: 10px;" id="myTabContent">
-        {% if role != 'admin'%}
+        {% if not role in ['admin', 'BCBA'] %}
             <div class="tab-pane fade show active" id="ovl" role="tabpanel" aria-labelledby="home-tab">
             
             <div class="table-preferences">
@@ -105,28 +110,22 @@
 
             </div>
         {% endif %}
-            
-        {% if role == 'admin' %}        
+
+        {% if role in ['admin', 'BCBA'] %}
             <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="profile-tab">
                 <div class="center">
                     <div class="table-preferences">
-                        <form method="POST" action="/filter/" method="POST" enctype="multipart/form-data">
+                        <form method="POST" action="/filter" method="POST" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label for="sel_year">Role</label>
+                                    <!-- <div class="form-group">
+                                        <label for="sel_role">Role</label>
                                         <select class="form-select form-control form-select-sm" style="width:25%" id="sel_role" name="role">
                                       {% for i in roles %}
                                       <option value="{{i}}">{{i}}</option>
                                       {% endfor %}
                                     </select>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-                                </div>
+                                </div> -->
                             </div>
 
                             <div class="col-sm-3">
@@ -139,22 +138,23 @@
                 </div>
                 <table class="table" id="entries">
                     <tr>
-                        {% for i in ['ProviderId', 'Name' ,'Email','First Name', 'Last Name', 'BACB ID', 'Role']%}
+                        {% for i in ['', 'ProviderId', 'Name' ,'Email', 'Role']%}
                         <th>
                             {{i}}
                         </th>
                         {% endfor %}
                     </tr>
-                    
+
                     {% for user in users %}
                     <tr>
-                        <td><a href='/user_report/{{user["_id"]}}'>View</a></td>
+                        <td>
+                            {% if user['role'] in ['RBT', 'basic'] %}
+                            <a href='/user_report/{{user["_id"]}}'>View</a>
+                            {% endif %}
+                        </td>
                         <td>{{ user['ProviderId'] }}</td>
                         <td>{{ user['name'] }}</td>
                         <td>{{ user['email'] }}</td>
-                        <td>{{ user["first_name"] }}</td>
-                        <td>{{ user["last_name"] }}</td>
-                        <td>{{ user["BACB_id"] }}</td>
                         <td>{{ user["role"] }}</td>
                         <td><a class="icon" href='/del/{{user["_id"]}}'>🗑️</a></td>
                         <td>

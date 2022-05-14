@@ -1,11 +1,12 @@
-{% macro heading(session, role, total_hours, supervised_hours, meeting_groups, minimum_supervised, year, month) %}
+{% macro heading(session, role, total_hours, supervised_hours, meeting_groups, minimum_supervised, year, month, id) %}
 <div class="card">
     <h1 class="center">Dashboard</h1>
      <div class="center">
          <p>You are currently logged In</p>
          <a class="btn btn-secondary" href="/user/signout">Sign Out</a>
+         <a class="btn btn-secondary" href="/">Home</a>
 
-         {% if role == 'admin' %}
+         {% if role in ['admin','BCBA'] %}
          <!-- <a class="btn btn-secondary" href="/users">Edit Users</a> -->
          <!-- <a class="btn btn-secondary" href="/users/">Edit Users</a> -->
          {% endif %}
@@ -25,12 +26,12 @@
         
         {% if True %}
         <div class="center">
-            <a href="/report/{{year}}/{{month}}" class="btn btn-success">Export PDF</a>
+            <a href="/report/{{year}}/{{month}}/{{id}}" class="btn btn-success">Export PDF</a>
         </div>
         {% endif %}
      </p>
  </div>
- {% if role == 'admin' %}
+ {% if role in ['admin','BCBA'] %}
  <div class="form-group card">
 
             <h1>Upload your CSV file</h1>
@@ -50,9 +51,9 @@
  {% else %}
  <div class="form-group card">
     <h1>This Month Report Status:</h1>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours: {{total_hours}}</p>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours: {{supervised_hours}} / {{minimum_supervised}} </p>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one group supervision meeting">Group Supervision Meetings: {{meeting_groups}}/1 </p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours: {{total_hours or 0}}</p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours: {{supervised_hours or 0}} / {{minimum_supervised or 0}} </p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one group supervision meeting">Group Supervision Meetings: {{meeting_groups or 0}} / 1 </p>
 </div>
 
 

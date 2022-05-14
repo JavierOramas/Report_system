@@ -14,7 +14,8 @@ class User:
     # Create Session for logged user
     def start_session(self, user):
         del user['password']
-        del user['_id']
+        # del user['_id']
+        user['_id'] = str(user['_id'])
         session['logged_in'] = True
         session['user'] = user
         return jsonify(user), 200
@@ -79,7 +80,6 @@ class User:
                 "role": entry["Status"],
             }
 
-            print(entry)
             if 'Hired Date' in entry and entry['Hired Date'] != None and entry['Hired Date'] != '':
                 entry["hired_date"]: datetime.datetime.strptime(
                     entry['Hired Date'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')

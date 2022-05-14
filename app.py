@@ -11,6 +11,7 @@ import datetime
 import math
 import datetime_format
 import pdfkit
+from passlib.hash import pbkdf2_sha256
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -45,7 +46,7 @@ def admin_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         if 'role' in session['user']:
-            if session['user']['role'] == 'admin':
+            if session['user']['role'] in ['admin', 'BCBA']:
                 return f(*args, **kwargs)
         else:
             return redirect('/')
@@ -57,7 +58,7 @@ def round_half_up(n, decimals=0):
     return math.floor(int(n)*multiplier + 0.5) / multiplier
 
 
-def get_entries(role, year, month):
+def get_entries(role, year, month, user):
     entries = db.Registry.find()
     entries = [entry for entry in entries]
 
@@ -69,7 +70,7 @@ def get_entries(role, year, month):
     for entry in entries:
         if datetime_format.get_date(entry["DateOfService"]).year == year and datetime_format.get_date(entry["DateOfService"]).month == month:
             entry['ProviderId'] = int(entry['ProviderId'])
-            if 'providerId' in session['user'] and int(entry['ProviderId']) == int(session['user']['providerId']) and "ClientId" in entry:
+            if 'providerId' in user and int(entry['ProviderId']) == int(user['providerId']) and "ClientId" in entry:
                 clients.append(entry['ClientId'])
                 supervisors.append(entry['Supervisor'])
                 dates.append(entry['DateOfService'])
@@ -98,7 +99,7 @@ def get_entries(role, year, month):
     if role == 'basic':
         # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
         total_hours = db.TotalHours.find_one({'ProviderId': int(
-            session['user']['providerId']), 'Month': month, 'Year': year})
+            user['providerId']), 'Month': month, 'Year': year})
         if total_hours == None:
             total_hours = 0
         else:
@@ -110,13 +111,17 @@ def get_entries(role, year, month):
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors)
 
 
-def get_pending(role):
+def get_pending(role, user):
 
-    if role == 'admin':
+    if role in ['admin', 'BCBA']:
         entries = list(db.Registry.find({'Verified': False}))
     elif role != 'basic' or role != 'RBT':
-        entries = list(db.Registry.find(
-            {'Verified': False, 'ProviderId': int(session['user']['providerId'])}))
+        try:
+            entries = list(db.Registry.find(
+                {'Verified': False, 'ProviderId': int(user['providerId'])}))
+        except:
+            entries = list(db.Registry.find(
+                {'Verified': False, 'ProviderId': int(user['ProviderId'])}))
     else:
         entries = []
 
@@ -178,22 +183,49 @@ def upload_file():
 @login_required
 @admin_required
 def providers():
-
     entries = db.user.find()
-    return render_template('dashboard.html', role='admin', entries=entries, providerIds=ids, session=session)
+    return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=ids, session=session)
 
 
-@app.route('/user_report/<id>')
+@app.route('/user_report/<id>', methods=["POST", "GET"])
 @login_required
 def report(id):
-    return render_template("user_work.html", session=session)
+    year = int(request.form.get("year")) if request.form.get(
+        "year") else datetime.datetime.now().year
+    month = int(request.form.get("month")) if request.form.get(
+        "month") else datetime.datetime.now().month
+
+    print(id)
+
+    try:
+        user = db.users.find_one({"_id": ObjectId(id)})
+    except:
+        user = db.users.find_one({"_id": id})
+
+    print(user)
+
+    if user and "ProviderId" in user:
+        user['providerId'] = user['ProviderId']
+        entries, total_hours, supervised_time, ids, meetings, min_year, supervisors = get_entries(
+            'basic', year, month, user)
+
+        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors)
+
+    return redirect("/")
 
 # Dashoard for client (login Needed)
 
 
+def get_roles(users):
+    roles = ['all']
+    for u in users:
+        roles.append(u['role'])
+    return set(roles)
+
+
 @app.route('/dashboard')
 @login_required
-def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year):
+def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=''):
     if 'providerId' in session['user']:
         session['user']['providerId'] = int(session['user']['providerId'])
 
@@ -207,8 +239,8 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
     # if role == 'basic':
     users = db.users.find()
     entries, total_hours, supervised_time, ids, meetings, min_year, supervisors = get_entries(
-        role, year, month)
-    pending = get_pending(role)
+        role, year, month, session['user'])
+    pending = get_pending(role, session['user'])
 
     for entry in entries:
         name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
@@ -222,7 +254,7 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
         if name:
             entry['Supervisor'] = name['first_name']
 
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending)
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert)
 
 # Only admins will see this page and it will let edit users and provider ids
 
@@ -234,8 +266,9 @@ def config(id):
     if request.method == 'POST':
         # print(id)
         try:
-            db.users.update_one({"_id": ObjectId(id)}, {'$set': {
+            db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
                 "name": request.form.get('name'),
+                "email": request.form.get('email'),
                 "first_name": request.form.get('first_name'),
                 "last_name": request.form.get('last_name'),
                 "BACB_id": request.form.get('BACB_id'),
@@ -246,6 +279,10 @@ def config(id):
                 "background_date": request.form.get('background_date'),
                 "background_exp_date": request.form.get('background_exp_date'),
             }})
+            pwd = request.form.get("password")
+            if pwd != '':
+                db.users.update_one({"_id": ObjectId(str(id))}, {
+                                    '$set': {"password": pbkdf2_sha256.encrypt(pwd)}})
         except:
             db.users.update_one({"_id": id}, {'$set': {
                 "name": request.form.get('name'),
@@ -259,22 +296,29 @@ def config(id):
                 "background_date": request.form.get('background_date'),
                 "background_exp_date": request.form.get('background_exp_date'),
             }})
-
+            pwd = request.form.get("password")
+            if pwd != '':
+                db.users.update_one({"_id": str(id)}, {
+                                    '$set': {"password": pbkdf2_sha256.encrypt(pwd)}})
         return redirect("/")
 
     if request.method == 'GET':
         try:
-            user = db.users.find_one({'_id': ObjectId(id)})
-        except:
-            user = db.users.find_one({'_id': id})
+            user = db.users.find_one({'_id': str(id)})
+            if user:
+                return render_template('edit_user.html', user=user)
+            else:
+                user = db.users.find_one({'_id': ObjectId(str(id))})
+                return render_template('edit_user.html', user=user)
 
-        if user:
+        except:
+            user = db.users.find_one({'_id': ObjectId(str(id))})
             return render_template('edit_user.html', user=user)
 
 
-@app.route('/user/new', methods=('GET', 'POST'))
-@login_required
-@admin_required
+@ app.route('/user/new', methods=('GET', 'POST'))
+@ login_required
+@ admin_required
 def new_user():
     if request.method == 'GET':
         user = {
@@ -316,8 +360,8 @@ def new_user():
             return render_template('edit_user.html', user=user)
 
 
-@app.route('/edit/new', methods=('GET', 'POST'))
-@login_required
+@ app.route('/edit/new', methods=('GET', 'POST'))
+@ login_required
 def add():
     if request.method == 'GET':
         entry = {
@@ -351,12 +395,12 @@ def add():
         return redirect('/')
 
 
-@app.route('/verify/<id>', methods=('GET', 'POST'))
-@login_required
+@ app.route('/verify/<id>', methods=('GET', 'POST'))
+@ login_required
 def verify(id):
     print('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
-    if session['user']['role'] == 'admin' or session[user]['providerId'] == entry['Supervisor']:
+    if session['user']['role'] in ['admin', 'BCBA'] or session[user]['providerId'] == entry['Supervisor']:
         print('here')
         db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
             "Verified": True,
@@ -365,8 +409,8 @@ def verify(id):
     return redirect('/')
 
 
-@app.route('/edit/<id>', methods=('GET', 'POST'))
-@login_required
+@ app.route('/edit/<id>', methods=('GET', 'POST'))
+@ login_required
 def edit(id):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     if request.method == 'GET':
@@ -388,74 +432,87 @@ def edit(id):
         return
 
 
-@app.route('/del/<id>', methods=('GET', 'POST'))
-@login_required
+@ app.route('/del/<id>', methods=('GET', 'POST'))
+@ login_required
 def delete(id):
-    if session['user']['role'] == 'admin' and db.users.find_one({"_id": ObjectId(id)}):
-        db.users.delete_one({"_id": ObjectId(id)})
+    if session['user']['role'] in ['admin', 'BCBA'] and db.users.find_one({"_id": ObjectId(id)}):
+        try:
+            db.users.delete_one({"_id": ObjectId(str(id))})
+        except:
+            db.users.delete_one({"_id": str(id)})
 
     return redirect('/')
 
 
-@app.route('/user/signup', methods=['POST'])
+@ app.route('/user/signup', methods=['POST'])
 def signup():
     return User().signup()
 
 
-@app.route('/user/login', methods=['POST'])
+@ app.route('/user/login', methods=['POST'])
 def login():
     return User().login(db)
 
 
-@app.route('/user/signout')
+@ app.route('/user/signout')
 def signout():
     return User().signout()
 
 
-@app.route('/user/logout')
+@ app.route('/user/logout')
 def logout():
     pass
 
 
-@app.route('/upload', methods=['POST', 'GET'])
+@ app.route('/upload', methods=['POST', 'GET'])
 def upload():
     Registry().add_data(db)
     return redirect('/')
 
 
-@app.route('/upload-providers', methods=['POST', 'GET'])
+@ app.route('/upload-providers', methods=['POST', 'GET'])
 def upload_provider():
     User().add_data(db)
     return redirect('/')
 
 
-@app.route("/filter", methods=['POST', 'GET'])
+@ app.route("/filter", methods=['POST', 'GET'])
 def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
-    # return redirect(url_for('dashboard', year=year, month=month))
+
+    if not month:
+        month = datetime.datetime.now().month
+    if not year:
+        year = datetime.datetime.now().year
+
     return dashboard(int(month), int(year))
 
 
-@app.route("/filter/<year>/<month>", methods=['POST', 'GET'])
+@ app.route("/filter/<year>/<month>", methods=['POST', 'GET'])
 def filter_data_args(year, month):
     # return redirect(url_for('dashboard', year=year, month=month))
     return dashboard(int(month), int(year))
 
 
-@app.route("/report/<year>/<month>")
-def get_report(year, month):
+@ app.route("/report/<year>/<month>/<id>")
+def get_report(year, month, id):
+    try:
+        user = db.users.find_one({"_id": str(id)})
+        if user is None:
+            user = db.users.find_one({"_id": ObjectId(str(id))})
+    except:
+        user = db.users.find_one({"_id": ObjectId(str(id))})
     # Detect the role of the loged user to determine the permissions
-    if 'role' in session['user'] and session['user']['role'] != None:
+    if 'role' in user and user['role'] != None:
         role = session['user']['role']
     else:
         role = 'basic'
 
     year = int(year)
     month = int(month)
-    user = session['user']
     entries, total_hours, supervised_time, ids, meetings, min_year, supervisors = get_entries(
-        role, year, month)
+        role, year, month, user)
     if user and entries:
         month_year = f'{month} {year}'
 
@@ -481,4 +538,4 @@ def get_report(year, month):
         return redirect(f'/filter/{year}/{month}')
     else:
         print("Something went Wrong!")
-        return dashboard(year, month)
+        return dashboard(year, month, alert='Something went Wrong!')

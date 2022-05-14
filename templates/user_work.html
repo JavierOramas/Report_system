@@ -12,12 +12,12 @@
 
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
-        {% if role != 'admin' %}
+        {% if not role in ['admin', 'BCBA'] %}
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="olv-tab" data-bs-toggle="tab" data-bs-target="#ovl" type="button" role="tab" aria-controls="ovl" aria-selected="true">Overlappings</button>
             </li>
         {% endif %}
-        {% if role == 'admin' %}
+        {% if not role in ['admin', 'BCBA'] %}
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="true">Users</button>
         </li>
@@ -26,7 +26,7 @@
 
         <div class="tab-pane fade show active" id="ovl" role="tabpanel" aria-labelledby="home-tab">
             <div class="table-preferences">
-                <form method="POST" action="/filter/" method="POST" enctype="multipart/form-data">
+                <form method="POST" action="/user_report/{{id}}" method="POST" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-sm-3">
                             <div class="form-group">
@@ -92,8 +92,8 @@
                         {% endfor %}
                     </table>
                 </div>
-                
             </div>
     </div>
     </div>
+    {% endblock content %}
 </div>
