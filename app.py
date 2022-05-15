@@ -284,7 +284,7 @@ def config(id):
                 db.users.update_one({"_id": ObjectId(str(id))}, {
                                     '$set': {"password": pbkdf2_sha256.encrypt(pwd)}})
         except:
-            db.users.update_one({"_id": id}, {'$set': {
+            db.users.update_one({"_id": str(id)}, {'$set': {
                 "name": request.form.get('name'),
                 "first_name": request.form.get('first_name'),
                 "last_name": request.form.get('last_name'),
