@@ -1,7 +1,7 @@
 from registry.models import Registry
 from user import routes
 from user.models import User
-from flask import Flask, render_template, redirect, session, request, url_for, jsonify
+from flask import Flask, render_template, redirect, session, request, url_for, jsonify, send_file
 from bson.objectid import ObjectId
 from functools import wraps
 import os
@@ -208,7 +208,7 @@ def report(id):
         user['providerId'] = user['ProviderId']
         entries, total_hours, supervised_time, ids, meetings, min_year, supervisors = get_entries(
             'basic', year, month, user)
-
+        print(id)
         return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors)
 
     return redirect("/")
@@ -511,8 +511,13 @@ def get_report(year, month, id):
 
     year = int(year)
     month = int(month)
+
+    user['providerId'] = user['ProviderId']
+
     entries, total_hours, supervised_time, ids, meetings, min_year, supervisors = get_entries(
         role, year, month, user)
+    print(entries)
+
     if user and entries:
         month_year = f'{month} {year}'
 
@@ -534,8 +539,10 @@ def get_report(year, month, id):
 
         # print('ready')
         pdfkit.from_string(template, 'report.pdf')
-        # print(template)
-        return redirect(f'/filter/{year}/{month}')
+        # print('template')
+        # return send_file('report.pdf')
+        return send_file('report.pdf', as_attachment=True)
+        # return redirect(f'/filter/{year}/{month}')
     else:
         print("Something went Wrong!")
         return dashboard(year, month, alert='Something went Wrong!')
