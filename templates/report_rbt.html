@@ -1,219 +1,183 @@
 <!DOCTYPE html>
+<head>
+  <meta name="pdfkit-orientation" content="Landscape" />
+</head>
 <body>
-    <style>
-        .logo{
-            max-width:100%;
-            max-height: 100%;
-            height: auto;
-        }
-        
-        .abs_table{
-            border-collapse: collapse;
-            border: 2px solid;
-            width: 100%;
-        }
-        
-        .abs_table td, tr{
-            text-align: center;
-            border-right: 2px solid;
-            border-bottom: 2px solid;
-            border-top: 2px solid;
-            border-left: 2px solid;
-            border-color: black;
-            margin: 5px;
-        }
-        
-        .abs_table , .abs_table td, .abs_table tr{
-            border-top: 0px;
-        }
-        
-        .header{
-            font-weight: bold;
-        }
-        
-        *{
-            font-family:sans-serif;
-        }
-        
-        .rbtData{
-            font-weight: bold;
-            border-top: 2px solid;
-        }
-        
-        .borderless, .borderless tr, .borderless td{
-        
-            border-right: 0px;
-            border-bottom: 0px;
-            border-top: 0px;
-            border-left: 0px;
-            margin-top: 25px;
-        }
-    </style>
-    <table>
-        <tr>
-            <td width="5%">
+  <style>
+    .logo {
+      max-width: 100%;
+      max-height: 100%;
+      height: auto;
+    }
 
-            </td>
-            <td width="10%">
-                <div>
-                    <img src="http://127.0.0.1:5000/static/Logo.jpg" class="logo">
-                </div>
-            </td>
-            <td style="text-align:center" width="80%">
-                <h1>RBT Service-Delivery and Supervision Hours Tracker</h1>
-            </td>
-        </tr>
-    </table>
+    .abs_table {
+      border-collapse: collapse;
+      border: 2px solid;
+      width: 100%;
+    }
 
-    <table class="rbtData abs_table">
-        <tr>
-            <td width="30%">
-                <div class="name">
-                    <p>{{ rbt_name }}</p>
-                </div>
-            </td>
-            <td width="30%">
-                <div class="hired_date">
-                    <p>Hired Date: {{hired_date}}</p>
-                </div>
-            </td>
-            <td width="40%">
-                <div class="month">
-                    <p>Month of Supervision: {{month_year}}</p>
-                </div>
-            </td>
-        </tr>
-    </table>
-    
-    <table class="entries abs_table">
-        <tr class="header">
-            <td>
-                Meeting Date
-            </td>
-            <td>
-                Meeting Duration
-            </td>
-            <td>
-                Individual
-            </td>
-            <td>
-                Group
-            </td>
-            <td>
-                Mode of Meeting
-            </td>
-            <td>
-                Observed with Client
-            </td>
-            <td>
-                Supervisor
-            </td>
-        </tr>
-        {% for entry in entries%}
-        <tr>
-            <td>
-                {{ entry['DateOfService']}}
-            </td>
-            <td>
-                {{ entry['MeetingDuration'] }}
-            </td>
-            {% if entry["Individual"] == 'yes'%}
-            <td>
-                x
-            </td>
-            <td>
-                -
-            </td>
-            {% else %}
-            <td>
-                -
-            </td>
-            <td>
-                x
-            </td>
-            {% endif %}
-            <td>
-                {{entry["ModeofMeeting"]}}
-            </td>
-            <td>
-                {{entry["ObservedwithClient"]}}
-            </td>
-            <td>
-                {{ entry["Supervisor"]}}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    .abs_table td,
+    tr {
+      text-align: center;
+      border-right: 2px solid;
+      border-bottom: 2px solid;
+      border-top: 2px solid;
+      border-left: 2px solid;
+      border-color: black;
+      margin: 5px;
+    }
 
-    <table class="summary abs_table">
-        <tr>
-            <td class="header">Total RBT Behavioral analytic hrs</td>
-            <td> {{total_hours}} </td>
-            <td class="header">Face to Face minimum requirement met</td>
-            <td style="color:red;">Requirement met</td>
-        </tr>
-        <tr>
-            <td class="header">Total Supervisor Hours</td>
-            <td> {{supervised_hours}} </td>
-            <td class="header">Individual Supervision minimum requirement met</td>
-            <td style="color:red;">Requirement met</td>
-        </tr>
+    .abs_table,
+    .abs_table td,
+    .abs_table tr {
+      border-top: 0px;
+    }
 
-        <tr>
-            <td class="header">Supervision minimum requirement met</td>
-            <td> {{minimum_supervision_hours}} </td>
-            <td class="header">Observation minimum requirement met</td>
-            <td style="color:red;">Requirement met</td>
-        </tr>
-        
-    </table>
+    .header {
+      font-weight: bold;
+    }
 
-    <table class="background abs_table">
-        <tr>
-           <td class="header" rowspan="2">Background check</td> 
-           <td class="header">Company</td>
-           <td class="header">Type</td>
-           <td class="header">Date</td>
-           <td class="header">Expiration Date</td>
-        </tr>
-        <tr>
-            <td>{{company}}</td>
-            <td>{{type}}</td>
-            <td>{{date}}</td>
-            <td>{{expDate}}</td>
-        </tr>
-    </table>
+    * {
+      font-family: sans-serif;
+    }
 
-    <table class="borderless abs_table">
-        {% for sup in supervisors %}
-        <tr>
-            <td class="header">
-                Supervisor Name and Credential: 
-            </td>
-            <td style="text-align: right; text-decoration: underline">
-                {{sup["name"]}}
-            </td>
-            <td class="header">
-                Signature & Date: 
-            </td>
-            <td style="text-align: right; text-decoration: underline">
-                {{signature}}
-            </td>
-        </tr>
-        {% endfor %}
-        <tr>
-            <td class="header">
-                Supervisor Name and Credential: 
-            </td>
-            <td style="text-align: right; text-decoration: underline">
-                {{rbt_name}}
-            </td>
-            <td class="header">
-                Signature & Date: 
-            </td>
-            <td style="text-align: right; text-decoration: underline">
-                {{signature}}
-            </td>
-        </tr>
-    </table>
+    .rbtData {
+      font-weight: bold;
+      border-top: 2px solid;
+    }
+
+    .borderless,
+    .borderless tr,
+    .borderless td {
+      border-right: 0px;
+      border-bottom: 0px;
+      border-top: 0px;
+      border-left: 0px;
+      margin-top: 25px;
+    }
+  </style>
+  <table>
+    <tr>
+      <td width="5%"></td>
+      <td width="10%">
+        <div>
+          <img src="http://127.0.0.1:5000/static/Logo.jpg" class="logo" />
+        </div>
+      </td>
+      <td style="text-align: center" width="80%">
+        <h1>RBT Service-Delivery and Supervision Hours Tracker</h1>
+      </td>
+    </tr>
+  </table>
+
+  <table class="rbtData abs_table">
+    <tr>
+      <td width="30%">
+        <div class="name">
+          <p>{{ rbt_name }}</p>
+        </div>
+      </td>
+      <td width="30%">
+        <div class="hired_date">
+          <p>Hired Date: {{hired_date}}</p>
+        </div>
+      </td>
+      <td width="40%">
+        <div class="month">
+          <p>Month of Supervision: {{month_year}}</p>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <table class="entries abs_table">
+    <tr class="header">
+      <td>Meeting Date</td>
+      <td>Meeting Duration</td>
+      <td>Individual</td>
+      <td>Group</td>
+      <td>Mode of Meeting</td>
+      <td>Observed with Client</td>
+      <td>Supervisor</td>
+    </tr>
+    {% for entry in entries%}
+    <tr>
+      <td>{{ entry['DateOfService']}}</td>
+      <td>{{ entry['MeetingDuration'] }}</td>
+      {% if entry["Individual"] == 'yes'%}
+      <td>x</td>
+      <td>-</td>
+      {% else %}
+      <td>-</td>
+      <td>x</td>
+      {% endif %}
+      <td>{{entry["ModeofMeeting"]}}</td>
+      <td>{{entry["ObservedwithClient"]}}</td>
+      <td>{{ entry["Supervisor"]}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <table class="summary abs_table">
+    <tr>
+      <td class="header">Total RBT Behavioral analytic hrs</td>
+      <td>{{total_hours}}</td>
+      <td class="header">Face to Face minimum requirement met</td>
+      <td style="color: red">Requirement met</td>
+    </tr>
+    <tr>
+      <td class="header">Total Supervisor Hours</td>
+      <td>{{supervised_hours}}</td>
+      <td class="header">Individual Supervision minimum requirement met</td>
+      <td style="color: red">Requirement met</td>
+    </tr>
+
+    <tr>
+      <td class="header">Supervision minimum requirement met</td>
+      <td>{{minimum_supervision_hours}}</td>
+      <td class="header">Observation minimum requirement met</td>
+      <td style="color: red">Requirement met</td>
+    </tr>
+  </table>
+
+  <table class="background abs_table">
+    <tr>
+      <td class="header" rowspan="2">Background check</td>
+      <td class="header">Company</td>
+      <td class="header">Type</td>
+      <td class="header">Date</td>
+      <td class="header">Expiration Date</td>
+    </tr>
+    <tr>
+      <td>{{company}}</td>
+      <td>{{type}}</td>
+      <td>{{date}}</td>
+      <td>{{expDate}}</td>
+    </tr>
+  </table>
+
+  <table class="borderless abs_table">
+    {% for sup in supervisors %}
+    <tr>
+      <td class="header">Supervisor Name and Credential:</td>
+      <td style="text-align: right; text-decoration: underline">
+        {{sup["name"]}}
+      </td>
+      <td class="header">Signature & Date:</td>
+      <td style="text-align: right; text-decoration: underline">
+        {{signature}}
+      </td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td class="header">Supervisor Name and Credential:</td>
+      <td style="text-align: right; text-decoration: underline">
+        {{rbt_name}}
+      </td>
+      <td class="header">Signature & Date:</td>
+      <td style="text-align: right; text-decoration: underline">
+        {{signature}}
+      </td>
+    </tr>
+  </table>
 </body>

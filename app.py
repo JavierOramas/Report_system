@@ -516,20 +516,25 @@ def get_report(year, month, id):
 
     entries, total_hours, supervised_time, ids, meetings, min_year, supervisors = get_entries(
         role, year, month, user)
-    print(entries)
-
+    # print(entries)
+    supervisors = []
     if user and entries:
         month_year = f'{month} {year}'
 
-        supervisors = list(supervisors)
-        for i in supervisors:
-            print(i)
-        supervisors = list(db.user.find({'ProviderId': {'$in': supervisors}}))
+        for entry in entries:
+            superv = db.users.find_one({"ProviderId": entry["Supervisor"]})
+            print(superv)
+            entry["Supervisor"] = superv['name']
+            if not superv in supervisors:
+                supervisors.append(superv)
+
         # print(supervisors)
+        # supervisors = list(set(supervisors))
         template = render_template(
             'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervision_hours=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors)
         options = {
             'page-size': 'A4',
+            # 'orientation': ,
             'enable-local-file-access': None,  # to avoid blanks
             'javascript-delay': 1000,
             'no-stop-slow-scripts': None,
@@ -546,3 +551,8 @@ def get_report(year, month, id):
     else:
         print("Something went Wrong!")
         return dashboard(year, month, alert='Something went Wrong!')
+
+
+@app.errorhandler(404)
+def not_foud(e):
+    return render_template('not_found.html')
