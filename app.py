@@ -83,12 +83,12 @@ def get_entries(role, year, month, user):
     meetings = 0
     min_year = int(datetime.datetime.now().year)
     for i in entries:
+        # print(i)
         min_year = min(min_year, int(
             datetime_format.get_date(i["DateOfService"]).year))
 
         i['MeetingDuration'] = round_half_up(i['MeetingDuration'], 1)
-        supervised_time += i['MeetingDuration']
-
+        supervised_time += int(i['MeetingDuration'])
         # TODO get this condition from other table that gives clinical meeting info
         condition = True
         if i['ProcedureCodeId'] == 194641 and condition == True:
@@ -107,6 +107,8 @@ def get_entries(role, year, month, user):
             total_hours = total_hours['TotalTime']
     else:
         total_hours = 0
+
+    print(supervised_time)
 
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors)
 
@@ -195,21 +197,24 @@ def report(id):
     month = int(request.form.get("month")) if request.form.get(
         "month") else datetime.datetime.now().month
 
-    print(id)
-
     try:
         user = db.users.find_one({"_id": ObjectId(id)})
     except:
         user = db.users.find_one({"_id": id})
 
-    print(user)
-
     if user and "ProviderId" in user:
         user['providerId'] = user['ProviderId']
         entries, total_hours, supervised_time, ids, meetings, min_year, supervisors = get_entries(
             'basic', year, month, user)
-        print(id)
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors)
+
+        for entry in entries:
+            name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
+            if name:
+                entry['Supervisor'] = name['name']
+
+        # 10th percento fo total hours
+        minimum_supervised = round_half_up(total_hours * 0.05)
+        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors)
 
     return redirect("/")
 
@@ -225,7 +230,7 @@ def get_roles(users):
 
 @app.route('/dashboard')
 @login_required
-def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=''):
+def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=None):
     if 'providerId' in session['user']:
         session['user']['providerId'] = int(session['user']['providerId'])
 
@@ -253,7 +258,7 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
         print(name)
         if name:
             entry['Supervisor'] = name['first_name']
-
+    print(alert)
     return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert)
 
 # Only admins will see this page and it will let edit users and provider ids
@@ -418,7 +423,7 @@ def edit(id):
             supervisors = [entry['Supervisor']]
             return render_template('edit.html', entry=entry, supervisors=supervisors)
         else:
-            return redirect(url_for('/', message={'error': 'you cant edit that entry'}))
+            return redirect(url_for('/dashboard', message={'error': 'you cant edit that entry'}))
     else:
         if entry["ProcedureCodeId"] != request.form.get('ProcedureCodeId') or entry["DateOfService"] != request.form.get('DateOfService') or entry["MeetingDuration"] != request.form.get('MeetingDuration'):
 
@@ -530,24 +535,25 @@ def get_report(year, month, id):
 
         # print(supervisors)
         # supervisors = list(set(supervisors))
-        template = render_template(
-            'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervision_hours=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors)
-        options = {
-            'page-size': 'A4',
-            # 'orientation': ,
-            'enable-local-file-access': None,  # to avoid blanks
-            'javascript-delay': 1000,
-            'no-stop-slow-scripts': None,
-            'debug-javascript': None,
-            'enable-javascript': None
-        }
+        try:
+            template = render_template(
+                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervision_hours=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors)
+            options = {
+                'page-size': 'A4',
+                # 'orientation': ,
+                'enable-local-file-access': None,  # to avoid blanks
+                'javascript-delay': 1000,
+                'no-stop-slow-scripts': None,
+                'debug-javascript': None,
+                'enable-javascript': None
+            }
 
-        # print('ready')
-        pdfkit.from_string(template, 'report.pdf')
-        # print('template')
-        # return send_file('report.pdf')
-        return send_file('report.pdf', as_attachment=True)
-        # return redirect(f'/filter/{year}/{month}')
+            pdfkit.from_string(template, 'report.pdf')
+            return send_file('report.pdf', as_attachment=True)
+        except:
+            # return redirect(url_for('dashboard', year=year, month=month, alert={'error': 'Error generating report'}))
+            return dashboard(year, month, alert={'error': 'Error generating report'})
+            pass
     else:
         print("Something went Wrong!")
         return dashboard(year, month, alert='Something went Wrong!')

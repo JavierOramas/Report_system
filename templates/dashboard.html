@@ -3,7 +3,7 @@
 
 {% block content %}
 
-{%if alert and alert != '' %}
+{% if alert and alert != '' %}
     <div class="alert alert-warning" role="alert">{{alert}}</div>
 {% endif %}
 
@@ -148,7 +148,7 @@
                     {% for user in users %}
                     <tr>
                         <td>
-                            {% if user['role'] in ['RBT', 'basic'] %}
+                            {% if user['role'] in ['RBT', 'basic', 'Trainee'] %}
                             <a href='/user_report/{{user["_id"]}}'>View</a>
                             {% endif %}
                         </td>
