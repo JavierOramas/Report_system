@@ -46,7 +46,7 @@ def admin_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         if 'role' in session['user']:
-            if session['user']['role'] in ['admin', 'BCBA']:
+            if session['user']['role'] in ['admin', 'bcba']:
                 return f(*args, **kwargs)
         else:
             return redirect('/')
@@ -115,9 +115,9 @@ def get_entries(role, year, month, user):
 
 def get_pending(role, user):
 
-    if role in ['admin', 'BCBA']:
+    if role in ['admin', 'bcba']:
         entries = list(db.Registry.find({'Verified': False}))
-    elif role != 'basic' or role != 'RBT':
+    elif role != 'basic' or role != 'rbt':
         try:
             entries = list(db.Registry.find(
                 {'Verified': False, 'ProviderId': int(user['providerId'])}))
@@ -405,7 +405,7 @@ def add():
 def verify(id):
     print('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
-    if session['user']['role'] in ['admin', 'BCBA'] or session[user]['providerId'] == entry['Supervisor']:
+    if session['user']['role'] in ['admin', 'bcba'] or session[user]['providerId'] == entry['Supervisor']:
         print('here')
         db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
             "Verified": True,
@@ -440,7 +440,7 @@ def edit(id):
 @ app.route('/del/<id>', methods=('GET', 'POST'))
 @ login_required
 def delete(id):
-    if session['user']['role'] in ['admin', 'BCBA'] and db.users.find_one({"_id": ObjectId(id)}):
+    if session['user']['role'] in ['admin', 'bcba'] and db.users.find_one({"_id": ObjectId(id)}):
         try:
             db.users.delete_one({"_id": ObjectId(str(id))})
         except:
@@ -552,7 +552,7 @@ def get_report(year, month, id):
             return send_file('report.pdf', as_attachment=True)
         except:
             # return redirect(url_for('dashboard', year=year, month=month, alert={'error': 'Error generating report'}))
-            return dashboard(year, month, alert={'error': 'Error generating report'})
+            # return dashboard(year, month, alert={'error': 'Error generating report'})
             pass
     else:
         print("Something went Wrong!")
