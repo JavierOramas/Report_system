@@ -24,7 +24,7 @@
         <strong>Email:</strong>{{ session['user']['email'] }} <br>
         <strong>ProviderId:</strong>{{ session['user']['providerId'] }} <br>
         
-        {% if meeting_group and supervised_hours and supervised_hours >= minimum_supervised and meeting_group >= 1  %}
+        {% if meeting_group != None and supervised_hours != None and supervised_hours >= minimum_supervised and meeting_group >= 1  %}
         <div class="center">
             <a href="/report/{{year}}/{{month}}/{{id}}" class="btn btn-success">Export PDF</a>
         </div>
