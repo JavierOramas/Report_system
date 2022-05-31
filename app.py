@@ -214,7 +214,7 @@ def report(id):
 
         # 10th percento fo total hours
         minimum_supervised = round_half_up(total_hours * 0.05)
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors)
+        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True)
 
     return redirect("/")
 
@@ -249,7 +249,6 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 
     for entry in entries:
         name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
-        print(name)
         if name:
             entry['Supervisor'] = name['first_name']
 
@@ -258,8 +257,8 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
         print(name)
         if name:
             entry['Supervisor'] = name['first_name']
-    print(alert)
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert)
+
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=True)
 
 # Only admins will see this page and it will let edit users and provider ids
 
@@ -537,7 +536,7 @@ def get_report(year, month, id):
         # supervisors = list(set(supervisors))
         try:
             template = render_template(
-                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervision_hours=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors)
+                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervision_hours=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors, report=True)
             options = {
                 'page-size': 'A4',
                 # 'orientation': ,

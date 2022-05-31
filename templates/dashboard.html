@@ -10,7 +10,7 @@
 
 <div class="card-wrapper">
     
-    {{ heading('', session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month) }}
+    {{ heading('', session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report) }}
 
     <div class="center card-wrapper">
 
@@ -87,7 +87,7 @@
                             </th>
                             {% endfor %}
                         </tr>
-                        
+
                         {% for entry in entries %}
                         <tr>
                             <td> {% if entry['Verified'] == False %} ❌ {% else %} ✅ {% endif %}</td>
@@ -161,13 +161,11 @@
                             <a class="icon" href='/user/edit/{{user["_id"]}}'>✏️</a>
                         </td>
                     </tr>
-                    
+
                     {% endfor %}
                 </table>
             </div>
-            
-            
-       
+
             </div>
         {% endif %}
         
