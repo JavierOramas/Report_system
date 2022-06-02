@@ -148,7 +148,7 @@
                     {% for user in users %}
                     <tr>
                         <td>
-                            {% if user['role'].lower() in ['rbt', 'basic', 'trainee'] %}
+                            {% if user['role'] == None or user['role'].lower() in ['rbt', 'basic', 'trainee'] %}
                             <a href='/user_report/{{user["_id"]}}'>View</a>
                             {% endif %}
                         </td>
