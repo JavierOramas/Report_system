@@ -59,6 +59,9 @@ def round_half_up(n, decimals=0):
 
 
 def get_entries(role, year, month, user):
+    if not 'providerId' in user:
+        return [],0,0,[],0,0,[]
+    
     entries = db.Registry.find()
     entries = [entry for entry in entries]
 
@@ -214,7 +217,7 @@ def report(id):
 
         # 10th percento fo total hours
         minimum_supervised = round_half_up(total_hours * 0.05)
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True)
+        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user)
 
     return redirect("/")
 
