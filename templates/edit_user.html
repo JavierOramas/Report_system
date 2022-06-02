@@ -79,6 +79,7 @@
             value='{{
           user["credential"] }}'
           />
+          {% if admin == True %}
           <label class="form-label" for="role">role</label>
           <input
             class="form-control"
@@ -87,6 +88,7 @@
             value='{{
           user["role"] }}'
           />
+          {% endif %}
           <label class="form-label" for="hired_date">hired_date</label>
           <input
             class="form-control"

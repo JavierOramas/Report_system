@@ -265,59 +265,66 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 
 @app.route('/user/edit/<id>', methods=('GET', 'POST'))
 @login_required
-@admin_required
 def config(id):
-    if request.method == 'POST':
-        # print(id)
-        try:
-            db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
-                "name": request.form.get('name'),
-                "email": request.form.get('email'),
-                "first_name": request.form.get('first_name'),
-                "last_name": request.form.get('last_name'),
-                "BACB_id": request.form.get('BACB_id'),
-                "credential": request.form.get('credential'),
-                "role": request.form.get('role'),
-                "hired_date": request.form.get('hired_date'),
-                "fingerprint_background": request.form.get('fingerprint'),
-                "background_date": request.form.get('background_date'),
-                "background_exp_date": request.form.get('background_exp_date'),
-            }})
-            pwd = request.form.get("password")
-            if pwd != '':
-                db.users.update_one({"_id": ObjectId(str(id))}, {
-                                    '$set': {"password": pbkdf2_sha256.encrypt(pwd)}})
-        except:
-            db.users.update_one({"_id": str(id)}, {'$set': {
-                "name": request.form.get('name'),
-                "first_name": request.form.get('first_name'),
-                "last_name": request.form.get('last_name'),
-                "BACB_id": request.form.get('BACB_id'),
-                "credential": request.form.get('credential'),
-                "role": request.form.get('role'),
-                "hired_date": request.form.get('hired_date'),
-                "fingerprint_background": request.form.get('fingerprint'),
-                "background_date": request.form.get('background_date'),
-                "background_exp_date": request.form.get('background_exp_date'),
-            }})
-            pwd = request.form.get("password")
-            if pwd != '':
-                db.users.update_one({"_id": str(id)}, {
-                                    '$set': {"password": pbkdf2_sha256.encrypt(pwd)}})
-        return redirect("/")
+    
+    try:
+        flag = (session['user']['_id'] == str(id))
+    except:
+        flag = (session['user']['_id'] ==  ObjectId(str(id)))
+    
+    if (flag) or ('role' in session['user'] and session['user']['role'] in ['admin', 'bcba']) :
+        if request.method == 'POST':
 
-    if request.method == 'GET':
-        try:
-            user = db.users.find_one({'_id': str(id)})
-            if user:
-                return render_template('edit_user.html', user=user)
-            else:
+            try:
+                db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
+                    "name": request.form.get('name'),
+                    "email": request.form.get('email'),
+                    "first_name": request.form.get('first_name'),
+                    "last_name": request.form.get('last_name'),
+                    "BACB_id": request.form.get('BACB_id'),
+                    "credential": request.form.get('credential'),
+                    "role": request.form.get('role'),
+                    "hired_date": request.form.get('hired_date'),
+                    "fingerprint_background": request.form.get('fingerprint'),
+                    "background_date": request.form.get('background_date'),
+                    "background_exp_date": request.form.get('background_exp_date'),
+                }})
+                pwd = request.form.get("password")
+                if pwd != '':
+                    db.users.update_one({"_id": ObjectId(str(id))}, {
+                                        '$set': {"password": pbkdf2_sha256.encrypt(pwd)}})
+            except:
+                db.users.update_one({"_id": str(id)}, {'$set': {
+                    "name": request.form.get('name'),
+                    "first_name": request.form.get('first_name'),
+                    "last_name": request.form.get('last_name'),
+                    "BACB_id": request.form.get('BACB_id'),
+                    "credential": request.form.get('credential'),
+                    "role": request.form.get('role'),
+                    "hired_date": request.form.get('hired_date'),
+                    "fingerprint_background": request.form.get('fingerprint'),
+                    "background_date": request.form.get('background_date'),
+                    "background_exp_date": request.form.get('background_exp_date'),
+                }})
+                pwd = request.form.get("password")
+                if pwd != '':
+                    db.users.update_one({"_id": str(id)}, {
+                                        '$set': {"password": pbkdf2_sha256.encrypt(pwd)}})
+            return redirect("/")
+
+        is_admin = session['user']['role'] in ['admin', 'bcba']
+        if request.method == 'GET':
+            try:
+                user = db.users.find_one({'_id': str(id)})
+                if user:
+                    return render_template('edit_user.html', user=user, admin=is_admin)
+                else:
+                    user = db.users.find_one({'_id': ObjectId(str(id))})
+                    return render_template('edit_user.html', user=user, admin=is_admin)
+    
+            except:
                 user = db.users.find_one({'_id': ObjectId(str(id))})
-                return render_template('edit_user.html', user=user)
-
-        except:
-            user = db.users.find_one({'_id': ObjectId(str(id))})
-            return render_template('edit_user.html', user=user)
+                return render_template('edit_user.html', user=user, admin=is_admin)
 
 
 @ app.route('/user/new', methods=('GET', 'POST'))
@@ -404,7 +411,7 @@ def add():
 def verify(id):
     print('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
-    if session['user']['role'] in ['admin', 'bcba'] or session[user]['providerId'] == entry['Supervisor']:
+    if session['user']['role'] in ['admin', 'bcba'] or session['user']['providerId'] == entry['Supervisor']:
         print('here')
         db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
             "Verified": True,

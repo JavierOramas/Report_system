@@ -5,9 +5,9 @@
          <p>You are currently logged In</p>
          <a class="btn btn-secondary" href="/user/signout">Sign Out</a>
          <a class="btn btn-secondary" href="/">Home</a>
+         <a class="btn btn-secondary" href="/user/edit/{{id}}">Edit account</a> 
 
          {% if role in ['admin','bcba'] %}
-         <!-- <a class="btn btn-secondary" href="/users">Edit Users</a> -->
          <!-- <a class="btn btn-secondary" href="/users/">Edit Users</a> -->
          {% endif %}
 
