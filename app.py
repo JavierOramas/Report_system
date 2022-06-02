@@ -59,8 +59,12 @@ def round_half_up(n, decimals=0):
 
 
 def get_entries(role, year, month, user):
+    print(user)
     if not 'providerId' in user:
-        return [],0,0,[],0,0,[]
+        if 'ProviderId' in user:
+            user['providerId'] = user['ProviderId']
+        else:
+            return [],0,0,[],0,0,[]
     
     entries = db.Registry.find()
     entries = [entry for entry in entries]
@@ -234,6 +238,7 @@ def get_roles(users):
 @app.route('/dashboard')
 @login_required
 def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=None):
+    print(month, year)
     if 'providerId' in session['user']:
         session['user']['providerId'] = int(session['user']['providerId'])
 
@@ -276,10 +281,13 @@ def config(id):
         flag = (session['user']['_id'] ==  ObjectId(str(id)))
     
     if (flag) or ('role' in session['user'] and session['user']['role'] in ['admin', 'bcba']) :
+        is_admin = session['user']['role'] in ['admin', 'bcba']
+        
         if request.method == 'POST':
 
             try:
-                db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
+                if is_admin:
+                    db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
                     "name": request.form.get('name'),
                     "email": request.form.get('email'),
                     "first_name": request.form.get('first_name'),
@@ -291,7 +299,21 @@ def config(id):
                     "fingerprint_background": request.form.get('fingerprint'),
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
-                }})
+                    }})
+                else:
+                    if is_admin:
+                        db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
+                    "name": request.form.get('name'),
+                    "email": request.form.get('email'),
+                    "first_name": request.form.get('first_name'),
+                    "last_name": request.form.get('last_name'),
+                    "BACB_id": request.form.get('BACB_id'),
+                    "credential": request.form.get('credential'),
+                    "hired_date": request.form.get('hired_date'),
+                    "fingerprint_background": request.form.get('fingerprint'),
+                    "background_date": request.form.get('background_date'),
+                    "background_exp_date": request.form.get('background_exp_date'),
+                    }})
                 pwd = request.form.get("password")
                 if pwd != '':
                     db.users.update_one({"_id": ObjectId(str(id))}, {
@@ -315,7 +337,6 @@ def config(id):
                                         '$set': {"password": pbkdf2_sha256.encrypt(pwd)}})
             return redirect("/")
 
-        is_admin = session['user']['role'] in ['admin', 'bcba']
         if request.method == 'GET':
             try:
                 user = db.users.find_one({'_id': str(id)})
@@ -490,10 +511,13 @@ def upload_provider():
     return redirect('/')
 
 
-@ app.route("/filter", methods=['POST', 'GET'])
+@ app.route("/filter/", methods=['POST', 'GET'])
 def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
+
+    print(year)
+    print(month)
 
     if not month:
         month = datetime.datetime.now().month
@@ -565,7 +589,7 @@ def get_report(year, month, id):
             pass
     else:
         print("Something went Wrong!")
-        return dashboard(year, month, alert='Something went Wrong!')
+        return dashboard( month, month, alert='Something went Wrong!')
 
 
 @app.errorhandler(404)
