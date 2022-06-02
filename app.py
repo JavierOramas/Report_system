@@ -59,7 +59,6 @@ def round_half_up(n, decimals=0):
 
 
 def get_entries(role, year, month, user):
-    print(user)
     if not 'providerId' in user:
         if 'ProviderId' in user:
             user['providerId'] = user['ProviderId']
@@ -114,8 +113,6 @@ def get_entries(role, year, month, user):
             total_hours = total_hours['TotalTime']
     else:
         total_hours = 0
-
-    print(supervised_time)
 
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors)
 
@@ -238,7 +235,6 @@ def get_roles(users):
 @app.route('/dashboard')
 @login_required
 def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=None):
-    print(month, year)
     if 'providerId' in session['user']:
         session['user']['providerId'] = int(session['user']['providerId'])
 
@@ -371,7 +367,6 @@ def new_user():
         return render_template('edit_user.html', user=user)
 
     if request.method == 'POST':
-        print(request.form.get('first_name'))
 
         db.users.insert_one({
             "name": request.form.get('name'),
