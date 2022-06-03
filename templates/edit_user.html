@@ -39,6 +39,9 @@
               </div>
             </div>
           </div>
+          <div class="d-flex flex-md-row flex-column justify-content text-center"
+          >
+          <div class="col-sm-4 col-md-offset-1">
           <label class="form-label" for="first_name">first_name</label>
           <input
             class="form-control"
@@ -47,14 +50,8 @@
             value='{{
           user["first_name"] }}'
           />
-          <label class="form-label" for="first_name">provider_id</label>
-          <input
-            class="form-control"
-            type="text"
-            name="provider_id"
-            value='{{
-          user["ProviderId"] }}'
-          />
+          </div>
+          <div class="col-sm-4 col-md-offset-1">
           <label class="form-label" for="last_name">last_name</label>
           <input
             class="form-control"
@@ -63,6 +60,22 @@
             value='{{
           user["last_name"] }}'
           />
+          </div>
+            </div>
+          <div
+              class="d-flex flex-md-row flex-column justify-content text-center"
+            >
+          <div class="col-sm-4 col-md-offset-1">
+          <label class="form-label" for="provider_id">provider_id</label>
+          <input
+            class="form-control"
+            type="text"
+            name="provider_id"
+            value='{{
+          user["ProviderId"] }}'
+          />
+          </div>
+          <div class="col-sm-4 col-md-offset-1">
           <label class="form-label" for="BACB_id">BACB_id</label>
           <input
             class="form-control"
@@ -71,6 +84,8 @@
             value='{{
           user["BACB_id"] }}'
           />
+          </div>
+          <div class="col-sm-4 col-md-offset-1">
           <label class="form-label" for="credential">credential</label>
           <input
             class="form-control"
@@ -79,7 +94,11 @@
             value='{{
           user["credential"] }}'
           />
+          </div>
+          </div>
+          <div class="d-flex flex-md-row flex-column justify-content text-center">
           {% if admin == True %}
+          <div class="col-sm-4 col-md-offset-1">
           <label class="form-label" for="role">role</label>
           <input
             class="form-control"
@@ -88,7 +107,9 @@
             value='{{
           user["role"] }}'
           />
+          </div>
           {% endif %}
+          <div class="col-sm-4 col-md-offset-1">
           <label class="form-label" for="hired_date">hired_date</label>
           <input
             class="form-control"
@@ -97,6 +118,10 @@
             value='{{
           user["hired_date"] }}'
           />
+          </div>
+        </div>
+        <div class="d-flex flex-md-row flex-column justify-content text-center">
+          <div class="col-sm-4 col-md-offset-1">
           <label class="form-label" for="fingerprint"
             >fingerprint_background</label
           >
@@ -107,6 +132,8 @@
             value='{{
           user["fingerprint_background"] }}'
           />
+          </div>
+          <div class="col-sm-4 col-md-offset-1">
           <label class="form-label" for="background_date"
             >background_date</label
           >
@@ -116,6 +143,8 @@
             name="background_date"
             value='{{ user["background_date"] }}'
           />
+          </div>
+          <div class="col-sm-4 col-md-offset-1">
           <label class="form-label" for="background_exp_date"
             >background_exp_date</label
           >
@@ -125,6 +154,8 @@
             name="background_exp_date"
             value='{{ user["background_exp_date"] }}'
           />
+          </div>
+        </div>
         </div>
         <div class="center">
           <a href="/" class="btn btn-danger">Cancel</a>
