@@ -3,7 +3,7 @@
 
 {% block content %}
 
-{% if alert and alert != '' %}
+{% if alert != None and alert != '' %}
     <div class="alert alert-warning" role="alert">{{alert}}</div>
 {% endif %}
 

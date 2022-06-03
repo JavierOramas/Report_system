@@ -202,11 +202,12 @@ def providers():
 
 @app.route('/user_report/<id>', methods=["POST", "GET"])
 @login_required
-def report(id):
+def report(id, alert=None):
+
     year = int(request.form.get("year")) if request.form.get(
         "year") else datetime.datetime.now().year
     month = int(request.form.get("month")) if request.form.get(
-        "month") else datetime.datetime.now().month
+        "month") else datetime.datetime.now().month-1
 
     try:
         user = db.users.find_one({"_id": ObjectId(id)})
@@ -225,7 +226,7 @@ def report(id):
         print("observed:",observed_with_client)
         # 5th percento fo total hours
         minimum_supervised = round_half_up(total_hours * 0.05)
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client)
+        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert)
 
     return redirect("/")
 
@@ -523,7 +524,7 @@ def filter_data():
     print(month)
 
     if not month:
-        month = datetime.datetime.now().month
+        month = datetime.datetime.now().month-1
     if not year:
         year = datetime.datetime.now().year
 
@@ -571,7 +572,6 @@ def get_report(year, month, id):
 
         # print(supervisors)
         # supervisors = list(set(supervisors))
-        print(observed_with_client)
         try:
             template = render_template(
                 'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervision_hours=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors, report=True, observed_with_client=observed_with_client)
@@ -588,12 +588,16 @@ def get_report(year, month, id):
             pdfkit.from_string(template, 'report.pdf')
             return send_file('report.pdf', as_attachment=True)
         except:
-            # return redirect(url_for('dashboard', year=year, month=month, alert={'error': 'Error generating report'}))
+            print("exception")
+            if not session['user'] in ['admin', 'bcba']:
+                return redirect(url_for('dashboard', year=year, month=month, alert={'error': 'Something went Wrong! Check that all the User info is correct'}))
+            else:
+                return redirect(url_for('report', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report'))
+                # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
             # return dashboard(year, month, alert={'error': 'Error generating report'})
-            pass
     else:
         print("Something went Wrong!")
-        return dashboard( month, month, alert='Something went Wrong!')
+        return dashboard( month, month, alert='Something went Wrong! Check that all the User info is correct')
 
 
 @app.errorhandler(404)
