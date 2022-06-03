@@ -6,13 +6,13 @@
 
             <form name="edit_form" method="POST">
                 <label for="DateOfService">Date Of Service (DD/MM/YYYY HH:MM)</label>
-                <input type="text" name="DateOfService" value={% if entry['DateOfService'] != '' %} {{ entry['DateOfService'] }} {% endif %} class="field" required>
+                <input type="text" class="field" name="DateOfService" value="{% if entry['DateOfService'] != '' %} {{ entry['DateOfService'] }} {% endif %}"  required>
 
                 <label for="MeetingDuration">MeetingDuration</label>
                 <input type="number" name="MeetingDuration" value={{entry['MeetingDuration']}} class="field" required>
                 
                 <label for="ProcedureCodeId">Procedure Code</label>
-                <input type="text" name="ProcedureCodeId" value={{ entry['ProcedureCodeId'] }} class="field" required>
+                <input type="text" class="field" name="ProcedureCodeId" value="{{ entry['ProcedureCodeId'] }}" required>
                 
                 <label for="Supervisor">Supervisor</label>
                 <select id="Supervisor" name="Supervisor" form="edit_form" class="form-select">

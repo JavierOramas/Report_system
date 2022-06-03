@@ -399,19 +399,18 @@ def new_user():
             return render_template('edit_user.html', user=user)
 
 
+@ app.route('/edit/new/<id>', methods=('GET', 'POST'))
 @ app.route('/edit/new', methods=('GET', 'POST'))
 @ login_required
-def add():
+def add(id=None):
     
-    try:
-        session['user']['ProviderId'] = session['user']['providerId']
-    except:
-        pass
+    if id is None:
+        id = session['user']['providerId']
     
     if request.method == 'GET':
         entry = {
             # "entryId": entry["Id"],
-            "ProviderId": session['user']['ProviderId'],
+            "ProviderId": id,
             "ProcedureCodeId": '',
             "TimeWorkedInHours": 0,
             "MeetingDuration": 0,

@@ -108,6 +108,7 @@
           user["role"] }}'
           />
           </div>
+
           {% endif %}
           <div class="col-sm-4 col-md-offset-1">
           <label class="form-label" for="hired_date">hired_date</label>
@@ -158,6 +159,10 @@
         </div>
         </div>
         <div class="center">
+          <div class="col-sm-1" style={"margin": "20px"}>
+            <label class="form-label" for='active'>Active</label>
+            <input class="form-conrol" type='checkbox' name='active' {% if ("active" in user and user["active"] == True) or not "active" in user %}checked{% endif %} />
+          </div>
           <a href="/" class="btn btn-danger">Cancel</a>
           <input
             style="float: left; margin: auto"

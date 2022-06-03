@@ -98,11 +98,9 @@
                             <td>{{ entry["ModeofMeeting"] }}</td>
                             <td>{{ entry["ObservedwithClient"] }}</td>
                             <td>{{ entry["Supervisor"] }}</td>
-                            {% if 'providerId' in session['user'] and entry["ProviderId"] == session['user']['providerId'] %}
                             <td>
                                 <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
                             </td>
-                            {% endif %}
                         </tr>
                         {% endfor %}
                     </table>
@@ -112,6 +110,16 @@
         {% endif %}
 
         {% if role in ['admin', 'bcba'] %}
+            <script>
+            function toggle() {
+             if( document.getElementById("hidethis").style.display=='none' ){
+               document.getElementById("hidethis").style.display = '';
+             }else{
+               document.getElementById("hidethis").style.display = 'none';
+             }
+            }
+            </script>
+
             <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="profile-tab">
                 <div class="center">
                     <div class="table-preferences">
@@ -133,6 +141,13 @@
                                     <a type="button" class="btn btn-primary btn-sm" href="/user/new">Add New</a>
                                 </div>
                             </div>
+                            <div class="col-sm-3">
+                                <div class="custom-control custom-checkbox checkbox-xl">
+                                    <input type="checkbox" value="off" name='show_inactive' onchange="toggle()"/>
+                                    <label for="show_inactive">Show Hidden</label>
+                                </div>
+                                
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -146,7 +161,7 @@
                     </tr>
 
                     {% for user in users %}
-                    <tr>
+                    <tr {% if "active" in user and user["active"] == False %} id="hidethis" style={'display': 'none'}{% endif %}>
                         <td>
                             {% if user['role'] == None or user['role'].lower() in ['rbt', 'basic', 'trainee'] %}
                             <a href='/user_report/{{user["_id"]}}'>View</a>

@@ -26,6 +26,13 @@
   box-sizing: border-box;
 }
 
+.checkbox-xl{
+  margin-left: 10px;
+  font-size: 25px;
+  font-weight: 500;
+  border-radius: .25em;
+}
+
 body {
   margin: 0;
   font-family: sans-serif;
