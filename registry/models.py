@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, session, redirect
 import uuid
+from sqlalchemy import except_all
 # from passlib.hash import pbkdf2_sha256
 from termcolor import colored
 from overlappings.tools import process
@@ -45,9 +46,11 @@ class Registry:
         year = datetime.datetime.strptime(
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
         data = data.drop(data.columns.difference(labels), 1)
-        data['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(
-            lambda x: x.replace(',', '.')).astype(float)
-
+        try:
+            data['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(
+                lambda x: x.replace(',', '.')).astype(float)
+        except:
+            data['TimeWorkedInHours'] = data['TimeWorkedInHours'].astype(float)
         total_time = data.groupby(['ProviderId']).sum()
 
         for name, entry in total_time.iterrows():
