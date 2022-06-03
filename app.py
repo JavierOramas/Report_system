@@ -94,7 +94,9 @@ def get_entries(role, year, month, user):
             datetime_format.get_date(i["DateOfService"]).year))
 
         i['MeetingDuration'] = round_half_up(i['MeetingDuration'], 1)
-        supervised_time += int(i['MeetingDuration'])
+        if i['Verified'] == True:
+            supervised_time += int(i['MeetingDuration'])
+
         # TODO get this condition from other table that gives clinical meeting info
         condition = True
         if i['ProcedureCodeId'] == 194641 and condition == True:
