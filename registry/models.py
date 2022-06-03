@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request, session, redirect
 import uuid
-from sqlalchemy import except_all
 # from passlib.hash import pbkdf2_sha256
 from termcolor import colored
 from overlappings.tools import process
