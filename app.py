@@ -288,7 +288,7 @@ def config(id):
         is_admin = session['user']['role'] in ['admin', 'bcba']
         
         if request.method == 'POST':
-
+            print(request.form.get('active') == 'on')
             try:
                 if is_admin:
                     db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
@@ -304,10 +304,10 @@ def config(id):
                     "fingerprint_background": request.form.get('fingerprint'),
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
+                    "active": (request.form.get('active') == 'on'),
                     }})
                 else:
-                    if is_admin:
-                        db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
+                    db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
                     "name": request.form.get('name'),
                     "email": request.form.get('email'),
                     "first_name": request.form.get('first_name'),
@@ -402,10 +402,16 @@ def new_user():
 @ app.route('/edit/new', methods=('GET', 'POST'))
 @ login_required
 def add():
+    
+    try:
+        session['user']['ProviderId'] = session['user']['providerId']
+    except:
+        pass
+    
     if request.method == 'GET':
         entry = {
             # "entryId": entry["Id"],
-            "ProviderId": session['user']['providerId'],
+            "ProviderId": session['user']['ProviderId'],
             "ProcedureCodeId": '',
             "TimeWorkedInHours": 0,
             "MeetingDuration": 0,
