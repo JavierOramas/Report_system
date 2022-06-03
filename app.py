@@ -90,7 +90,6 @@ def get_entries(role, year, month, user):
     meetings = 0
     min_year = int(datetime.datetime.now().year)
     for i in entries:
-        print(i)
         if i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes':
             print("here")
             observed_with_client += 1
@@ -589,7 +588,7 @@ def get_report(year, month, id):
             return send_file('report.pdf', as_attachment=True)
         except:
             print("exception")
-            if not session['user'] in ['admin', 'bcba']:
+            if not session['user']['role'] in ['admin', 'bcba']:
                 return redirect(url_for('dashboard', year=year, month=month, alert={'error': 'Something went Wrong! Check that all the User info is correct'}))
             else:
                 return redirect(url_for('report', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report'))

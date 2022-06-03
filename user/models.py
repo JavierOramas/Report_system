@@ -91,12 +91,12 @@ class User:
             if 'Background Screening' in entry and entry['Background Screening'] != None and entry['Background Screening'] != '':
                 entry["background_exp_date"]: datetime.datetime.strptime(
                     entry[''], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-
+            if not db.users.find_one({"ProviderId": entry["ProviderId"]}):
             # Insert the data and log to the console the action
-            if db.users.insert_one(entry):
-                print('Log: ' + colored('Entry added successfully', 'green'))
-            else:
-                print(
-                    'Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))
-        # Return success code
+                if db.users.insert_one(entry):
+                    print('Log: ' + colored('Entry added successfully', 'green'))
+                else:
+                    print(
+                        'Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))
+                # Return success code
         return {'status': 200}
