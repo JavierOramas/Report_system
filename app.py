@@ -199,6 +199,7 @@ def providers():
     return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=ids, session=session)
 
 
+@app.route('/user_report/<id>/<alert>', methods=["POST", "GET"])
 @app.route('/user_report/<id>', methods=["POST", "GET"])
 @login_required
 def report(id, alert=None):
@@ -588,15 +589,16 @@ def get_report(year, month, id):
             return send_file('report.pdf', as_attachment=True)
         except:
             print("exception")
+            alert = {'error': 'Something went Wrong! Check that all the User info is correct'}
             if not session['user']['role'] in ['admin', 'bcba']:
-                return redirect(url_for('dashboard', year=year, month=month, alert={'error': 'Something went Wrong! Check that all the User info is correct'}))
+                return redirect(url_for('dashboard', year=year, month=month, alert=alert))
             else:
-                return redirect(url_for('report', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report'))
+                return redirect(url_for('report', id=id, alert=alert))
                 # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
             # return dashboard(year, month, alert={'error': 'Error generating report'})
     else:
         print("Something went Wrong!")
-        return dashboard( month, month, alert='Something went Wrong! Check that all the User info is correct')
+        return dashboard( month, month, alert=alert)
 
 
 @app.errorhandler(404)
