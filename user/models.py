@@ -64,12 +64,11 @@ class User:
 
     def add_data(self, db):
         # Load data from csv pre-loaded from the client
-        data = pd.read_csv('static/files/data.csv')
-
+        data = pd.read_csv('static/files/data.csv', dtype={ 'Credential':str, 'Hired Date':str, 'Background Screening Date':str, 'Background Screening':str})
         # crete the collection entries
         for index, entry in data.iterrows():
 
-            entry = {
+            item = {
                 "ProviderId": entry['ProviderId'],
                 "name": entry["Name and Credential"],
                 "email": entry["Email"],
@@ -79,24 +78,37 @@ class User:
                 "credential": entry["Credential"],
                 "role": entry["Status"],
             }
+            
+            try:
+                if 'Hired Date' in entry and entry['Hired Date'] != None and entry['Hired Date'] != '':
+                    item["hired_date"]= datetime.datetime.strptime(entry['Hired Date'], '%m/%d/%Y').strftime('%d/%m/%y')
+            except:
+                print("failed to parse date")
 
-            if 'Hired Date' in entry and entry['Hired Date'] != None and entry['Hired Date'] != '':
-                entry["hired_date"]: datetime.datetime.strptime(
-                    entry['Hired Date'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-
-            if 'Background Screening Date' in entry and entry['Background Screening Date'] != None and entry['Background Screening Date'] != '':
-                entry["background_date"]: datetime.datetime.strptime(
-                    entry[''], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-
-            if 'Background Screening' in entry and entry['Background Screening'] != None and entry['Background Screening'] != '':
-                entry["background_exp_date"]: datetime.datetime.strptime(
-                    entry[''], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-            if not db.users.find_one({"ProviderId": entry["ProviderId"]}):
+            try:
+                if 'Background Screening Date' in entry and entry['Background Screening Date'] != None and entry['Background Screening Date'] != '':
+                    item["background_date"]= datetime.datetime.strptime(str(entry['Background Screening Date']), '%m/%d/%Y').strftime('%d/%m/%y')
+            except:
+                print("failed to parse date screening")
+                
+            try:
+                if 'Background Screening' in entry and entry['Background Screening'] != None and entry['Background Screening'] != '':
+                    item["background_exp_date"]= datetime.datetime.strptime(str(entry['Background Screening']), '%m/%d/%Y').strftime('%d/%m/%y')
+            except:
+                print("failed to parse date background screening")
+            
+            if not db.users.find_one({"ProviderId": item["ProviderId"]}):
             # Insert the data and log to the console the action
                 if db.users.insert_one(entry):
                     print('Log: ' + colored('Entry added successfully', 'green'))
                 else:
                     print(
-                        'Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))
+                        'Log: ' + colored(f'Error adding entry to database \n {item}', 'red'))
+            else:
+                if db.users.update_one({'ProviderId': item["ProviderId"]}, {'$set': item}):
+                    print('Log: ' + colored('Entry edited successfully', 'yellow'))
+                else:
+                    print(
+                        'Log: ' + colored(f'Error adding entry to database \n {item}', 'red'))
                 # Return success code
         return {'status': 200}
