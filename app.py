@@ -90,7 +90,7 @@ def get_entries(role, year, month, user):
     meetings = 0
     min_year = int(datetime.datetime.now().year)
     for i in entries:
-        print(i)
+        # print(i)
         if i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes':
             observed_with_client += 1
             
@@ -103,7 +103,7 @@ def get_entries(role, year, month, user):
 
         # TODO get this condition from other table that gives clinical meeting info
         condition = True
-        print(i['ProcedureCodeId'] == 194641)
+        # print(i['ProcedureCodeId'] == 194641)
         if int(i['ProcedureCodeId']) == 194641 and condition == True:
             meetings += 1
 
@@ -224,7 +224,7 @@ def report(id, alert=None):
             name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
             if name:
                 entry['Supervisor'] = name['name']
-        print("observed:",observed_with_client)
+        # print("observed:",observed_with_client)
         # 5th percent of total hours
         minimum_supervised = round_half_up(total_hours * 0.05)
         return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert)
@@ -267,10 +267,10 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 
     for entry in pending:
         name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
-        print(name)
+        # print(name)
         if name:
             entry['Supervisor'] = name['first_name']
-    print(observed_with_client)
+    # print(observed_with_client)
     return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=True, observed_with_client=observed_with_client)
 
 # Only admins will see this page and it will let edit users and provider ids
@@ -289,7 +289,7 @@ def config(id):
         is_admin = session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']
         
         if request.method == 'POST':
-            print(request.form.get('active') == 'on')
+            # print(request.form.get('active') == 'on')
             try:
                 if is_admin:
                     db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
@@ -443,14 +443,14 @@ def add(id=None):
 @ app.route('/verify/<id>', methods=('GET', 'POST'))
 @ login_required
 def verify(id):
-    print('verifying')
+    # print('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     if session['user']['role'].lower() in ['admin', 'bcba','bcba (l)'] or session['user']['providerId'] == entry['Supervisor']:
-        print('here')
+        # print('here')
         db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
             "Verified": True,
         }})
-    print(db.Registry.find_one({"_id": ObjectId(id)}))
+    # print(db.Registry.find_one({"_id": ObjectId(id)}))
     return redirect('/')
 
 
@@ -458,7 +458,7 @@ def verify(id):
 @ login_required
 def edit(id):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
-    print(entry)
+    # print(entry)
     if request.method == 'GET':
         supervisors = [entry['Supervisor']]
         return render_template('edit.html', entry=entry, supervisors=supervisors)
@@ -530,8 +530,8 @@ def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
 
-    print(year)
-    print(month)
+    # print(year)
+    # print(month)
 
     if not month:
         month = datetime.datetime.now().month-1
@@ -549,42 +549,52 @@ def filter_data_args(year, month):
 
 @ app.route("/report/<year>/<month>/<id>")
 def get_report(year, month, id):
-    try:
-        user = db.users.find_one({"_id": str(id)})
-        if user is None:
-            user = db.users.find_one({"_id": ObjectId(str(id))})
-    except:
-        user = db.users.find_one({"_id": ObjectId(str(id))})
-    # Detect the role of the loged user to determine the permissions
-    if 'role' in user and user['role'] != None:
-        role = session['user']['role']
-    else:
-        role = 'basic'
+    # try:
+    #     user = db.users.find_one({"_id": str(id)})
+    #     if user is None:
+    #         user = db.users.find_one({"_id": ObjectId(str(id))})
+    # except:
+    #     user = db.users.find_one({"_id": ObjectId(str(id))})
+    # # Detect the role of the loged user to determine the permissions
+    # if 'role' in user and user['role'] != None:
+    #     role = session['user']['role']
+    # else:
+    #     role = 'basic'
 
     year = int(year)
     month = int(month)
+    
+    try:
+        user = db.users.find_one({"_id": ObjectId(id)})
+    except:
+        user = db.users.find_one({"_id": id})
 
-    user['providerId'] = user['ProviderId']
-
-    entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
-        role, year, month, user)
-    # print(entries)
+    if user and "ProviderId" in user:
+        user['providerId'] = user['ProviderId']
+        entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
+            'basic', year, month, user)
+    
     supervisors = []
     if user and entries:
         month_year = f'{month} {year}'
 
+        providers = []
         for entry in entries:
             superv = db.users.find_one({"ProviderId": entry["Supervisor"]})
-            print(superv)
+            # print(superv)
             entry["Supervisor"] = superv['name']
-            if not superv in supervisors:
+            if not entry['Supervisor'] in providers:
+                providers.append(entry["Supervisor"])
                 supervisors.append(superv)
 
         # print(supervisors)
         # supervisors = list(set(supervisors))
+        company = user['background_screening_type']
+        date = user['background_date']
+        exp_date = user['background_exp_date']
         try:
             template = render_template(
-                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervision_hours=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors, report=True, observed_with_client=observed_with_client)
+                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors, report=True, observed_with_client=observed_with_client)
             options = {
                 'page-size': 'A4',
                 # 'orientation': ,
