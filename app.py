@@ -90,8 +90,8 @@ def get_entries(role, year, month, user):
     meetings = 0
     min_year = int(datetime.datetime.now().year)
     for i in entries:
+        print(i)
         if i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes':
-            print("here")
             observed_with_client += 1
             
         min_year = min(min_year, int(
@@ -103,7 +103,8 @@ def get_entries(role, year, month, user):
 
         # TODO get this condition from other table that gives clinical meeting info
         condition = True
-        if i['ProcedureCodeId'] == 194641 and condition == True:
+        print(i['ProcedureCodeId'] == 194641)
+        if int(i['ProcedureCodeId']) == 194641 and condition == True:
             meetings += 1
 
         if 'ProviderId' in i:
@@ -224,7 +225,7 @@ def report(id, alert=None):
             if name:
                 entry['Supervisor'] = name['name']
         print("observed:",observed_with_client)
-        # 5th percento fo total hours
+        # 5th percent of total hours
         minimum_supervised = round_half_up(total_hours * 0.05)
         return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert)
 
