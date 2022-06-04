@@ -36,7 +36,7 @@
     </ul>
 
     <div class="tab-content" style="margin-top: 10px;" id="myTabContent">
-        {% if not role in ['admin', 'role'] %}
+        {% if not role in ['admin', 'bcba', 'bcba (L)'] %}
             <div class="tab-pane fade show active" id="ovl" role="tabpanel" aria-labelledby="home-tab">
             
             <div class="table-preferences">
@@ -45,7 +45,7 @@
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label for="sel_year">Year</label>
-                                <select class="form-select form-control form-select-sm" style="width:25%" id="sel_year" name="year">
+                                <select class="form-select form-control form-select-sm" style="width:40%" id="sel_year" name="year">
                                     {% for i in range(min_year, year+1) %}
                                     <option value="{{i}}" {{'selected' if i == year }}>{{i}}</option>
                                     {% endfor %}
@@ -56,7 +56,7 @@
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label for="sel_month">Month</label>
-                                    <select class="form-select form-control form-select-sm" style="width:25%" id="sel_month" name="month">
+                                    <select class="form-select form-control form-select-sm" style="width:40%" id="sel_month" name="month">
                                         {% for i in range(1,13) %}
                                         <option value="{{i}}" {{'selected' if i == month }}>{{i}}</option>
                                         {% endfor %}
