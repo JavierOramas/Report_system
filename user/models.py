@@ -77,6 +77,7 @@ class User:
                 "BACB_id": entry["BACB Account ID"],
                 "credential": entry["Credential"],
                 "role": entry["Status"],
+                "background_screening_type" : entry["Background Screening Type"], 
             }
             
             try:
