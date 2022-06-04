@@ -457,23 +457,27 @@ def verify(id):
 @ login_required
 def edit(id):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
+    print(entry)
     if request.method == 'GET':
-        if entry and 'providerId' in session['user'] and int(entry["ProviderId"]) == int(session['user']['providerId']):
-            supervisors = [entry['Supervisor']]
-            return render_template('edit.html', entry=entry, supervisors=supervisors)
-        else:
-            return redirect(url_for('/dashboard', message={'error': 'you cant edit that entry'}))
+        supervisors = [entry['Supervisor']]
+        return render_template('edit.html', entry=entry, supervisors=supervisors)
+
     else:
         if entry["ProcedureCodeId"] != request.form.get('ProcedureCodeId') or entry["DateOfService"] != request.form.get('DateOfService') or entry["MeetingDuration"] != request.form.get('MeetingDuration'):
-
             db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
                 "ProcedureCodeId": int(request.form.get('ProcedureCodeId')),
-                "MeetingDuration": int(request.form.get("MeetingDuration")),
+                "MeetingDuration": float(request.form.get("MeetingDuration")),
+                "Group": 'yes' if request.form.get('supervision_type_group') == 'on' else 'no',
+                "Individual": 'yes' if request.form.get('supervision_type_individual') else 'no',
+                "ObservedwithClient": request.form.get('observed'),
+                "ModeofMeeting": request.form.get('meeting_type'),
                 "DateOfService": request.form.get('DateOfService'),
                 "Verified": False
             }})
-
-        return
+      
+        # if entry and 'providerId' in session['user'] and int(entry["ProviderId"]) == int(session['user']['providerId']):
+        return redirect(url_for('dashboard'))
+        # return redirect(url_for('user_wor))
 
 
 @ app.route('/del/<id>', methods=('GET', 'POST'))

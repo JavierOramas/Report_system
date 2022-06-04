@@ -84,12 +84,10 @@
                             <td>{{ entry["ModeofMeeting"] }}</td>
                             <td>{{ entry["ObservedwithClient"] }}</td>
                             <td>{{ entry["Supervisor"] }}</td>
-                            {% if 'providerId' in session['user'] and entry["ProviderId"] == session['user']['providerId'] %}
                             <td>
                                 <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
                             </td>
-                            {% endif %}
-                        </tr>
+                            </tr>
                         {% endfor %}
                     </table>
                 </div>
