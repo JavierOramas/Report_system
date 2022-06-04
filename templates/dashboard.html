@@ -109,7 +109,7 @@
             </div>
         {% endif %}
 
-        {% if role in ['admin', 'bcba'] %}
+        {% if role in ['admin', 'bcba', 'bcba (l)'] %}
             <script>
             function toggle() {
              if( document.getElementById("hidethis").style.display=='none' ){
@@ -163,7 +163,7 @@
                     {% for user in users %}
                     <tr {% if "active" in user and user["active"] == False %} id="hidethis" style={'display': 'none'}{% endif %}>
                         <td>
-                            {% if user['role'] == None or user['role'].lower() in ['rbt', 'basic', 'trainee'] %}
+                            {% if user['role'] == None or user['role'].lower() in ['rbt', 'rbt/trainee', 'basic', 'trainee'] %}
                             <a href='/user_report/{{user["_id"]}}'>View</a>
                             {% endif %}
                         </td>
@@ -184,7 +184,7 @@
             </div>
         {% endif %}
         
-        {% if role != 'rbt' or role != 'basic'%}
+        {% if not role.lower() in ['rbt', 'rbt/trainee', 'basic'] %}
             <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
                 <div class="center">
                     <table class="table" id="pending">

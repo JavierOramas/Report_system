@@ -46,7 +46,7 @@ def admin_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         if 'role' in session['user']:
-            if session['user']['role'] in ['admin', 'bcba']:
+            if session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']:
                 return f(*args, **kwargs)
         else:
             return redirect('/')
@@ -125,9 +125,9 @@ def get_entries(role, year, month, user):
 
 def get_pending(role, user):
 
-    if role in ['admin', 'bcba']:
+    if role.lower() in ['admin', 'bcba', 'bcba (l)']:
         entries = list(db.Registry.find({'Verified': False}))
-    elif role != 'basic' or role != 'rbt':
+    elif not role.lower() in ['basic','rbt','rbt/trainee']:
         try:
             entries = list(db.Registry.find(
                 {'Verified': False, 'ProviderId': int(user['providerId'])}))
@@ -284,8 +284,8 @@ def config(id):
     except:
         flag = (session['user']['_id'] ==  ObjectId(str(id)))
     
-    if (flag) or ('role' in session['user'] and session['user']['role'] in ['admin', 'bcba']) :
-        is_admin = session['user']['role'] in ['admin', 'bcba']
+    if (flag) or ('role' in session['user'] and session['user']['role'] in ['admin', 'bcba','bcba (l)']) :
+        is_admin = session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']
         
         if request.method == 'POST':
             print(request.form.get('active') == 'on')
@@ -444,7 +444,7 @@ def add(id=None):
 def verify(id):
     print('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
-    if session['user']['role'] in ['admin', 'bcba'] or session['user']['providerId'] == entry['Supervisor']:
+    if session['user']['role'].lower() in ['admin', 'bcba','bcba (l)'] or session['user']['providerId'] == entry['Supervisor']:
         print('here')
         db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
             "Verified": True,
@@ -483,7 +483,7 @@ def edit(id):
 @ app.route('/del/<id>', methods=('GET', 'POST'))
 @ login_required
 def delete(id):
-    if session['user']['role'] in ['admin', 'bcba'] and db.users.find_one({"_id": ObjectId(id)}):
+    if session['user']['role'].lower() in ['admin', 'bcba','bcba (l)'] and db.users.find_one({"_id": ObjectId(id)}):
         try:
             db.users.delete_one({"_id": ObjectId(str(id))})
         except:
@@ -599,7 +599,7 @@ def get_report(year, month, id):
         except:
             print("exception")
             alert = {'error': 'Something went Wrong! Check that all the User info is correct'}
-            if not session['user']['role'] in ['admin', 'bcba']:
+            if not session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']:
                 return redirect(url_for('dashboard', year=year, month=month, alert=alert))
             else:
                 return redirect(url_for('report', id=id, alert=alert))

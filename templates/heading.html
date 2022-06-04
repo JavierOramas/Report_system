@@ -7,7 +7,7 @@
          <a class="btn btn-secondary" href="/">Home</a>
          <a class="btn btn-secondary" href="/user/edit/{{id}}">Edit account</a> 
 
-         {% if role in ['admin','bcba'] %}
+         {% if role in ['admin','bcba', 'bcba (l)' ] %}
          <!-- <a class="btn btn-secondary" href="/users/">Edit Users</a> -->
          {% endif %}
 
@@ -37,7 +37,7 @@
     
      </p>
  </div>
- {% if role in ['admin','bcba'] %}
+ {% if role in ['admin','bcba', 'bcba (l)'] %}
  <div class="form-group card">
 
             <h1>Upload your CSV file</h1>
