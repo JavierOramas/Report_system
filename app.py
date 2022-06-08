@@ -65,8 +65,9 @@ def get_entries(role, year, month, user):
         else:
             return [],0,0,[],0,0,[], 0
     
-    entries = db.Registry.find()
+    entries = db.Registry.find({'ProviderId':int(user['providerId'])})
     entries = [entry for entry in entries]
+    print(entries)
 
     temp = []
     clients = []
@@ -76,7 +77,10 @@ def get_entries(role, year, month, user):
     for entry in entries:
         if datetime_format.get_date(entry["DateOfService"]).year == year and datetime_format.get_date(entry["DateOfService"]).month == month:
             entry['ProviderId'] = int(entry['ProviderId'])
-            if 'providerId' in user and int(entry['ProviderId']) == int(user['providerId']) and "ClientId" in entry:
+            print(entry['ProviderId'])
+            print(user['providerId'])
+            if 'providerId' in user and "ClientId" in entry:
+                print("here")
                 clients.append(entry['ClientId'])
                 supervisors.append(entry['Supervisor'])
                 dates.append(entry['DateOfService'])
@@ -120,7 +124,7 @@ def get_entries(role, year, month, user):
             total_hours = total_hours['TotalTime']
     else:
         total_hours = 0
-
+    print(entries)
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors), observed_with_client
 
 
@@ -374,12 +378,13 @@ def new_user():
             "background_date": '',
             "background_exp_date": '',
         }
-        return render_template('edit_user.html', user=user)
+        return render_template('edit_user.html', user=user, admin=True)
 
     if request.method == 'POST':
 
         db.users.insert_one({
             "name": request.form.get('name'),
+            "email": request.form.get('email'),
             "first_name": request.form.get('first_name'),
             "last_name": request.form.get('last_name'),
             "BACB_id": request.form.get('BACB_id'),
