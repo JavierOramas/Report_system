@@ -1,7 +1,10 @@
 import datetime
 def format(date):
-    return datetime.datetime.strptime(date, '%m/%d/%Y %H:%M').strftime('%m/%d/%y %H:%M')
-
+    try:
+        return datetime.datetime.strptime(date, '%m/%d/%Y %H:%M').strftime('%m/%d/%y %H:%M')
+    except:
+        return datetime.datetime.strptime(date, '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
+        
 def get_date(date):
     if date[0] == ' ':
         date = date[1:]
@@ -10,4 +13,7 @@ def get_date(date):
     try:
         return datetime.datetime.strptime(date, '%m/%d/%y %H:%M')
     except:
-        return datetime.datetime.strptime(date, '%m/%d/%y')
+        try:
+            return datetime.datetime.strptime(date, '%m/%d/%y')
+        except:
+            return datetime.datetime.strptime(date, '%d/%m/%y')
