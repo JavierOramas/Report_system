@@ -51,7 +51,6 @@ class User:
             "email": request.form.get('email'),
         }
         user = db.users.find_one(user)
-        print(user)
         if user and pbkdf2_sha256.verify(request.form.get('password'), user['password']):
             return self.start_session(user)
 
@@ -67,7 +66,6 @@ class User:
         data = pd.read_csv('static/files/data.csv', dtype={ 'Credential':str, 'Hired Date':str, 'Background Screening Date':str, 'Background Screening':str})
         # crete the collection entries
         for index, entry in data.iterrows():
-
             item = {
                 "ProviderId": entry['ProviderId'],
                 "name": entry["Name and Credential"],
@@ -97,8 +95,10 @@ class User:
                     item["background_exp_date"]= datetime.datetime.strptime(str(entry['Background Screening']), '%m/%d/%Y').strftime('%m/%d/%y')
             except:
                 print("failed to parse date background screening")
-            
-            if not db.users.find_one({"ProviderId": item["ProviderId"]}):
+                
+            print(db.users.find_one({"ProviderId": [int(item["ProviderId"]), str(item['ProviderId'])]}))
+            print(item)
+            if db.users.find_one({"ProviderId": item["ProviderId"]}) in [[], None, False] and db.users.find_one({"ProviderId": str(item["ProviderId"])}) in [[], None, False]:
             # Insert the data and log to the console the action
                 try:
                     if db.users.insert_one(entry):

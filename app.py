@@ -296,7 +296,7 @@ def config(id):
                 if is_admin:
                     db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
                     "name": request.form.get('name'),
-                    "ProviderId": request.form.get('provider_id'),
+                    "ProviderId": int(request.form.get('provider_id')),
                     "email": request.form.get('email'),
                     "first_name": request.form.get('first_name'),
                     "last_name": request.form.get('last_name'),
