@@ -16,4 +16,7 @@ def get_date(date):
         try:
             return datetime.datetime.strptime(date, '%m/%d/%y')
         except:
-            return datetime.datetime.strptime(date, '%d/%m/%y')
+            try:
+                return datetime.datetime.strptime(date, '%d/%m/%y')
+            except:
+                return datetime.datetime.strptime(date, '%d/%m/%y %H:%M')
