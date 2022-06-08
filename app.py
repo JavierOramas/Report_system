@@ -67,7 +67,6 @@ def get_entries(role, year, month, user):
     
     entries = db.Registry.find({'ProviderId':int(user['providerId'])})
     entries = [entry for entry in entries]
-    print(entries)
 
     temp = []
     clients = []
@@ -80,7 +79,6 @@ def get_entries(role, year, month, user):
             print(entry['ProviderId'])
             print(user['providerId'])
             if 'providerId' in user and "ClientId" in entry:
-                print("here")
                 clients.append(entry['ClientId'])
                 supervisors.append(entry['Supervisor'])
                 dates.append(entry['DateOfService'])

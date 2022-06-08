@@ -100,11 +100,14 @@ class User:
             
             if not db.users.find_one({"ProviderId": item["ProviderId"]}):
             # Insert the data and log to the console the action
-                if db.users.insert_one(entry):
-                    print('Log: ' + colored('Entry added successfully', 'green'))
-                else:
-                    print(
+                try:
+                    if db.users.insert_one(entry):
+                        print('Log: ' + colored('Entry added successfully', 'green'))
+                    else:
+                        print(
                         'Log: ' + colored(f'Error adding entry to database \n {item}', 'red'))
+                except:
+                    pass
             else:
                 if db.users.update_one({'ProviderId': item["ProviderId"]}, {'$set': item}):
                     print('Log: ' + colored('Entry edited successfully', 'yellow'))
