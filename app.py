@@ -64,7 +64,6 @@ def get_entries(role, year, month, user):
             user['providerId'] = user['ProviderId']
         else:
             return [],0,0,[],0,0,[], 0
-    print(user)
     entries = db.Registry.find({'ProviderId':int(str(user['providerId']))})
     entries = [entry for entry in entries]
 
@@ -76,8 +75,6 @@ def get_entries(role, year, month, user):
     for entry in entries:
         if datetime_format.get_date(entry["DateOfService"]).year == year and datetime_format.get_date(entry["DateOfService"]).month == month:
             entry['ProviderId'] = int(entry['ProviderId'])
-            print(entry['ProviderId'])
-            print(user['providerId'])
             if 'providerId' in user and "ClientId" in entry:
                 clients.append(entry['ClientId'])
                 supervisors.append(entry['Supervisor'])
