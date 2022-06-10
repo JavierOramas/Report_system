@@ -1,3 +1,4 @@
+from time import sleep
 from registry.models import Registry
 from user import routes
 from user.models import User
@@ -618,6 +619,7 @@ def get_report(year, month, id):
         
         pdfkit.from_string(template, 'report.pdf')
         print("pdf generated")
+        sleep(1)
         return send_file('report.pdf', as_attachment=True)
     else:
         print("Something went Wrong!")
