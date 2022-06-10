@@ -228,6 +228,7 @@ def report(id, alert=None):
         minimum_supervised = round_half_up(total_hours * 0.05)
         return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert)
 
+
     return redirect("/")
 
 # Dashoard for client (login Needed)
@@ -616,6 +617,7 @@ def get_report(year, month, id):
             # return dashboard(year, month, alert={'error': 'Error generating report'})
         
         pdfkit.from_string(template, 'report.pdf')
+        print("pdf generated")
         return send_file('report.pdf', as_attachment=True)
     else:
         print("Something went Wrong!")
