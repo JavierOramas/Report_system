@@ -595,10 +595,10 @@ def get_report(year, month, id):
         company = user['background_screening_type']
         date = user['background_date']
         exp_date = user['background_exp_date']
-        # try:
-        template = render_template(
+        try:
+            template = render_template(
                 'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors, report=True, observed_with_client=observed_with_client)
-        options = {
+            options = {
                 'page-size': 'A4',
                 # 'orientation': ,
                 'enable-local-file-access': None,  # to avoid blanks
@@ -607,8 +607,8 @@ def get_report(year, month, id):
                 'debug-javascript': None,
                 'enable-javascript': None
             }
-        # except:
-        if False:
+        except:
+        # if False:
             print("exception")
             alert = {'error': 'Something went Wrong! Check that all the User info is correct'}
             if not session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']:
@@ -617,6 +617,7 @@ def get_report(year, month, id):
                 return redirect(url_for('report', id=id, alert=alert))
                 # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
             # return dashboard(year, month, alert={'error': 'Error generating report'})
+        
         pdfkit.from_string(template, 'report.pdf')
         return send_file('report.pdf', as_attachment=True)
     else:
