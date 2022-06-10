@@ -60,12 +60,12 @@ def round_half_up(n, decimals=0):
 
 def get_entries(role, year, month, user):
     if not 'providerId' in user:
-        if 'ProviderId' in user:
+        if 'ProviderId' in user and user['ProviderId'] != '' and user['ProviderId'] != None:
             user['providerId'] = user['ProviderId']
         else:
             return [],0,0,[],0,0,[], 0
-    
-    entries = db.Registry.find({'ProviderId':int(user['providerId'])})
+    print(user)
+    entries = db.Registry.find({'ProviderId':int(str(user['providerId']))})
     entries = [entry for entry in entries]
 
     temp = []
