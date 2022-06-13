@@ -27,12 +27,6 @@
       margin: 5px;
     }
 
-    .abs_table,
-    .abs_table td,
-    .abs_table tr {
-      border-top: 0px;
-    }
-
     .header {
       font-weight: bold;
     }
@@ -46,15 +40,14 @@
       border-top: 2px solid;
     }
 
-    .borderless,
-    .borderless tr,
-    .borderless td {
+    .borderless, .borderless tr, .borderless td{
+
       border-right: 0px;
       border-bottom: 0px;
       border-top: 0px;
       border-left: 0px;
       margin-top: 25px;
-    }
+  }
   </style>
   <table>
     <tr>
@@ -73,36 +66,36 @@
   <table class="rbtData abs_table">
     <tr>
       <td width="30%">
-        <div class="name">
+        <div class="name"  style="color: red">
           <p>{{ rbt_name }}</p>
         </div>
       </td>
       <td width="30%">
-        <div class="hired_date">
+        <div class="hired_date"  style="color: red">
           <p>Hired Date: {{hired_date}}</p>
         </div>
       </td>
       <td width="40%">
-        <div class="month">
+        <div class="month"  style="color: red">
           <p>Month of Supervision: {{month_year}}</p>
         </div>
       </td>
     </tr>
   </table>
 
-  <table class="entries abs_table">
-    <tr class="header">
-      <td>Meeting Date</td>
-      <td>Meeting Duration</td>
-      <td>Individual</td>
-      <td>Group</td>
-      <td>Mode of Meeting</td>
-      <td>Observed with Client</td>
-      <td>Supervisor</td>
+  <table class="entries abs_table" style="border-top: 0px">
+    <tr class="header" style="border-top: 0px">
+      <td style="border-top: 0px">Meeting Date</td>
+      <td style="border-top: 0px">Meeting Duration</td>
+      <td style="border-top: 0px">Individual</td>
+      <td style="border-top: 0px">Group</td>
+      <td style="border-top: 0px">Mode of Meeting</td>
+      <td style="border-top: 0px">Observed with Client</td>
+      <td style="border-top: 0px">Supervisor</td>
     </tr>
     {% for entry in entries%}
     <tr>
-      <td>{{ entry['DateOfService']}}</td>
+      <td>{{ entry['DateOfService' ]}}</td>
       <td>{{ entry['MeetingDuration'] }}</td>
       {% if entry["Individual"] == 'yes'%}
       <td>x</td>
@@ -116,18 +109,34 @@
       <td>{{ entry["Supervisor"]}}</td>
     </tr>
     {% endfor %}
+
+    {% for i in range(3) %}
+    <tr style="height: 22px">
+      <td>  </td>
+      <td>  </td>
+      <td>  </td>
+      <td>  </td>
+      <td>  </td>
+      <td>  </td>
+      <td>  </td>
+    </tr>
+    {% endfor %}
   </table>
 
-  <table class="summary abs_table">
+  <table class="summary abs_table" style="margin-top: 15px">
     <tr>
       <td class="header">Total RBT Behavioral analytic hrs</td>
       <td>{{total_hours}}</td>
+      <td style='width: 60px'> </td>
+      <td style='width: 60px'> </td>
       <td class="header">Face to Face minimum requirement met</td>
       <td style="color: red">Requirement met</td>
     </tr>
     <tr>
       <td class="header">Total Supervisor Hours</td>
       <td>{{supervised_hours}}</td>
+      <td style='width: 60px'> </td>
+      <td style='width: 60px'> </td>
       <td class="header">Individual Supervision minimum requirement met</td>
       <td style="color: red">Requirement met</td>
     </tr>
@@ -135,12 +144,14 @@
     <tr>
       <td class="header">Supervision minimum requirement met</td>
       <td>{{minimum_supervised}}</td>
+      <td style='width: 60px'> </td>
+      <td style='width: 60px'> </td>
       <td class="header">Observation minimum requirement met</td>
       <td style="color: red">Requirement met</td>
     </tr>
   </table>
 
-  <table class="background abs_table">
+  <table class="background abs_table" style="margin-top: 15px">
     <tr>
       <td class="header" rowspan="2">Background check</td>
       <td class="header">Company</td>
@@ -160,23 +171,25 @@
     {% for sup in supervisors %}
     <tr>
       <td class="header">Supervisor Name and Credential:</td>
-      <td style="text-align: right; text-decoration: underline">
+      <td style="text-align: left; border-bottom: 0.5px solid; max-width: 300px">
         {{sup["name"]}}
       </td>
       <td class="header">Signature & Date:</td>
-      <td style="text-align: right; text-decoration: underline">
+      <td
+        style="text-align: left; border-bottom: 0.5px solid; min-width: 100px"
+      >
         {{signature}}
       </td>
     </tr>
     {% endfor %}
-    <tr>
-      <td class="header">Supervisor Name and Credential:</td>
-      <td style="text-align: right; text-decoration: underline">
+    <tr >
+      <td class="header">RBT Name and Credential:</td>
+      <td style="text-align: left; border-bottom: 0.5px solid; max-width: 300px">
         {{rbt_name}}
       </td>
       <td class="header">Signature & Date:</td>
       <td
-        style="text-align: right; text-decoration: underline; min-width: 100px"
+        style="text-align: left; border-bottom: 0.5px solid; min-width: 100px"
       >
         {{signature}}
       </td>

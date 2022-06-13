@@ -19,10 +19,10 @@
     border-color: black;
     margin: 5px;
 }
-
+/* 
 .abs_table , .abs_table td, .abs_table tr{
-    border-top: 0px;
-}
+ border-top: 0px; 
+} */
 
 .header{
     font-weight: bold;
