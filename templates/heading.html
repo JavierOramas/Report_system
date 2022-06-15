@@ -1,61 +1,51 @@
 {% macro heading(id, session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client) %}
-<div class="card">
-    <h1 class="center">Dashboard</h1>
-     <div class="center">
-         <p>You are currently logged In</p>
-         <a class="btn btn-secondary" href="/user/signout">Sign Out</a>
-         <a class="btn btn-secondary" href="/">Home</a>
-         <a class="btn btn-secondary" href="/user/edit/{{id}}">Edit account</a> 
 
-         {% if role in ['admin','bcba', 'bcba (l)' ] %}
-         <!-- <a class="btn btn-secondary" href="/users/">Edit Users</a> -->
-         {% endif %}
-
-     </div>
- </div>
-
- <div class="card">
-     <h2 class="center">
-         Your Info
-     </h2>
-     <p>
-
-        <strong>Name:</strong>{{ session['user']['name'] }} <br>
-        <strong>Email:</strong>{{ session['user']['email'] }} <br>
-        <strong>ProviderId:</strong>{{ session['user']['providerId'] }} <br>
-        
-        {% if report == True and supervised_hours >= minimum_supervised and observed_with_client >= 1  %}
-        <div class="center">
-            <a href="/report/{{year}}/{{month}}/{{id}}" class="btn btn-success">Export PDF</a>
-        </div>
-        {% elif report == True and not role in ['admin','role']%}
-        <div class="center">
-            <a href="/report/{{year}}/{{month}}/{{id}}" class="btn btn-success disabled" aria-disabled="true">Export PDF</a>
+<div class="topnav">
+    <a class='active' href="/">Home</a>
+    <a href="/user/edit/{{id}}">Edit account</a>
+    {% if report == True and supervised_hours >= minimum_supervised and observed_with_client >= 1  %}
+    <div class="center">
+        <a href="/report/{{year}}/{{month}}/{{id}}" class="">Export PDF</a>
+    </div>
+    {% elif report == True and not role in ['admin','role']%}
+    <div class="center">
+        <a href="/report/{{year}}/{{month}}/{{id}}" class="disabled" aria-disabled="true">Export PDF</a>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <p> Some requirements are not met or entries have not been verified by supervisor </p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        {% endif %}
-    
-     </p>
- </div>
- {% if role in ['admin','bcba', 'bcba (l)'] %}
- <div class="form-group card">
+    </div>
+    {% endif %}
 
+    
+    <div class="flex-lg-row-reverse">
+        <a class="" href="/user/signout">Sign Out</a>
+    </div>
+
+</div>
+
+ {% if role in ['admin','bcba', 'bcba (l)'] %}
+ <div class="container card">
+    <div class='row' >
+        <div class="col-sm">
             <h1>Upload your CSV file</h1>
             <form method="POST" action="/dashboard" enctype="multipart/form-data">
                 <p><input class='form-control' type="file" accept=".csv" name="file"></p>
                 <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
             </form>
-       
+        </div>
+        <div class="col-sm">
             <h1>Upload Users CSV</h1>
             <form method="POST" action="/dashboard/providers" enctype="multipart/form-data">
                 <p><input class='form-control' type="file" accept=".csv" name="file"></p>
                 <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
             </form>
-      
+        </div>
+
     </div>
 
  {% else %}
- <div class="form-group card">
+ <div class="row card">
     <h1>This Month Report Status:</h1>
     <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours: {{total_hours or 0}}h</p>
     <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours/Minimum Requirement: {{supervised_hours or 0}}h / {{minimum_supervised or 0}}h </p>
