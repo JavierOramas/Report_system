@@ -1,3 +1,4 @@
+from inspect import signature
 from time import sleep
 
 from colorama import Cursor
@@ -15,7 +16,7 @@ import math
 import datetime_format
 import pdfkit
 from passlib.hash import pbkdf2_sha256
-from utils import get_rbt_coordinator, round_half_up
+from utils import get_rbt_coordinator, get_second_monday, round_half_up
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -619,7 +620,7 @@ def get_report(year, month, id):
         exp_date = user['background_exp_date']
         try:
             template = render_template(
-                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
+                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'],signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
             options = {
                 'page-size': 'A4',
                 # 'orientation': ,
