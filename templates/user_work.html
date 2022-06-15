@@ -1,0 +1,133 @@
+    {% extends "base.html" %}
+{% from 'heading.html' import heading %}
+
+{% block content %}
+
+{% if alert and alert != '' %}
+    <div class="alert alert-warning" role="alert">{{alert}}</div>
+{% endif %}
+
+
+<div class="card-wrapper">
+    {{ heading(id,session, role, total_hours, supervised_time, meetings, minimum_supervised, year, month, report, observed_with_client) }}
+
+    <div class="center card-wrapper">
+
+    <div class="card-table">
+
+
+        <ul class="nav nav-tabs" id="dataTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="ovl-tab" data-bs-toggle="tab" data-bs-target="#ovl" type="button" role="tab" aria-controls="ovl" aria-selected="true">Overlappings</button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
+            </li>
+
+        </ul>
+
+        <div class="tab-content" style="margin-top: 10px;" id="myTabContent">
+            <div class="tab-pane fade show active" id="ovl" role="tabpanel" aria-labelledby="ovl-tab">
+                <div class="table-preferences">
+                    <form method="POST" action="/user_report/{{id}}" method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="sel_year">Year</label>
+                                    <select class="form-select form-control form-select-sm" style="width:40%" id="sel_year" name="year">
+                                        {% for i in range(min_year, year+1) %}
+                                        <option value="{{i}}" {{'selected' if i == year }}>{{i}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="sel_month">Month</label>
+                                    <select class="form-select form-control form-select-sm" style="width:40%" id="sel_month" name="month">
+                                        {% for i in range(1,13) %}
+                                        <option value="{{i}}" {{'selected' if i == month }}>{{i}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <a type="button" class="btn btn-primary btn-sm" href="/edit/new/{{id}}">Add New</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <p>{{user['name']}}</p>
+                <div class="center">
+                    <table class="table" id="entries">
+                        <tr>
+                            {% for i in ["Confirmed ","DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                            <th>
+                                {{i}}
+                            </th>
+                            {% endfor %}
+                        </tr>
+
+                        {% for entry in entries %}
+                        <tr>
+                            <td> {% if entry['Verified'] == False %} ❌ {% else %} ✅ {% endif %}</td>
+                            <td>{{ entry["DateOfService"] }}</td>
+                            <td>{{ entry["MeetingDuration"] }}</td>
+                            <td>{{ entry["Individual"] }}</td>
+                            <td>{{ entry["Group"] }}</td>
+                            <td>{{ entry["ModeofMeeting"] }}</td>
+                            <td>{{ entry["ObservedwithClient"] }}</td>
+                            <td>{{ entry["Supervisor"] }}</td>
+                            <td>
+                                <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
+                            </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                <div class="center">
+                    <table class="table" id="pending">
+                        <tr>
+                            {% for i in ["DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                            <th>
+                                {{i}}
+                            </th>
+                            {% endfor %}
+                        </tr>
+                        
+                        {% for entry in pending %}
+                        <tr>
+                            <td>{{ entry["DateOfService"] }}</td>
+                            <td>{{ entry["MeetingDuration"] }}</td>
+                            <td>{{ entry["Individual"] }}</td>
+                            <td>{{ entry["Group"] }}</td>
+                            <td>{{ entry["ModeofMeeting"] }}</td>
+                            <td>{{ entry["ObservedwithClient"] }}</td>
+                            <td>{{ entry["Supervisor"] }}</td>
+                            <td>
+                                <a type="button" class="btn btn-primary btn-sm" href="/verify/{{ entry['_id'] }}">Verify</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+            
+    </div>
+    {% endblock content %}
+</div>

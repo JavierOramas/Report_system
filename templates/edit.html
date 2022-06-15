@@ -5,20 +5,20 @@
         <div class="card">
 
             <form name="edit_form" method="POST">
-                <label for="DateOfService">Date Of Service (DD/MM/YYYY HH:MM)</label>
-                <input type="text" name="DateOfService" value={% if entry['DateOfService'] != '' %} {{ entry['DateOfService'] }} {% endif %} class="field" required>
+                <label for="DateOfService">Date Of Service (MM/DD/YYYY HH:MM)</label>
+                <input type="text" class="field" name="DateOfService" value="{% if entry['DateOfService'] != '' %}{{entry['DateOfService']}}{% endif %}"  required>
 
                 <label for="MeetingDuration">MeetingDuration</label>
                 <input type="number" name="MeetingDuration" value={{entry['MeetingDuration']}} class="field" required>
-                
+
                 <label for="ProcedureCodeId">Procedure Code</label>
-                <input type="text" name="ProcedureCodeId" value={{ entry['ProcedureCodeId'] }} class="field" required>
-                
-                <label for="Supervisor">Supervisor</label>
-                <select id="Supervisor" name="Supervisor" form="edit_form" class="form-select">
+                <input type="text" class="field" name="ProcedureCodeId" value="{{ entry['ProcedureCodeId'] }}" required>
+
+                <label for="sup">Supervisor</label>
+                <select id="sup" name="sup" class="form-select">
                     {% for supervisor in supervisors %}
-                        <option value="{{supervisor['ProviderId']}}">
-                            {{supervisor}}
+                        <option value={{supervisor['ProviderId']}}>
+                            {{supervisor['name']}}
                         </option>
                     {% endfor %}
                 </select>
@@ -26,9 +26,9 @@
                 <label for="supervision">Supervision type</label>
                 <fieldset>
                     <div id="supervision" class="radio_group">
-                        <input type="radio" id="individual" name="supervision_type" class="radio"/>
+                        <input type="radio" id="individual" name="supervision_type" value='no' class="radio"  {% if entry['Individual'] == 'yes' %}checked{% endif %}/>
                         <label for="individual">Individual</label>
-                        <input type="radio" id="group" name="supervision_type" class="radio"/>
+                        <input type="radio" id="group" name="supervision_type" value='yes' class="radio" {% if entry['Group'] == 'yes' %}checked{% endif %}/>
                         <label for="group">Group</label>
                     </div>
                 </fieldset>
@@ -36,9 +36,9 @@
                 <label for="mode_meeting">Mode Of Meeting</label>
                 <fieldset>
                     <div id="mode_meeting" class="radio_group">
-                        <input type="radio" id="remote" name="meeting_type" value="remote" class="radio"/>
+                        <input type="radio" id="remote" name="meeting_type" value="Remote" class="radio" {% if entry['ModeofMeeting'] in ['Remote', 'remote'] %}checked{% endif %}/>
                         <label for="remote">Remote</label>
-                        <input type="radio" id="in_person" name="meeting_type" value="in person" class="radio"/>
+                        <input type="radio" id="in_person" name="meeting_type" value="In Person" class="radio" {% if entry['ModeofMeeting'] in ['In Person','in person'] %}checked{% endif %}/>
                         <label for="in_person">In Person</label>
                     </div>
                 </fieldset>
@@ -46,9 +46,9 @@
                 <label for="observed">Observed With Client</label>
                 <fieldset>
                     <div id="observed" class="radio_group">
-                        <input type="radio" id="yes" name="observed" value="yes" class="radio"/>
+                        <input type="radio" id="yes" name="observed" value="yes" class="radio" {% if entry['ObservedwithClient'] == 'yes' %}checked{% endif %}/>
                         <label for="yes">Yes</label>
-                        <input type="radio" id="no" name="observed" value="no" class="radio"/>
+                        <input type="radio" id="no" name="observed" value="no" class="radio" {% if entry['ObservedwithClient'] == 'no' %}checked{% endif %}/>
                         <label for="no">No</label>
                     </div>
                 </fieldset>

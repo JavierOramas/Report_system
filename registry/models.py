@@ -4,49 +4,55 @@ import uuid
 from termcolor import colored
 from overlappings.tools import process
 import pandas as pd
-from app import db
+# from app import db
 import datetime
 import os
 import datetime_format
 
+
 class Registry:
-    
+
     def get_55_code(self):
         return [150582, 194640]
     # Declare the model for the collection that will be added to MongoDB database
-    def get_observed(self,entry):
+
+    def get_observed(self, entry):
 
         if entry["ProcedureCodeId"] in [255975]:
-            return 'yes','Remote'
+            return 'yes', 'Remote'
 
         if entry["ProcedureCodeId"] in self.get_55_code():
-            return 'yes','In Person'
+            return 'yes', 'In Person'
         else:
-            return 'no','Remote'
+            return 'no', 'Remote'
 
-    def get_group_individual(self,entry):
+    def get_group_individual(self, entry):
         if entry["ProcedureCodeId"] in [194641]:
-            return 'yes','no'
+            return 'yes', 'no'
         else:
-            return 'no','yes'
+            return 'no', 'yes'
 
-    def add_data(self):
+    def add_data(self, db):
         # Load data from csv pre-loaded from the client
         try:
             data = pd.read_csv('static/files/data.csv')
         except:
-            return {'status' : 500}
+            return {'status': 500}
         labels = ['ProviderId', 'TimeWorkedInHours']
 
-        month = datetime.datetime.strptime(data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').month
-        year = datetime.datetime.strptime(data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
+        month = datetime.datetime.strptime(
+            data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').month
+        year = datetime.datetime.strptime(
+            data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
         data = data.drop(data.columns.difference(labels), 1)
-        data['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(lambda x: x.replace(',','.')).astype(float)
-
+        try:
+            data['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(
+                lambda x: x.replace(',', '.')).astype(float)
+        except:
+            data['TimeWorkedInHours'] = data['TimeWorkedInHours'].astype(float)
         total_time = data.groupby(['ProviderId']).sum()
 
-
-        for name,entry in total_time.iterrows():
+        for name, entry in total_time.iterrows():
             # entry['ProviderId'] = entry['Name']
             item = {
                 'ProviderId': name,
@@ -54,13 +60,13 @@ class Registry:
                 'Year': year,
                 'TotalTime': entry['TimeWorkedInHours']
             }
-            
+
             if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}):
                 db.TotalHours.insert_one(item)
 
         data = process('static/files/data.csv', 'providers.csv')
-            # crete the collection entries
-        for index,entry in data.iterrows():
+        # crete the collection entries
+        for index, entry in data.iterrows():
             entry = {
                 "entryId": entry["Id"],
                 "ProviderId": entry["ProvId"],
@@ -79,12 +85,14 @@ class Registry:
                 "Verified": True
             }
 
-            entry['DateTimeFrom'] = datetime_format.format(entry['DateTimeFrom'])
+            entry['DateTimeFrom'] = datetime_format.format(
+                entry['DateTimeFrom'])
             entry['DateTimeTo'] = datetime_format.format(entry['DateTimeTo'])
-            entry['DateOfService'] = datetime_format.format(entry['DateOfService'])
+            entry['DateOfService'] = datetime_format.format(
+                entry['DateOfService'])
 
         # Insert the data and log to the console the action
-            if not db.Registry.find_one({"ProviderId":entry['ProviderId'], "entryId":entry['entryId']}):
+            if not db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']}):
                 db.Registry.insert_one(entry)
             # print('Log: ' + colored('Entry added successfully', 'green'))
         # else:
@@ -94,4 +102,4 @@ class Registry:
         return {'status': 200}
     # except:
         # pass
-            #TODO notify errors
+        # TODO notify errors

@@ -26,6 +26,13 @@
   box-sizing: border-box;
 }
 
+.checkbox-xl{
+  margin-left: 10px;
+  font-size: 25px;
+  font-weight: 500;
+  border-radius: .25em;
+}
+
 body {
   margin: 0;
   font-family: sans-serif;
@@ -225,4 +232,18 @@ input.radio {
   float: left;
   clear: none;
   margin: 2px 0 0 2px;
+}
+
+.user-edit, .user-edit input{
+  margin: 1%;
+  /* margin-right: 20px; */
+  /* padding: 1%; */
+}
+
+.col-sm-4{
+  margin-right: 20px;
+}
+
+.icon{
+  text-decoration: none;
 }

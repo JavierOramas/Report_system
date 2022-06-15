@@ -1,12 +1,13 @@
-{% macro heading(session, role, total_hours, supervised_hours, meeting_groups, minimum_supervised) %}
+{% macro heading(id, session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client) %}
 <div class="card">
     <h1 class="center">Dashboard</h1>
      <div class="center">
          <p>You are currently logged In</p>
-         <a class="btn btn-secondary" href="/user/signout/">Sign Out</a>
+         <a class="btn btn-secondary" href="/user/signout">Sign Out</a>
+         <a class="btn btn-secondary" href="/">Home</a>
+         <a class="btn btn-secondary" href="/user/edit/{{id}}">Edit account</a> 
 
-         {% if role == 'admin' %}
-         <a class="btn btn-secondary" href="/users/">Edit Users</a>
+         {% if role in ['admin','bcba', 'bcba (l)' ] %}
          <!-- <a class="btn btn-secondary" href="/users/">Edit Users</a> -->
          {% endif %}
 
@@ -18,28 +19,54 @@
          Your Info
      </h2>
      <p>
-         <strong>ID:</strong>{{ session['user']['_id'] }} <br>
-         <strong>Name:</strong>{{ session['user']['name'] }} <br>
-         <strong>Email:</strong>{{ session['user']['email'] }} <br>
-         <strong>ProviderId:</strong>{{ session['user']['providerId'] }} <br>
 
+        <strong>Name:</strong>{{ session['user']['name'] }} <br>
+        <strong>Email:</strong>{{ session['user']['email'] }} <br>
+        <strong>ProviderId:</strong>{{ session['user']['providerId'] }} <br>
+        
+        {% if report == True and supervised_hours >= minimum_supervised and observed_with_client >= 1  %}
+        <div class="center">
+            <a href="/report/{{year}}/{{month}}/{{id}}" class="btn btn-success">Export PDF</a>
+        </div>
+        {% elif report == True and not role in ['admin','role']%}
+        <div class="center">
+            <a href="/report/{{year}}/{{month}}/{{id}}" class="btn btn-success disabled" aria-disabled="true">Export PDF</a>
+            <p> Some requirements are not met or entries have not been verified by supervisor </p>
+        </div>
+        {% endif %}
+    
      </p>
  </div>
- {% if role == 'admin' %}
+ {% if role in ['admin','bcba', 'bcba (l)'] %}
  <div class="form-group card">
-     <h1>Upload your CSV file</h1>
-     <form method="POST" action="" enctype="multipart/form-data">
-         <p><input class='form-control' type="file" accept=".csv" name="file"></p>
-         <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
-     </form>
- </div>
+
+            <h1>Upload your CSV file</h1>
+            <form method="POST" action="/dashboard" enctype="multipart/form-data">
+                <p><input class='form-control' type="file" accept=".csv" name="file"></p>
+                <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
+            </form>
+       
+            <h1>Upload Users CSV</h1>
+            <form method="POST" action="/dashboard/providers" enctype="multipart/form-data">
+                <p><input class='form-control' type="file" accept=".csv" name="file"></p>
+                <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
+            </form>
+      
+    </div>
+
  {% else %}
  <div class="form-group card">
     <h1>This Month Report Status:</h1>
-    <p>Total Hours: {{total_hours}}</p>
-    <p>Supervised Hours: {{supervised_hours}} / {{minimum_supervised}} </p>
-    <p>Meeting Groups: {{meeting_groups}}/1 </p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours: {{total_hours or 0}}h</p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours/Minimum Requirement: {{supervised_hours or 0}}h / {{minimum_supervised or 0}}h </p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" >Group Supervision Meetings: {{meeting_group or 0}}</p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">Sessions observed with client/minimum requirement: {{observed_with_client or 0}} / 1 </p>
+    
+    {% if meeting_group and supervised_hours and supervised_hours < minimum_supervised and meeting_group < 1 %}
+        <p>You have not met the minimum supervised hours requirement</p>
+    {% endif %}
 </div>
+
 
  {% endif %}
  

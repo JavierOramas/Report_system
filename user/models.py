@@ -1,14 +1,21 @@
 from flask import Flask, jsonify, request, session, redirect
 import uuid
 from passlib.hash import pbkdf2_sha256
-from app import db
+import pandas as pd
+import datetime
+import os
+from termcolor import colored
+import datetime_format
+# from app import db
+
 
 class User:
 
     # Create Session for logged user
     def start_session(self, user):
         del user['password']
-        del user['_id']
+        # del user['_id']
+        user['_id'] = str(user['_id'])
         session['logged_in'] = True
         session['user'] = user
         return jsonify(user), 200
@@ -20,66 +27,92 @@ class User:
             "role":                     'basic',
             "password":                 request.form.get('password'),
             "email":                    request.form.get('email'),
-            "providerId":               request.form.get('providerId'),
+            "ProviderId":               request.form.get('providerId'),
         }
 
         # encrypt the password
         user['password'] = pbkdf2_sha256.encrypt(user['password'])
 
         # Verify uniqueness of the user and insert it in the database if no error
-        if db.users.find_one({"email":user["email"]}): #or db.users.find_one({"providerId":user["providerId"]}):
-            return jsonify({"error": "Email Address or ProviderId Already exists"}),400
+        # or db.users.find_one({"providerId":user["providerId"]}):
+        if db.users.find_one({"email": user["email"]}):
+            return jsonify({"error": "Email Address or ProviderId Already exists"}), 400
 
         if db.users.insert_one(user):
             return self.start_session(user)
 
         # If this is reached something wrong Happened
-        return jsonify({"error":"Sign Up failed"}), 400
+        return jsonify({"error": "Sign Up failed"}), 400
 
-    def login(self):
+    def login(self, db):
 
         # Find user and login
         user = {
-            "email" : request.form.get('email'),
+            "email": request.form.get('email'),
         }
         user = db.users.find_one(user)
         if user and pbkdf2_sha256.verify(request.form.get('password'), user['password']):
             return self.start_session(user)
 
         # If this is reached something wrong Happened
-        return jsonify({"error":"Login failed"}), 401
+        return jsonify({"error": "Login failed"}), 401
 
     def signout(self):
         session.clear()
         return redirect('/')
 
-    def add_data(self):
-            # Load data from csv pre-loaded from the client
-        # data = pd.read_csv('static/files/data.csv')
-        
+    def add_data(self, db):
+        # Load data from csv pre-loaded from the client
+        data = pd.read_csv('static/files/data.csv', dtype={ 'Credential':str, 'Hired Date':str, 'Background Screening Date':str, 'Background Screening':str})
         # crete the collection entries
-        for index,entry in data.iterrows():
-            entry['DateTimeFrom'] = datetime.datetime.strptime(entry['DateTimeFrom'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-            entry['DateTimeTo'] = datetime.datetime.strptime(entry['DateTimeTo'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-            entry['DateOfService'] = datetime.datetime.strptime(entry['DateOfService'], '%m/%d/%Y %H:%M').strftime('%d/%m/%y %H:%M')
-            entry = {
-                "_id":                      entry['ProviderId'],
-                "name":                     entry['Name and Credential'],
-                "first_name":               entry['ProviderFirstName'],
-                "last_name":                entry['ProviderLastName'],
-                "BACB_id":                  entry['BACB Account ID'],
-                "credential":               entry['Credential'],
-                "role":                     entry['Role'],
-                "hired_date":               entry['Hired Date'],
-                "fingerprint_background":   entry['DateOfService'],
-                "background_date":          entry['Background Screening Date'],
-                "background_exp_date":      entry['Background Screening'],
+        for index, entry in data.iterrows():
+            item = {
+                "ProviderId": entry['ProviderId'],
+                "name": entry["Name and Credential"],
+                "email": entry["Email"],
+                "first_name": entry["ProviderFirstName"],
+                "last_name": entry["ProviderLastName"],
+                "BACB_id": entry["BACB Account ID"],
+                "credential": entry["Credential"],
+                "role": entry["Status"],
+                "background_screening_type" : entry["Background Screening Type"], 
             }
+            
+            try:
+                if 'Hired Date' in entry and entry['Hired Date'] != None and entry['Hired Date'] != '':
+                    item["hired_date"]= datetime.datetime.strptime(entry['Hired Date'], '%m/%d/%Y').strftime('%m/%d/%y')
+            except:
+                print("failed to parse date")
 
+            try:
+                if 'Background Screening Date' in entry and entry['Background Screening Date'] != None and entry['Background Screening Date'] != '':
+                    item["background_date"]= datetime.datetime.strptime(str(entry['Background Screening Date']), '%m/%d/%Y').strftime('%m/%d/%y')
+            except:
+                print("failed to parse date screening")
+                
+            try:
+                if 'Background Screening' in entry and entry['Background Screening'] != None and entry['Background Screening'] != '':
+                    item["background_exp_date"]= datetime.datetime.strptime(str(entry['Background Screening']), '%m/%d/%Y').strftime('%m/%d/%y')
+            except:
+                print("failed to parse date background screening")
+                
+            print(db.users.find_one({"ProviderId": [int(item["ProviderId"]), str(item['ProviderId'])]}))
+            print(item)
+            if db.users.find_one({"ProviderId": item["ProviderId"]}) in [[], None, False] and db.users.find_one({"ProviderId": str(item["ProviderId"])}) in [[], None, False]:
             # Insert the data and log to the console the action
-            if db.users.insert_one(entry):
-                print('Log: ' + colored('Entry added successfully', 'green'))
+                try:
+                    if db.users.insert_one(entry):
+                        print('Log: ' + colored('Entry added successfully', 'green'))
+                    else:
+                        print(
+                        'Log: ' + colored(f'Error adding entry to database \n {item}', 'red'))
+                except:
+                    pass
             else:
-                print('Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))
-        # Return success code
+                if db.users.update_one({'ProviderId': item["ProviderId"]}, {'$set': item}):
+                    print('Log: ' + colored('Entry edited successfully', 'yellow'))
+                else:
+                    print(
+                        'Log: ' + colored(f'Error adding entry to database \n {item}', 'red'))
+                # Return success code
         return {'status': 200}

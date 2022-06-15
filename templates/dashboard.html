@@ -3,56 +3,220 @@
 
 {% block content %}
 
-<div class="card-wrapper">
-    {{ heading(session, role, total_hours, supervised_hours, meeting_group, minimum_supervised) }}
-    <div class="card-wrapper">
-        <div class="card-table">
-            <div class="table-preferences">
-                <label for="sel_year">Year</label>
-                <select class="form-select form-select-sm" style="width:25%" id="sel_year" name="years">
-                    {% for i in range(min_year, current_year+1) %}
-                    <option value="{{i}}" {{'selected' if i == current_year }}>{{i}}</option>
-                    {% endfor %}
-                </select>
-                <label for="sel_month">Month</label>
-                <select class="form-select form-select-sm" style="width:25%;float:left" id="sel_month" name="months">
-                    {% for i in range(1,13) %}
-                        <option value="{{i}}" {{'selected' if i == current_month }}>{{i}}</option>
-                    {% endfor %}
-                </select>
+{% if alert != None and alert != '' %}
+    <div class="alert alert-warning" role="alert">{{alert}}</div>
+{% endif %}
 
-                <a type="button" class="btn btn-primary btn-sm" href="/edit/new">Add New</a>
+
+<div class="card-wrapper">
+    
+    {{ heading(id, session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client) }}
+
+    <div class="center card-wrapper">
+
+    <div class="card-table">
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+        {% if not role in ['admin', 'bcba', 'bcba (l)'] %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="olv-tab" data-bs-toggle="tab" data-bs-target="#ovl" type="button" role="tab" aria-controls="ovl" aria-selected="true">Overlappings</button>
+            </li>
+        {% endif %}
+        {% if role in ['admin','role'] %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="true">Users</button>
+        </li>
+        {% endif %}
+
+        {% if role != 'role' or role != 'basic'%}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
+        </li>
+        {% endif %}
+    </ul>
+
+    <div class="tab-content" style="margin-top: 10px;" id="myTabContent">
+        {% if not role in ['admin', 'bcba', 'bcba (L)'] %}
+            <div class="tab-pane fade show active" id="ovl" role="tabpanel" aria-labelledby="home-tab">
+
+            <div class="table-preferences">
+                <form method="POST" action="/filter/" method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label for="sel_year">Year</label>
+                                <select class="form-select form-control form-select-sm" style="width:40%" id="sel_year" name="year">
+                                    {% for i in range(min_year, year+1) %}
+                                    <option value="{{i}}" {{'selected' if i == year }}>{{i}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            </div>
+                            
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="sel_month">Month</label>
+                                    <select class="form-select form-control form-select-sm" style="width:40%" id="sel_month" name="month">
+                                        {% for i in range(1,13) %}
+                                        <option value="{{i}}" {{'selected' if i == month }}>{{i}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <a type="button" class="btn btn-primary btn-sm" href="/edit/new">Add New</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="center">
+                    <table class="table" id="entries">
+                        <tr>
+                            {% for i in ["Confirmed ","DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                            <th>
+                                {{i}}
+                            </th>
+                            {% endfor %}
+                        </tr>
+
+                        {% for entry in entries %}
+                        <tr>
+                            <td> {% if entry['Verified'] == False %} ❌ {% else %} ✅ {% endif %}</td>
+                            <td>{{ entry["DateOfService"] }}</td>
+                            <td>{{ entry["MeetingDuration"] }}</td>
+                            <td>{{ entry["Individual"] }}</td>
+                            <td>{{ entry["Group"] }}</td>
+                            <td>{{ entry["ModeofMeeting"] }}</td>
+                            <td>{{ entry["ObservedwithClient"] }}</td>
+                            <td>{{ entry["Supervisor"] }}</td>
+                            <td>
+                                <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
             </div>
-            <div class="center">
+        {% endif %}
+
+        {% if role in ['admin', 'bcba', 'bcba (l)'] %}
+            <script>
+            function toggle() {
+             if( document.getElementById("hidethis").style.display=='none' ){
+               document.getElementById("hidethis").style.display = '';
+             }else{
+               document.getElementById("hidethis").style.display = 'none';
+             }
+            }
+            </script>
+
+            <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="center">
+                    <div class="table-preferences">
+                        <form method="POST" action="/filter" method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <!-- <div class="form-group">
+                                        <label for="sel_role">Role</label>
+                                        <select class="form-select form-control form-select-sm" style="width:25%" id="sel_role" name="role">
+                                      {% for i in roles %}
+                                      <option value="{{i}}">{{i}}</option>
+                                      {% endfor %}
+                                    </select>
+                                </div> -->
+                            </div>
+
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <a type="button" class="btn btn-primary btn-sm" href="/user/new">Add New</a>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="custom-control custom-checkbox checkbox-xl">
+                                    <input type="checkbox" value="off" name='show_inactive' onchange="toggle()"/>
+                                    <label for="show_inactive">Show Hidden</label>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 <table class="table" id="entries">
                     <tr>
-                        {% for i in ["Confirmed ","DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                        {% for i in ['', 'ProviderId', 'Name' ,'Email', 'Role']%}
                         <th>
                             {{i}}
                         </th>
                         {% endfor %}
                     </tr>
-                    
-                {% for entry in entries %}
-                <tr>
-                    <td> {% if entry['Verified'] == False %} ❌ {% else %} ✅ {% endif %}</td>
-                    <td>{{ entry["DateOfService"] }}</td>
-                    <td>{{ entry["MeetingDuration"] }}</td>
-                    <td>{{ entry["Individual"] }}</td>
-                    <td>{{ entry["Group"] }}</td>
-                    <td>{{ entry["ModeofMeeting"] }}</td>
-                    <td>{{ entry["ObservedwithClient"] }}</td>
-                    <td>{{ entry["Supervisor"] }}</td>
-                    {% if 'providerId' in session['user'] and entry["ProviderId"] == session['user']['providerId'] %}
-                    <td>
-                        <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
-                    </td>
-                    {% endif %}
-                </tr>
-                {% endfor %}
+
+                    {% for user in users %}
+                    <tr {% if "active" in user and user["active"] == False %} id="hidethis" style={'display': 'none'}{% endif %}>
+                        <td>
+                            {% if user['role'] == None or user['role'].lower() in ['rbt', 'rbt/trainee', 'basic', 'trainee'] %}
+                            <a href='/user_report/{{user["_id"]}}'>View</a>
+                            {% endif %}
+                        </td>
+                        <td>{{ user['ProviderId'] }}</td>
+                        <td>{{ user['name'] }}</td>
+                        <td>{{ user['email'] }}</td>
+                        <td>{{ user["role"] }}</td>
+                        <td><a class="icon" href='/del/{{user["_id"]}}'>🗑️</a></td>
+                        <td>
+                            <a class="icon" href='/user/edit/{{user["_id"]}}'>✏️</a>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
                 </table>
             </div>
         </div>
+            
+        {% endif %}
+
+        {% if not role.lower() in ['rbt', 'rbt/trainee', 'basic'] %}
+            <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                <div class="center">
+                    <table class="table" id="pending">
+                        <tr>
+                            {% for i in ["DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                            <th>
+                                {{i}}
+                            </th>
+                            {% endfor %}
+                        </tr>
+                        
+                        {% for entry in pending %}
+                        <tr>
+                            <td>{{ entry["DateOfService"] }}</td>
+                            <td>{{ entry["MeetingDuration"] }}</td>
+                            <td>{{ entry["Individual"] }}</td>
+                            <td>{{ entry["Group"] }}</td>
+                            <td>{{ entry["ModeofMeeting"] }}</td>
+                            <td>{{ entry["ObservedwithClient"] }}</td>
+                            <td>{{ entry["Supervisor"] }}</td>
+                            <td>
+                                <a type="button" class="btn btn-primary btn-sm" href="/verify/{{ entry['_id'] }}">Verify</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+            </div>
+        {% endif %}
+    </div>
+    </div>
+    
     </div>
 
 {% endblock %}
+

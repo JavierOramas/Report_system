@@ -12,7 +12,7 @@ $("form[name=signup_form]").submit(function(e){
         success: function(resp){
             console.log(resp);
             $error.text(" ").addClass("error--hidden");
-            window.location.href = "/dashboard/"
+            window.location.href = "/dashboard"
         },
         error:function(resp){
             console.log(resp);
@@ -37,7 +37,7 @@ $("form[name=login_form]").submit(function(e){
         success: function(resp){
             console.log(resp);
             $error.text(" ").addClass("error--hidden");
-            window.location.href = "/dashboard/"
+            window.location.href = "/dashboard"
         },
         error:function(resp){
             console.log(resp);
@@ -115,3 +115,8 @@ $( document ).ready(function() {
         alert(fromdate);
     });
 });
+
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
