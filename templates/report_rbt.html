@@ -170,13 +170,13 @@
 
   <table class="borderless abs_table">
     <tr>
-      <td class="header">RBT Coordinator Name and Credential:</td>
+      <td style="text-align: left;" class="header">RBT Coordinator Name and Credential:</td>
       <td style="text-align: left; border-bottom: 0.5px solid; max-width: 300px">
         {{coordinator}}
       </td>
       <td class="header">Signature & Date:</td>
       <td
-        style="text-align: right; border-bottom: 0.5px solid; min-width: 100px"
+        style="text-align: right; border-bottom: 0.5px solid; min-width: 200px"
       >
         {{signature}}
       </td>
@@ -184,26 +184,26 @@
 
     {% for sup in supervisors %}
     <tr>
-      <td class="header">Supervisor Name and Credential:</td>
+      <td style="text-align: left;" class="header">Supervisor Name and Credential:</td>
       <td style="text-align: left; border-bottom: 0.5px solid; max-width: 300px">
         {{sup["name"]}}
       </td>
       <td class="header">Signature & Date:</td>
       <td
-        style="text-align: right; border-bottom: 0.5px solid; min-width: 100px"
+        style="text-align: right; border-bottom: 0.5px solid; min-width: 200px"
       >
         {{signature}}
       </td>
     </tr>
     {% endfor %}
     <tr >
-      <td class="header">RBT Name and Credential:</td>
+      <td style="text-align: left;" class="header">RBT Name and Credential:</td>
       <td style="text-align: left; border-bottom: 0.5px solid; max-width: 300px">
         {{rbt_name}}
       </td>
       <td class="header">Signature & Date:</td>
       <td
-        style="text-align: right; border-bottom: 0.5px solid; min-width: 100px"
+        style="text-align: right; border-bottom: 0.5px solid; min-width: 200px"
       >
         {{signature}}
       </td>
