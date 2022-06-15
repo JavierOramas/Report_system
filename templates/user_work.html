@@ -77,7 +77,6 @@
                             </th>
                             {% endfor %}
                         </tr>
-
                         {% for entry in entries %}
                         <tr>
                             <td> {% if entry['Verified'] == False %} ❌ {% else %} ✅ {% endif %}</td>
@@ -89,12 +88,11 @@
                             <td>{{ entry["ObservedwithClient"] }}</td>
                             <td>{{ entry["Supervisor"] }}</td>
                             <td>
-                                <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
+                            <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
                             </td>
                             </tr>
                         {% endfor %}
                     </table>
-                </div>
                 </div>
             </div>
 
