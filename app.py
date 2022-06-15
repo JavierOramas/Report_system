@@ -1,4 +1,6 @@
 from time import sleep
+
+from colorama import Cursor
 from registry.models import Registry
 from user import routes
 from user.models import User
@@ -14,6 +16,7 @@ import datetime_format
 import pdfkit
 from passlib.hash import pbkdf2_sha256
 
+from utils import round_half_up
 app = Flask(__name__)
 app.config["DEBUG"] = True
 app.secret_key = 'testing'
@@ -53,18 +56,14 @@ def admin_required(f):
             return redirect('/')
     return wrap
 
-
-def round_half_up(n, decimals=0):
-    multiplier = 10 ** decimals
-    return math.floor(int(n)*multiplier + 0.5) / multiplier
-
-
 def get_entries(role, year, month, user):
+
     if not 'providerId' in user:
         if 'ProviderId' in user and user['ProviderId'] != '' and user['ProviderId'] != None:
             user['providerId'] = user['ProviderId']
         else:
             return [],0,0,[],0,0,[], 0
+        
     entries = db.Registry.find({'ProviderId':int(str(user['providerId']))})
     entries = [entry for entry in entries]
 
@@ -74,17 +73,19 @@ def get_entries(role, year, month, user):
     supervisors = []
 
     for entry in entries:
-        if datetime_format.get_date(entry["DateOfService"]).year == year and datetime_format.get_date(entry["DateOfService"]).month == month:
+        
+        if (datetime_format.get_date(entry["DateOfService"]).year == year or datetime_format.get_date(entry["DateOfService"]).year + 2000 == year) and datetime_format.get_date(entry["DateOfService"]).month == month:
             entry['ProviderId'] = int(entry['ProviderId'])
-            if 'providerId' in user and "ClientId" in entry:
-                clients.append(entry['ClientId'])
+            if 'providerId' in user:
+                if "ClientId" in entry:
+                    clients.append(entry['ClientId'])
                 supervisors.append(entry['Supervisor'])
                 dates.append(entry['DateOfService'])
                 temp.append(entry)
     entries = temp
     entries = sorted(entries, key=lambda d: d['DateOfService'])
 
-    ids = ['all']
+    ids = []
     supervised_time = 0
     observed_with_client = 0
     meetings = 0
@@ -93,7 +94,7 @@ def get_entries(role, year, month, user):
         # print(i)
         if i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes':
             observed_with_client += 1
-            
+
         min_year = min(min_year, int(
             datetime_format.get_date(i["DateOfService"]).year))
 
@@ -103,12 +104,12 @@ def get_entries(role, year, month, user):
 
         # TODO get this condition from other table that gives clinical meeting info
         condition = True
-        # print(i['ProcedureCodeId'] == 194641)
         if int(i['ProcedureCodeId']) == 194641 and condition == True:
             meetings += 1
 
         if 'ProviderId' in i:
             ids += list(set([i['ProviderId'] for i in entries]))
+
     if role == 'basic':
         # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
         total_hours = db.TotalHours.find_one({'ProviderId': int(
@@ -120,15 +121,13 @@ def get_entries(role, year, month, user):
             total_hours = total_hours['TotalTime']
     else:
         total_hours = 0
-    print(entries)
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors), observed_with_client
 
 
 def get_pending(role, user):
-
     if role.lower() in ['admin', 'bcba', 'bcba (l)']:
         entries = list(db.Registry.find({'Verified': False}))
-    elif not role.lower() in ['basic','rbt','rbt/trainee']:
+    elif role.lower() in ['basic','rbt','rbt/trainee']:
         try:
             entries = list(db.Registry.find(
                 {'Verified': False, 'ProviderId': int(user['providerId'])}))
@@ -137,7 +136,6 @@ def get_pending(role, user):
                 {'Verified': False, 'ProviderId': int(user['ProviderId'])}))
     else:
         entries = []
-
     return entries
 
 # routes.
@@ -227,7 +225,7 @@ def report(id, alert=None):
         # print("observed:",observed_with_client)
         # 5th percent of total hours
         minimum_supervised = round_half_up(total_hours * 0.05)
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert)
+        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user))
 
 
     return redirect("/")
@@ -267,6 +265,8 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
             entry['Supervisor'] = name['first_name']
 
     for entry in pending:
+        if not 'Supervisor' in entry or entry['Supervisor'] == None:
+            continue
         name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
         # print(name)
         if name:
@@ -406,14 +406,19 @@ def new_user():
 @ app.route('/edit/new', methods=('GET', 'POST'))
 @ login_required
 def add(id=None):
-    
+
     if id is None:
         id = session['user']['providerId']
-    
+    else:
+        try:
+            user = db.users.find_one({"_id": ObjectId(id)})
+        except:
+            user = db.users.find_one({"_id": id})
+
     if request.method == 'GET':
         entry = {
             # "entryId": entry["Id"],
-            "ProviderId": id,
+            "ProviderId": user['ProviderId'],
             "ProcedureCodeId": '',
             "TimeWorkedInHours": 0,
             "MeetingDuration": 0,
@@ -428,14 +433,32 @@ def add(id=None):
             "Individual": '',
             "Verified": True
         }
-        supervisors = [1]
+        
+        supervisor_roles = ["BCBA (L)","BCBA","BCaBA"]
+        supervisors = []
+        for role in supervisor_roles:
+            temp = db.users.find({"role": role})
+            supervisors += list(temp)
+            
         return render_template('edit.html', entry=entry, supervisors=supervisors)
         # return redirect(url_for('/', message={'error':'you cant edit that entry'}))
     else:
+        group= individual = 'no'
+        if request.form.get("supervision_type") == 'yes':
+            group = 'yes'
+        if request.form.get("supervision_type") == 'no':
+            individual = 'yes'
+            
         db.Registry.insert_one({
+            "ProviderId": user['ProviderId'],
             "ProcedureCodeId": int(request.form.get('ProcedureCodeId')),
             "MeetingDuration": int(request.form.get("MeetingDuration")),
+            "ModeofMeeting": request.form.get("meeting_type"),
+            "ObservedwithClient": request.form.get("observed"),
+            "Group": group,
+            "Individual": individual,
             "DateOfService": request.form.get('DateOfService'),
+            "Supervisor": int(request.form.get('sup')),
             "Verified": False
         })
 

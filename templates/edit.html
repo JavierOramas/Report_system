@@ -10,15 +10,15 @@
 
                 <label for="MeetingDuration">MeetingDuration</label>
                 <input type="number" name="MeetingDuration" value={{entry['MeetingDuration']}} class="field" required>
-                
+
                 <label for="ProcedureCodeId">Procedure Code</label>
                 <input type="text" class="field" name="ProcedureCodeId" value="{{ entry['ProcedureCodeId'] }}" required>
-                
-                <label for="Supervisor">Supervisor</label>
-                <select id="Supervisor" name="Supervisor" form="edit_form" class="form-select">
+
+                <label for="sup">Supervisor</label>
+                <select id="sup" name="sup" class="form-select">
                     {% for supervisor in supervisors %}
-                        <option value="{{supervisor['ProviderId']}}">
-                            {{supervisor}}
+                        <option value={{supervisor['ProviderId']}}>
+                            {{supervisor['name']}}
                         </option>
                     {% endfor %}
                 </select>
@@ -26,9 +26,9 @@
                 <label for="supervision">Supervision type</label>
                 <fieldset>
                     <div id="supervision" class="radio_group">
-                        <input type="radio" id="individual" name="supervision_type_individual" class="radio"  {% if entry['Individual'] == 'yes' %}checked{% endif %}/>
+                        <input type="radio" id="individual" name="supervision_type" value='no' class="radio"  {% if entry['Individual'] == 'yes' %}checked{% endif %}/>
                         <label for="individual">Individual</label>
-                        <input type="radio" id="group" name="supervision_type_group" class="radio" {% if entry['Group'] == 'yes' %}checked{% endif %}/>
+                        <input type="radio" id="group" name="supervision_type" value='yes' class="radio" {% if entry['Group'] == 'yes' %}checked{% endif %}/>
                         <label for="group">Group</label>
                     </div>
                 </fieldset>
