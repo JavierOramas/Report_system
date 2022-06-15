@@ -3,6 +3,7 @@ from time import sleep
 
 from colorama import Cursor
 from registry.models import Registry
+from super_roles.super_roles import get_admins
 from user import routes
 from user.models import User
 from flask import Flask, render_template, redirect, session, request, url_for, jsonify, send_file
@@ -196,7 +197,7 @@ def upload_file():
 @admin_required
 def providers():
     entries = db.user.find()
-    return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=ids, session=session)
+    return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=ids, session=session, report=False)
 
 
 @app.route('/user_report/<id>/<alert>', methods=["POST", "GET"])
@@ -273,7 +274,8 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
         if name:
             entry['Supervisor'] = name['first_name']
     # print(observed_with_client)
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=True, observed_with_client=observed_with_client)
+    print(role, get_admins())
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client)
 
 # Only admins will see this page and it will let edit users and provider ids
 
@@ -635,7 +637,7 @@ def get_report(year, month, id):
             print("exception")
             alert = {'error': 'Something went Wrong! Check that all the User info is correct'}
             if not session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']:
-                return redirect(url_for('dashboard', year=year, month=month, alert=alert))
+                return redirect(url_for('dashboard', year=year, month=month, alert=alert, report=False))
             else:
                 return redirect(url_for('report', id=id, alert=alert))
                 # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')

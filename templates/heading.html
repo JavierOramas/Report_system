@@ -1,5 +1,12 @@
 {% macro heading(id, session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client) %}
 
+{% if report == True and ( supervised_hours < minimum_supervised or observed_with_client < 1 ) %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <p> Some requirements are not met or entries have not been verified by supervisor </p>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
 <div class="topnav">
     <a class='active' href="/">Home</a>
     <a href="/user/edit/{{id}}">Edit account</a>
@@ -9,10 +16,8 @@
     </div>
     {% elif report == True and not role in ['admin','role']%}
     <div class="center">
-        <a href="/report/{{year}}/{{month}}/{{id}}" class="disabled" aria-disabled="true">Export PDF</a>
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <p> Some requirements are not met or entries have not been verified by supervisor </p>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="disabled">
+        <a href="/report/{{year}}/{{month}}/{{id}}" aria-disabled="true">Export PDF</a>
         </div>
     </div>
     {% endif %}
