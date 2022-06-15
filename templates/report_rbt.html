@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta name="pdfkit-orientation" content="Landscape" />
+  <meta charset="utf-8">
 </head>
 <body>
   <style>
@@ -168,6 +169,19 @@
   </table>
 
   <table class="borderless abs_table">
+    <tr>
+      <td class="header">RBT Coordinator Name and Credential:</td>
+      <td style="text-align: left; border-bottom: 0.5px solid; max-width: 300px">
+        {{coordinator}}
+      </td>
+      <td class="header">Signature & Date:</td>
+      <td
+        style="text-align: left; border-bottom: 0.5px solid; min-width: 100px"
+      >
+        {{signature}}
+      </td>
+    </tr>
+
     {% for sup in supervisors %}
     <tr>
       <td class="header">Supervisor Name and Credential:</td>
