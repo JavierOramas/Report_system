@@ -622,7 +622,6 @@ def get_report(year, month, id):
                 'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
             options = {
                 'page-size': 'A4',
-                'encoding'
                 # 'orientation': ,
                 'enable-local-file-access': None,  # to avoid blanks
                 'javascript-delay': 1000,
