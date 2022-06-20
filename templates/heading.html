@@ -1,4 +1,4 @@
-{% macro heading(id, session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client) %}
+{% macro heading(id,user ,session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing) %}
 
 {% if report == True and ( supervised_hours < minimum_supervised or observed_with_client < 1 ) %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -6,6 +6,17 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endif %}
+
+{% if report == True and missing != [] %}
+<div class="alert alert-warning alert-dismissible" role="alert">
+    <p> The RBT data is incomplete, missing the following info (
+    {% for i in missing %}
+    {{i}}
+    {% endfor %}
+    ) </p>
+</div>
+{% endif %}
+
 
 <div class="topnav">
     <a class='active' href="/">Home</a>

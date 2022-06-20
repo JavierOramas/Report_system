@@ -86,13 +86,13 @@ class User:
 
             try:
                 if 'Background Screening Date' in entry and entry['Background Screening Date'] != None and entry['Background Screening Date'] != '':
-                    item["background_date"]= datetime.datetime.strptime(str(entry['Background Screening Date']), '%m/%d/%Y').strftime('%m/%d/%y')
+                    item["background_date"]= datetime.datetime.strptime(str(entry['Background Screening Date']), '%m/%d/%Y').strftime('%m/%d/%Y')
             except:
                 print("failed to parse date screening")
                 
             try:
                 if 'Background Screening' in entry and entry['Background Screening'] != None and entry['Background Screening'] != '':
-                    item["background_exp_date"]= datetime.datetime.strptime(str(entry['Background Screening']), '%m/%d/%Y').strftime('%m/%d/%y')
+                    item["background_exp_date"]= datetime.datetime.strptime(str(entry['Background Screening']), '%m/%d/%Y').strftime('%m/%d/%Y')
             except:
                 print("failed to parse date background screening")
                 

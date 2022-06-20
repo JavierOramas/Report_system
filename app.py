@@ -1,3 +1,4 @@
+from cmath import nan
 from inspect import signature
 from time import sleep
 
@@ -227,7 +228,18 @@ def report(id, alert=None):
         # print("observed:",observed_with_client)
         # 5th percent of total hours
         minimum_supervised = round_half_up(total_hours * 0.05)
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user))
+        print("user:", user)
+
+        missing = []
+
+        for i in ["ProviderId","name","email","first_name","last_name","BACB_id","credential","background_date","hired_date","background_screening_type","background_exp_date","fingerprint_background"]:
+
+            if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
+                continue
+            missing.append(i)
+
+        print("missing:", missing)
+        return render_template("user_work.html", id=id,session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing)
 
 
     return redirect("/")
@@ -274,8 +286,15 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
         if name:
             entry['Supervisor'] = name['first_name']
     # print(observed_with_client)
-    print(role, get_admins())
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client)
+
+    missing = []
+    if not (role in get_admins()):
+        user = session['user']
+        for i in ["ProviderId","name","email","first_name","last_name","BACB_id","credential","role","background_screening_type"]:
+            if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
+                continue
+            missing.append(i)
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
 
 # Only admins will see this page and it will let edit users and provider ids
 

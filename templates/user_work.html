@@ -7,8 +7,7 @@
     <div class="alert alert-warning" role="alert">{{alert}}</div>
 {% endif %}
 
-{{ heading(id,session, role, total_hours, supervised_time, meetings, minimum_supervised, year, month, report, observed_with_client) }}
-
+{{ heading(id, user,session, role, total_hours, supervised_time, meetings, minimum_supervised, year, month, True, observed_with_client, missing) }}
 <div class="card-wrapper">
 
     <div class="center card-wrapper">
@@ -103,7 +102,7 @@
                             </th>
                             {% endfor %}
                         </tr>
-                        
+
                         {% for entry in pending %}
                         <tr>
                             <td>{{ entry["DateOfService"] }}</td>
