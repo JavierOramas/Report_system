@@ -488,7 +488,13 @@ def edit(id):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     # print(entry)
     if request.method == 'GET':
-        supervisors = [entry['Supervisor']]
+        
+        supervisor_roles = ["BCBA (L)","BCBA","BCaBA"]
+        supervisors = []
+        for role in supervisor_roles:
+            temp = db.users.find({"role": role})
+            supervisors += list(temp)
+            
         return render_template('edit.html', entry=entry, supervisors=supervisors)
 
     else:
