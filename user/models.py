@@ -88,20 +88,29 @@ class User:
                 if 'Background Screening Date' in entry and entry['Background Screening Date'] != None and entry['Background Screening Date'] != '':
                     item["background_date"]= datetime.datetime.strptime(str(entry['Background Screening Date']), '%m/%d/%Y').strftime('%m/%d/%Y')
             except:
-                print("failed to parse date screening")
-                
-            try:
-                if 'Background Screening' in entry and entry['Background Screening'] != None and entry['Background Screening'] != '':
-                    item["background_exp_date"]= datetime.datetime.strptime(str(entry['Background Screening']), '%m/%d/%Y').strftime('%m/%d/%Y')
-            except:
-                print("failed to parse date background screening")
-                
-            print(db.users.find_one({"ProviderId": [int(item["ProviderId"]), str(item['ProviderId'])]}))
-            print(item)
-            if db.users.find_one({"ProviderId": item["ProviderId"]}) in [[], None, False] and db.users.find_one({"ProviderId": str(item["ProviderId"])}) in [[], None, False]:
-            # Insert the data and log to the console the action
                 try:
-                    if db.users.insert_one(entry):
+                    if 'Background Screening Date' in entry and entry['Background Screening Date'] != None and entry['Background Screening Date'] != '':
+                        item["background_date"]= datetime.datetime.strptime(str(entry['Background Screening Date']), '%m/%d/%y').strftime('%m/%d/%Y')
+                except:
+                    print("failed to parse date screening")
+
+            try:
+                if 'Background Screening ' in entry and entry['Background Screening '] != None and entry['Background Screening '] != '':
+                    item["background_exp_date"]= datetime.datetime.strptime(str(entry['Background Screening ']), '%m/%d/%Y').strftime('%m/%d/%Y')
+            except:
+                try:
+                    if 'Background Screening ' in entry and entry['Background Screening '] != None and entry['Background Screening '] != '':
+                        item["background_exp_date"]= datetime.datetime.strptime(str(entry['Background Screening ']), '%m/%d/%y').strftime('%m/%d/%Y')
+                except:
+                   print("failed to parse date background screening")
+
+            # print(db.users.find_one({"ProviderId": [int(item["ProviderId"]), str(item['ProviderId'])]}))
+            # print(item)
+            if db.users.find_one({"ProviderId": item["ProviderId"]}) in [[], None, False] and db.users.find_one({"ProviderId": str(item["ProviderId"])}) in [[], None, False]:
+                # Insert the data and log to the console the action
+                try:
+                    print("Inserting user")
+                    if db.users.insert_one(item):
                         print('Log: ' + colored('Entry added successfully', 'green'))
                     else:
                         print(
@@ -109,6 +118,7 @@ class User:
                 except:
                     pass
             else:
+                print("updating user")
                 if db.users.update_one({'ProviderId': item["ProviderId"]}, {'$set': item}):
                     print('Log: ' + colored('Entry edited successfully', 'yellow'))
                 else:

@@ -67,7 +67,7 @@ def get_entries(role, year, month, user):
         else:
             return [],0,0,[],0,0,[], 0
         
-    entries = db.Registry.find({'ProviderId':int(str(user['providerId']))})
+    entries = db.Registry.find({'ProviderId':int(str(user['providerId'])), 'Verified': True})
     entries = [entry for entry in entries]
 
     temp = []
@@ -237,7 +237,7 @@ def report(id, alert=None):
 
         missing = []
 
-        for i in ["ProviderId","name","email","first_name","last_name","BACB_id","credential","background_date","hired_date","background_screening_type","background_exp_date","fingerprint_background"]:
+        for i in ["ProviderId","name","email","first_name","last_name","BACB_id","credential","background_date","hired_date","background_screening_type","background_exp_date"]:
 
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue

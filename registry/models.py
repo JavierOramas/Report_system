@@ -2,12 +2,13 @@ from flask import Flask, jsonify, request, session, redirect
 import uuid
 # from passlib.hash import pbkdf2_sha256
 from termcolor import colored
-from overlappings.tools import process
+from overlappings.tools import get_supervisor_codes, process
 import pandas as pd
 # from app import db
 import datetime
 import os
 import datetime_format
+from super_roles.super_roles import get_admins, get_supervisors
 
 
 class Registry:
@@ -91,9 +92,13 @@ class Registry:
             entry['DateOfService'] = datetime_format.format(
                 entry['DateOfService'])
 
+            supervisor = db.users.find_one({'ProviderId': entry['Supervisor']})
+            print(entry['Supervisor'])
+            print(supervisor)
+            if not entry['MeetingDuration'] < 1 and supervisor != None and supervisor['role'] in get_supervisors():
         # Insert the data and log to the console the action
-            if not db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']}):
-                db.Registry.insert_one(entry)
+                if not db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']}):
+                    db.Registry.insert_one(entry)
             # print('Log: ' + colored('Entry added successfully', 'green'))
         # else:
             # print('Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))
