@@ -510,7 +510,7 @@ def verify(id):
 @ login_required
 def delete_entry(id):
     db.Registry.delete_one({"_id": ObjectId(id)})
-    return render_template(url_for("dashboard"))
+    return redirect(url_for("dashboard"))
 
 @ app.route('/edit/<id>', methods=('GET', 'POST'))
 @ login_required

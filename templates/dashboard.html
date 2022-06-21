@@ -28,9 +28,9 @@
         </li>
         {% endif %}
 
-        {% if role != 'role' or role != 'basic'%}
+        {% if not role.lower() in ['rbt', 'rbt/trainee', 'basic', 'role']%}
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
+            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">Pending</button>
         </li>
         {% endif %}
     </ul>
