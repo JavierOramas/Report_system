@@ -200,6 +200,11 @@ def providers():
     entries = db.user.find()
     return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=ids, session=session, report=False)
 
+@app.route('/manage_procedure_codes')
+def procedure_codes():
+    codes = db.procedure_codes.find()
+    
+    return render_template('procedure_codes.html', codes=codes)
 
 @app.route('/user_report/<id>/<alert>', methods=["POST", "GET"])
 @app.route('/user_report/<id>', methods=["POST", "GET"])
@@ -500,6 +505,12 @@ def verify(id):
     # print(db.Registry.find_one({"_id": ObjectId(id)}))
     return redirect('/')
 
+
+@ app.route('/del/entry/<id>', methods=('GET', 'POST'))
+@ login_required
+def delete_entry(id):
+    db.Registry.delete_one({"_id": ObjectId(id)})
+    return render_template(url_for("dashboard"))
 
 @ app.route('/edit/<id>', methods=('GET', 'POST'))
 @ login_required

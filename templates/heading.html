@@ -21,6 +21,7 @@
 <div class="topnav">
     <a class='active' href="/">Home</a>
     <a href="/user/edit/{{id}}">Edit account</a>
+    <a href="/manage_procedure_codes">Procedure Codes</a>
     {% if report == True and supervised_hours >= minimum_supervised and observed_with_client >= 1  %}
     <div class="center">
         <a href="/report/{{year}}/{{month}}/{{id}}" class="">Export PDF</a>
@@ -28,15 +29,15 @@
     {% elif report == True and not role in ['admin','role']%}
     <div class="center">
         <div class="disabled">
-        <a href="/report/{{year}}/{{month}}/{{id}}" aria-disabled="true">Export PDF</a>
+            <a href="/report/{{year}}/{{month}}/{{id}}" aria-disabled="true">Export PDF</a>
         </div>
     </div>
     {% endif %}
-
     
-    <div class="flex-lg-row-reverse">
+    <div class="pull-right">
         <a class="" href="/user/signout">Sign Out</a>
     </div>
+</div>
 
 </div>
 

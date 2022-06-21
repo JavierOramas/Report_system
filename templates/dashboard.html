@@ -184,7 +184,6 @@
 
         {% endif %}
 
-        {% if not role.lower() in ['rbt', 'rbt/trainee', 'basic'] %}
             <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
                 <div class="center">
                     <table class="table" id="pending">
@@ -212,7 +211,7 @@
                         {% endfor %}
                     </table>
             </div>
-        {% endif %}
+        
     </div>
     </div>
     

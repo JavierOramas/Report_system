@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from 'heading.html' import heading %}
+
+{% block content %}
+
+{{ heading(id, user,session, role, total_hours, supervised_time, meetings, minimum_supervised, year, month, False, observed_with_client, missing) }}
+
+<p>codes here</p>
+
+{% endblock%}
