@@ -332,7 +332,7 @@ def config(id):
                     "credential": request.form.get('credential'),
                     "role": request.form.get('role'),
                     "hired_date": request.form.get('hired_date'),
-                    "fingerlog_background": request.form.get('fingerlog'),
+                    "fingerprint_background": request.form.get('fingerprint'),
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
                     "active": (request.form.get('active') == 'on'),
@@ -346,7 +346,7 @@ def config(id):
                     "BACB_id": request.form.get('BACB_id'),
                     "credential": request.form.get('credential'),
                     "hired_date": request.form.get('hired_date'),
-                    "fingerlog_background": request.form.get('fingerlog'),
+                    "fingerprint_background": request.form.get('fingerprint'),
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
                     }
@@ -354,7 +354,7 @@ def config(id):
                 log(pwd)
                 if pwd != '':
                     data['password'] = pbkdf2_sha256.encrypt(pwd)
-
+                log(data)
                 db.users.update_one({"_id": ObjectId(str(id))}, {'$set': data})
             except:
                 data = {
@@ -365,7 +365,7 @@ def config(id):
                     "credential": request.form.get('credential'),
                     "role": request.form.get('role'),
                     "hired_date": request.form.get('hired_date'),
-                    "fingerlog_background": request.form.get('fingerlog'),
+                    "fingerprint_background": request.form.get('fingerprint'),
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
                 }
@@ -404,7 +404,7 @@ def new_user():
             "credential": '',
             "role": '',
             "hired_date": '',
-            "fingerlog_background": '',
+            "fingerprint_background": '',
             "background_date": '',
             "background_exp_date": '',
         }
@@ -421,7 +421,7 @@ def new_user():
             "credential": request.form.get('credential'),
             "role": request.form.get('role'),
             "hired_date": request.form.get('hired_date'),
-            "fingerlog_background": request.form.get('fingerlog'),
+            "fingerprint_background": request.form.get('fingerprint'),
             "background_date": request.form.get('background_date'),
             "background_exp_date": request.form.get('background_exp_date'),
         })
