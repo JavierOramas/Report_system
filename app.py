@@ -101,9 +101,10 @@ def get_entries(role, year, month, user):
         min_year = min(min_year, int(
             datetime_format.get_date(i["DateOfService"]).year))
 
-        i['MeetingDuration'] = round_half_up(i['MeetingDuration'], 1)
+        i['MeetingDuration'] = i['MeetingDuration']
+        # print(i['MeetingDuration'])
         if i['Verified'] == True:
-            supervised_time += int(i['MeetingDuration'])
+            supervised_time += i['MeetingDuration']
 
         # TODO get this condition from other table that gives clinical meeting info
         condition = True
@@ -215,7 +216,7 @@ def report(id, alert=None):
         "year") else datetime.datetime.now().year
     month = int(request.form.get("month")) if request.form.get(
         "month") else datetime.datetime.now().month-1
-
+    
     try:
         user = db.users.find_one({"_id": ObjectId(id)})
     except:
@@ -232,7 +233,7 @@ def report(id, alert=None):
                 entry['Supervisor'] = name['name']
         # log("observed:",observed_with_client)
         # 5th percent of total hours
-        minimum_supervised = round_half_up(total_hours * 0.05)
+        minimum_supervised = round_half_up(total_hours * 0.05, 3)
         log("user:", user)
 
         missing = []
@@ -299,7 +300,7 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue
             missing.append(i)
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours), minimum_supervised=round_half_up(5/100*total_hours, 1), supervised_hours=round_half_up(supervised_time, 1), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
+    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours,3), minimum_supervised=round_half_up(5/100*total_hours, 3), supervised_hours=round_half_up(supervised_time, 3), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
 
 # Only admins will see this page and it will let edit users and provider ids
 
@@ -491,7 +492,7 @@ def add(id=None):
         db.Registry.insert_one({
             "ProviderId": user['ProviderId'],
             "ProcedureCodeId": int(request.form.get('ProcedureCodeId')),
-            "MeetingDuration": int(request.form.get("MeetingDuration")),
+            "MeetingDuration": float(request.form.get("MeetingDuration")),
             "ModeofMeeting": request.form.get("meeting_type"),
             "ObservedwithClient": request.form.get("observed"),
             "Group": group,
@@ -501,7 +502,11 @@ def add(id=None):
             "Verified": False
         })
 
-        return redirect('/')
+        if not session['user']['role'] in get_admins():
+            return redirect('/')
+        else:
+            print("here")
+            return redirect(url_for('report', id=user['_id']))
 
 
 @ app.route('/verify/<id>', methods=('GET', 'POST'))
@@ -515,14 +520,27 @@ def verify(id):
             "Verified": True,
         }})
     # log(db.Registry.find_one({"_id": ObjectId(id)}))
-    return redirect('/')
+    if not session['user']['role'] in get_admins():
+            return redirect('/')
+    else:
+        rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
+        print(rbt)
+        return redirect(url_for('report', id=rbt['_id']))
+
 
 
 @ app.route('/del/entry/<id>', methods=('GET', 'POST'))
 @ login_required
 def delete_entry(id):
+    entry = db.Registry.find_one({"_id": ObjectId(id)})
+    rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
+    
     db.Registry.delete_one({"_id": ObjectId(id)})
-    return redirect(url_for("dashboard"))
+    
+    if not session['user']['role'] in get_admins():
+            return redirect('/')
+    else:
+        return redirect(url_for('report', id=rbt['_id']))
 
 @ app.route('/edit/<id>', methods=('GET', 'POST'))
 @ login_required
@@ -552,9 +570,11 @@ def edit(id):
                 "Verified": False
             }})
       
-        # if entry and 'providerId' in session['user'] and int(entry["ProviderId"]) == int(session['user']['providerId']):
-        return redirect(url_for('dashboard'))
-        # return redirect(url_for('user_wor))
+        if not session['user']['role'] in get_admins():
+            return redirect('/')
+        else:
+            rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
+            return redirect(url_for('report', id=rbt['_id']))
 
 
 @ app.route('/del/<id>', methods=('GET', 'POST'))
@@ -565,8 +585,6 @@ def delete(id):
             db.users.delete_one({"_id": ObjectId(str(id))})
         except:
             db.users.delete_one({"_id": str(id)})
-
-    return redirect('/')
 
 
 @ app.route('/user/signup', methods=['POST'])
@@ -664,13 +682,14 @@ def get_report(year, month, id):
                 supervisors.append(superv)
 
         # log(supervisors)
-        # supervisors = list(set(supervisors))
+        # supervisors = list(set(superviso
+        # rs))
         company = user['background_screening_type']
         date = user['background_date']
         exp_date = user['background_exp_date']
         try:
             template = render_template(
-                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'],signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(total_hours*0.05, 1), supervised_hours=round_half_up(supervised_time), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
+                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'],signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(total_hours*0.05), supervised_hours=round_half_up(supervised_time, 3), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
             options = {
                 'page-size': 'A4',
                 # 'orientation': ,

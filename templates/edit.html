@@ -9,7 +9,7 @@
                 <input type="text" class="field" name="DateOfService" value="{% if entry['DateOfService'] != '' %}{{entry['DateOfService']}}{% endif %}"  required>
 
                 <label for="MeetingDuration">MeetingDuration</label>
-                <input type="number" name="MeetingDuration" value={{entry['MeetingDuration']}} class="field" required>
+                <input type="number" step="0.1" name="MeetingDuration" value={{entry['MeetingDuration']}} class="field" required>
 
                 <label for="ProcedureCodeId">Procedure Code</label>
                 <input type="text" class="field" name="ProcedureCodeId" value="{{ entry['ProcedureCodeId'] }}" required>
