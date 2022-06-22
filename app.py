@@ -320,11 +320,15 @@ def config(id):
         if request.method == 'POST':
             log('edit')
             try:
+                prov_id = int(request.form.get('provider_id'))
+            except:
+                prov_id = ''
+            try:
                 if is_admin:
                     log('user is admin')
                     data = {
                     "name": request.form.get('name'),
-                    "ProviderId": int(request.form.get('provider_id')),
+                    "ProviderId": prov_id,
                     "email": request.form.get('email'),
                     "first_name": request.form.get('first_name'),
                     "last_name": request.form.get('last_name'),
@@ -340,6 +344,7 @@ def config(id):
                 else:
                     data = {
                     "name": request.form.get('name'),
+                    "ProviderId": prov_id,
                     "email": request.form.get('email'),
                     "first_name": request.form.get('first_name'),
                     "last_name": request.form.get('last_name'),
@@ -359,6 +364,7 @@ def config(id):
             except:
                 data = {
                     "name": request.form.get('name'),
+                    "ProviderId": prov_id,
                     "first_name": request.form.get('first_name'),
                     "last_name": request.form.get('last_name'),
                     "BACB_id": request.form.get('BACB_id'),
