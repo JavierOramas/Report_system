@@ -308,12 +308,12 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 @login_required
 def config(id):
     log(id)
-    log(flag)
     log(session['user'])
     try:
         flag = (session['user']['_id'] == str(id))
     except:
         flag = (session['user']['_id'] ==  ObjectId(str(id)))
+    log(flag)
     is_admin = ('role' in session['user'] and session['user']['role'] in get_admins())
     log(is_admin)
     if (flag) or  is_admin:
