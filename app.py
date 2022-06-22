@@ -1,7 +1,7 @@
 from cmath import nan
 from inspect import signature
 from time import sleep
-
+from logger import log
 from colorama import Cursor
 from registry.models import Registry
 from super_roles.super_roles import get_admins
@@ -94,7 +94,7 @@ def get_entries(role, year, month, user):
     meetings = 0
     min_year = int(datetime.datetime.now().year)
     for i in entries:
-        # print(i)
+        # log(i)
         if i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes':
             observed_with_client += 1
 
@@ -120,7 +120,7 @@ def get_entries(role, year, month, user):
         if total_hours == None:
             total_hours = 0
         else:
-            # print(total_hours, year ,month)
+            # log(total_hours, year ,month)
             total_hours = total_hours['TotalTime']
     else:
         total_hours = 0
@@ -230,10 +230,10 @@ def report(id, alert=None):
             name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
             if name:
                 entry['Supervisor'] = name['name']
-        # print("observed:",observed_with_client)
+        # log("observed:",observed_with_client)
         # 5th percent of total hours
         minimum_supervised = round_half_up(total_hours * 0.05)
-        print("user:", user)
+        log("user:", user)
 
         missing = []
 
@@ -243,7 +243,7 @@ def report(id, alert=None):
                 continue
             missing.append(i)
 
-        print("missing:", missing)
+        log("missing:", missing)
         return render_template("user_work.html", id=id,session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing)
 
 
@@ -287,10 +287,10 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
         if not 'Supervisor' in entry or entry['Supervisor'] == None:
             continue
         name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
-        # print(name)
+        # log(name)
         if name:
             entry['Supervisor'] = name['first_name']
-    # print(observed_with_client)
+    # log(observed_with_client)
 
     missing = []
     if not (role in get_admins()):
@@ -326,7 +326,7 @@ def config(id):
                     "credential": request.form.get('credential'),
                     "role": request.form.get('role'),
                     "hired_date": request.form.get('hired_date'),
-                    "fingerprint_background": request.form.get('fingerprint'),
+                    "fingerlog_background": request.form.get('fingerlog'),
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
                     "active": (request.form.get('active') == 'on'),
@@ -340,15 +340,15 @@ def config(id):
                     "BACB_id": request.form.get('BACB_id'),
                     "credential": request.form.get('credential'),
                     "hired_date": request.form.get('hired_date'),
-                    "fingerprint_background": request.form.get('fingerprint'),
+                    "fingerlog_background": request.form.get('fingerlog'),
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
                     }
                 pwd = request.form.get("password")
-                print(pwd)
+                log(pwd)
                 if pwd != '':
                     data['password'] = pbkdf2_sha256.encrypt(pwd)
-                
+
                 db.users.update_one({"_id": ObjectId(str(id))}, {'$set': data})
             except:
                 data = {
@@ -359,7 +359,7 @@ def config(id):
                     "credential": request.form.get('credential'),
                     "role": request.form.get('role'),
                     "hired_date": request.form.get('hired_date'),
-                    "fingerprint_background": request.form.get('fingerprint'),
+                    "fingerlog_background": request.form.get('fingerlog'),
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
                 }
@@ -398,7 +398,7 @@ def new_user():
             "credential": '',
             "role": '',
             "hired_date": '',
-            "fingerprint_background": '',
+            "fingerlog_background": '',
             "background_date": '',
             "background_exp_date": '',
         }
@@ -415,7 +415,7 @@ def new_user():
             "credential": request.form.get('credential'),
             "role": request.form.get('role'),
             "hired_date": request.form.get('hired_date'),
-            "fingerprint_background": request.form.get('fingerprint'),
+            "fingerlog_background": request.form.get('fingerlog'),
             "background_date": request.form.get('background_date'),
             "background_exp_date": request.form.get('background_exp_date'),
         })
@@ -424,7 +424,7 @@ def new_user():
 
     if request.method == 'GET':
         user = db.users.find_one({'_id': str(id)})
-        print(user)
+        log(user)
         if user:
             return render_template('edit_user.html', user=user)
 
@@ -495,14 +495,14 @@ def add(id=None):
 @ app.route('/verify/<id>', methods=('GET', 'POST'))
 @ login_required
 def verify(id):
-    # print('verifying')
+    # log('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     if session['user']['role'].lower() in ['admin', 'bcba','bcba (l)'] or session['user']['providerId'] == entry['Supervisor']:
-        # print('here')
+        # log('here')
         db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
             "Verified": True,
         }})
-    # print(db.Registry.find_one({"_id": ObjectId(id)}))
+    # log(db.Registry.find_one({"_id": ObjectId(id)}))
     return redirect('/')
 
 
@@ -516,7 +516,7 @@ def delete_entry(id):
 @ login_required
 def edit(id):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
-    # print(entry)
+    # log(entry)
     if request.method == 'GET':
         
         supervisor_roles = ["BCBA (L)","BCBA","BCaBA"]
@@ -594,8 +594,8 @@ def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
 
-    # print(year)
-    # print(month)
+    # log(year)
+    # log(month)
 
     if not month:
         month = datetime.datetime.now().month-1
@@ -645,13 +645,13 @@ def get_report(year, month, id):
         providers = []
         for entry in entries:
             superv = db.users.find_one({"ProviderId": entry["Supervisor"]})
-            # print(superv)
+            # log(superv)
             entry["Supervisor"] = superv['name']
             if not entry['Supervisor'] in providers:
                 providers.append(entry["Supervisor"])
                 supervisors.append(superv)
 
-        # print(supervisors)
+        # log(supervisors)
         # supervisors = list(set(supervisors))
         company = user['background_screening_type']
         date = user['background_date']
@@ -670,7 +670,7 @@ def get_report(year, month, id):
             }
         except:
         # if False:
-            print("exception")
+            log("exception")
             alert = {'error': 'Something went Wrong! Check that all the User info is correct'}
             if not session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']:
                 return redirect(url_for('dashboard', year=year, month=month, alert=alert, report=False))
@@ -680,11 +680,11 @@ def get_report(year, month, id):
             # return dashboard(year, month, alert={'error': 'Error generating report'})
         
         pdfkit.from_string(template, 'report.pdf', options=options)
-        print("pdf generated")
+        log("pdf generated")
         sleep(1)
         return send_file('report.pdf', as_attachment=True)
     else:
-        print("Something went Wrong!")
+        log("Something went Wrong!")
         return dashboard( month, month, alert=alert)
 
 
