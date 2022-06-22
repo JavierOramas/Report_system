@@ -307,15 +307,21 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 @app.route('/user/edit/<id>', methods=('GET', 'POST'))
 @login_required
 def config(id):
+    log(id)
+    log(flag)
+    log(session['user'])
     try:
         flag = (session['user']['_id'] == str(id))
     except:
         flag = (session['user']['_id'] ==  ObjectId(str(id)))
-    if (flag) or ('role' in session['user'] and session['user']['role'] in ['admin', 'bcba','bcba (l)']) :
-        is_admin = session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']
+    is_admin = ('role' in session['user'] and session['user']['role'] in get_admins())
+    log(is_admin)
+    if (flag) or  is_admin:
         if request.method == 'POST':
+            log('edit')
             try:
                 if is_admin:
+                    log('user is admin')
                     data = {
                     "name": request.form.get('name'),
                     "ProviderId": int(request.form.get('provider_id')),
