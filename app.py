@@ -307,20 +307,16 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 @app.route('/user/edit/<id>', methods=('GET', 'POST'))
 @login_required
 def config(id):
-    
     try:
         flag = (session['user']['_id'] == str(id))
     except:
         flag = (session['user']['_id'] ==  ObjectId(str(id)))
-    
     if (flag) or ('role' in session['user'] and session['user']['role'] in ['admin', 'bcba','bcba (l)']) :
         is_admin = session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']
-        
         if request.method == 'POST':
-            # print(request.form.get('active') == 'on')
             try:
                 if is_admin:
-                    db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
+                    data = {
                     "name": request.form.get('name'),
                     "ProviderId": int(request.form.get('provider_id')),
                     "email": request.form.get('email'),
@@ -334,9 +330,9 @@ def config(id):
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
                     "active": (request.form.get('active') == 'on'),
-                    }})
+                    }
                 else:
-                    db.users.update_one({"_id": ObjectId(str(id))}, {'$set': {
+                    data = {
                     "name": request.form.get('name'),
                     "email": request.form.get('email'),
                     "first_name": request.form.get('first_name'),
@@ -347,13 +343,15 @@ def config(id):
                     "fingerprint_background": request.form.get('fingerprint'),
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
-                    }})
+                    }
                 pwd = request.form.get("password")
+                print(pwd)
                 if pwd != '':
-                    db.users.update_one({"_id": ObjectId(str(id))}, {
-                                        '$set': {"password": pbkdf2_sha256.encrypt(pwd)}})
+                    data['password'] = pbkdf2_sha256.encrypt(pwd)
+                
+                db.users.update_one({"_id": ObjectId(str(id))}, {'$set': data})
             except:
-                db.users.update_one({"_id": str(id)}, {'$set': {
+                data = {
                     "name": request.form.get('name'),
                     "first_name": request.form.get('first_name'),
                     "last_name": request.form.get('last_name'),
@@ -364,11 +362,13 @@ def config(id):
                     "fingerprint_background": request.form.get('fingerprint'),
                     "background_date": request.form.get('background_date'),
                     "background_exp_date": request.form.get('background_exp_date'),
-                }})
+                }
                 pwd = request.form.get("password")
                 if pwd != '':
-                    db.users.update_one({"_id": str(id)}, {
-                                        '$set': {"password": pbkdf2_sha256.encrypt(pwd)}})
+                    data['password'] = pbkdf2_sha256.encrypt(pwd)
+               
+                db.users.update_one({"_id": str(id)}, {
+                    '$set': {"password": data}})
             return redirect("/")
 
         if request.method == 'GET':

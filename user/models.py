@@ -1,3 +1,4 @@
+import email
 from flask import Flask, jsonify, request, session, redirect
 import uuid
 from passlib.hash import pbkdf2_sha256
@@ -50,7 +51,9 @@ class User:
         user = {
             "email": request.form.get('email'),
         }
-        user = db.users.find_one(user)
+        print(user)
+        user = db.users.find_one({'email':request.form.get('email')})
+        print(user)
         if user and pbkdf2_sha256.verify(request.form.get('password'), user['password']):
             return self.start_session(user)
 
