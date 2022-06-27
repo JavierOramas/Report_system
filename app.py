@@ -585,12 +585,23 @@ def edit(id):
 @ app.route('/del/<id>', methods=('GET', 'POST'))
 @ login_required
 def delete(id):
-    if session['user']['role'].lower() in ['admin', 'bcba','bcba (l)'] and db.users.find_one({"_id": ObjectId(id)}):
-        try:
-            db.users.delete_one({"_id": ObjectId(str(id))})
-        except:
-            db.users.delete_one({"_id": str(id)})
-
+    # print(id)
+    db.users.delete_one({"_id": ObjectId(id)})
+    # if session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']:
+    #     try:
+    #         if db.users.find_one({"_id": ObjectId(id)}):
+    #             try:
+    #                 print(id)
+    #             except:
+    #                 db.users.delete_one({"_id": str(id)})
+    #     except:
+    #         if db.users.find_one({"_id": str(id)}):
+    #             try:
+    #                 db.users.delete_one({"_id": ObjectId(id)})
+    #             except:
+    #                 db.users.delete_one({"_id": str(id)})
+    session['messages'] = {'correct': "user deleted successfully"}
+    return redirect(url_for('dashboard'))
 
 @ app.route('/user/signup', methods=['POST'])
 def signup():
