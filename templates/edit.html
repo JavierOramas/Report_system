@@ -55,7 +55,13 @@
 
 
                 <div class="center">
-                    <a href="/" class="btn btn-danger">Cancel</a>
+                    <button class='btn btn-danger' onclick="goBack()">Cancel</button>
+
+                    <script>
+                    function goBack() {
+                      window.history.back();
+                    }
+                    </script>
                     <input style="float:left; margin:auto" type="submit" value="Submit" class="btn btn-primary">
                 </div>
             </form>

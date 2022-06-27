@@ -25,7 +25,7 @@ def get_rbt_codes():
     return [150580]
 
 def get_indirect_codes():
-    return [194642]
+    return [194642, 150577]
 
 def get_remote_individual_supervision_codes():
     return [150577]
@@ -34,10 +34,13 @@ def get_valid_ids():
     return [150582, 194640, 150577, 150580, 194642,194641]
 
 def get_supervisor_ids():
-    return [150582, 194640, 150577]
+    return [150582, 194640, 150577, 255975]
 
 def get_group_supervisor_ids():
     return [194641]
+
+def get_ind_sup_meeting():
+    return [150577]
 
 def get_providers(path):
     return pd.read_csv(path, sep=',')
@@ -82,7 +85,7 @@ def calculate_overlapping(entry,providerName,providerId,depured_data,procedureCo
             try:
                 start = datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M')
                 end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')
-            except(e):
+            except:
                 start = datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M:%S')
                 end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M:%S')
 
@@ -197,7 +200,9 @@ def process(incoming_data, db_providers, fix=False):
     code_doc = np.array(data[[i in get_indirect_codes() for i in data['ProcedureCodeId']]])
     code55 = np.array(data[[i in get_supervisor_ids() for i in data['ProcedureCodeId']]])
     code_meeting = np.array(data[[i in get_group_supervisor_ids() for i in data['ProcedureCodeId']]])
-
+    code_ind_sup_meeting = np.array(data[[i in get_ind_sup_meeting() for i in data['ProcedureCodeId']]])
+    
+  
     for i in code_doc:
         if i[procedureCodeId] == 194642 and (i[providerId] in list(supervisors['ProviderId']) or i[providerId] in list(risen_supervisors['ProviderId'])):
                 notifications.append(i)
