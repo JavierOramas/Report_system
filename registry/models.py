@@ -93,8 +93,8 @@ class Registry:
                 entry['DateOfService'])
 
             supervisor = db.users.find_one({'ProviderId': entry['Supervisor']})
-            print(entry['Supervisor'])
-            print(supervisor)
+            # print(entry['Supervisor'])
+            # print(supervisor)
             if not entry['MeetingDuration'] < 1 and supervisor != None and supervisor['role'] in get_supervisors():
         # Insert the data and log to the console the action
                 if not db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']}):

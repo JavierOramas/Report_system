@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
-from os import path
 from datetime import datetime
-import streamlit as st
-import json
 import os
 
 risen_supervisors = pd.DataFrame([])
@@ -19,7 +16,7 @@ def get_trainee_codes():
     return [150582, 194640]
 
 def get_supervisor_codes():
-    return [150582, 194640,255975]
+    return [150582, 194640, 150577, 255975]
 
 def get_rbt_codes():
     return [150580]
@@ -31,7 +28,7 @@ def get_remote_individual_supervision_codes():
     return [150577]
 
 def get_valid_ids():
-    return [150582, 194640, 150577, 150580, 194642,194641]
+    return [150582, 194640, 150577, 150580, 194642,194641, 255975]
 
 def get_supervisor_ids():
     return [150582, 194640, 150577, 255975]
@@ -120,14 +117,18 @@ def process(incoming_data, db_providers, fix=False):
     final_ol = pd.DataFrame()
 
     providers_data = get_providers(db_providers)
-
+    
+    print(providers_data.columns)
+    
     supervisors = providers_data[providers_data['Type'] == 'Supervisor']
     risen_supervisors = providers_data[providers_data['Type'] == 'Risen Supervisor']
     # print(risen_supervisors)
     trainees = providers_data[providers_data['Status'] == 'Trainee']
     RBTs = providers_data[providers_data['Status'] == 'RBT']
     data = get_data(incoming_data)
-
+    print("start")
+    print(data[data['ProviderFirstName'] == 'Gabriella'])
+    
     supervisors_id = get_supervisor_codes()
 
     # eliminar datos no deseados
@@ -135,7 +136,7 @@ def process(incoming_data, db_providers, fix=False):
     data['data_filter1'] = data_filter
     data = data[data.data_filter1]
     data = data.drop('data_filter1', 1)
-
+    print(data[data['ProviderFirstName'] == 'Gabriella'])
     # st.dataframe(data)
 
     errors = []
@@ -191,17 +192,19 @@ def process(incoming_data, db_providers, fix=False):
                 errors.append(i)
                 providersErrors.append(i[providerId])
                 continue
-
+        # print(i)
+        
         depured_data.append(i)
 
 
 ###### Using procedure code id because its faster and better than procedure code
+    print(data[data['ProviderFirstName'] == 'Gabriella'])
     code53 = np.array(data[[i in get_rbt_codes() for i in data['ProcedureCodeId']]])
     code_doc = np.array(data[[i in get_indirect_codes() for i in data['ProcedureCodeId']]])
-    code55 = np.array(data[[i in get_supervisor_ids() for i in data['ProcedureCodeId']]])
+    code55 = np.array(data[[i in get_supervisor_codes() for i in data['ProcedureCodeId']]])
     code_meeting = np.array(data[[i in get_group_supervisor_ids() for i in data['ProcedureCodeId']]])
-    code_ind_sup_meeting = np.array(data[[i in get_ind_sup_meeting() for i in data['ProcedureCodeId']]])
     
+    # print(f"code55: {code55}")
   
     for i in code_doc:
         if i[procedureCodeId] == 194642 and (i[providerId] in list(supervisors['ProviderId']) or i[providerId] in list(risen_supervisors['ProviderId'])):
@@ -213,6 +216,9 @@ def process(incoming_data, db_providers, fix=False):
         non_supervisors.append(i)
 
     for i in code55:
+        if i[6] == 'Gabriella':
+            print(i)
+        
         if i[providerId] in list(risen_supervisors['ProviderId']):
             depured_data.append(i)
             continue

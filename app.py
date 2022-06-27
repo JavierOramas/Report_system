@@ -529,7 +529,7 @@ def verify(id):
             return redirect('/')
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-        print(rbt)
+        # print(rbt)
         return redirect(url_for('report', id=rbt['_id']))
 
 
