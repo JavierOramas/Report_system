@@ -260,9 +260,14 @@ def get_roles(users):
     return set(roles)
 
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=None):
+    
+    if alert == None:
+        alert = session['messages'] if 'messages' in session else None
+        session['messages'] = None
+
     if 'providerId' in session['user']:
         session['user']['providerId'] = int(session['user']['providerId'])
 
@@ -610,7 +615,10 @@ def logout():
 @ app.route('/upload', methods=['POST', 'GET'])
 def upload():
     Registry().add_data(db)
-    return redirect('/')
+    alert = {"correct":'File uploaded and processed successfully'}
+    print(alert)
+    session['messages'] = alert
+    return redirect(url_for('dashboard'))
 
 
 @ app.route('/upload-providers', methods=['POST', 'GET'])
