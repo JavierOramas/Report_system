@@ -1,10 +1,85 @@
 {% extends "base.html" %}
-{% from 'heading.html' import heading %}
+{% from 'topnav.html' import topnav %}
 
 {% block content %}
 
-{{ heading(id, user,session, role, total_hours, supervised_time, meetings, minimum_supervised, year, month, False, observed_with_client, missing) }}
+{{ topnav(id, user,session, role, total_hours, supervised_time, meetings, minimum_supervised, year, month, False, observed_with_client, missing) }}
 
-<p>codes here</p>
+<div class='card' style='margin-top:75px' >
+    
+  <div class='add_code'>
+    <div class='card-header'>
+      <h3>Add Code</h3>
+    </div>
+    <div class='card-body'>
+      <form action='/manage_procedure_codes' method='POST'>
+        <table>
+        <tr>
+          <td>
+            <div class='form-group'>
+              <label for='code'>Code</label>
+              <input type='number' required pattern="[0-9]+" class='form-control' id='code' name='code' placeholder='Code'>
+            </div>
+          </td>
+          <td>
+          </td>
+          <td>
+            <div class='form-group'>
+              <label for='name'>Name</label>
+              <input type='text' required class='form-control' id='name' name='name' placeholder='Code Name'>
+            </div>
+          </td>
+          <td>
+          </td>
+          <td>
+          <input type='submit' class='btn btn-primary' value='Add'>
+          </td>
+        </tr>
 
+      </table>
+      </form>
+    </div>
+  <div class="table-responsive">
+      <table class="table">
+          <thead>
+            <tr>
+              <th>Code Name</th>
+              <th>Code ID</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for code in codes %}
+            <tr>
+              <td>{{ code['name'] }}</td>
+              <td>{{ code['code'] }}</td>
+              <td>
+                <button type="button" class="btn btn-none" data-bs-toggle="modal" data-bs-target="#delete{{codes['_id']}}">
+                    🗑️
+                  </button>
+                  
+                  <!-- Modal -->
+                  <div class="modal fade" id="delete{{codes['_id']}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Code will be deleted</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Are You sure you want to DELETE code {{code['name']}}?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <a class="btn btn-primary" href='/del/procedure/{{code["_id"]}}'>Delete</a>
+                        </div>
+                      </div>
+                    </div>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+
+</div>
 {% endblock%}

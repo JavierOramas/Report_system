@@ -1,3 +1,4 @@
+{% from 'topnav.html' import topnav %}
 {% macro heading(id,user ,session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing) %}
 
 {% if report == True and ( supervised_hours < minimum_supervised or observed_with_client < 1 ) %}
@@ -6,6 +7,8 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endif %}
+
+{{ topnav(id,user ,session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing) }}
 
 {% if report == True and missing != [] %}
 <div class="alert alert-warning alert-dismissible" role="alert">
@@ -16,28 +19,6 @@
     ) </p>
 </div>
 {% endif %}
-
-
-<div class="topnav">
-    <a class='active' href="/">Home</a>
-    <a href="/user/edit/{{id}}">Edit account</a>
-    <a href="/manage_procedure_codes">Procedure Codes</a>
-    {% if report == True and supervised_hours >= minimum_supervised and observed_with_client >= 1  %}
-    <div class="center">
-        <a href="/report/{{year}}/{{month}}/{{id}}" class="">Export PDF</a>
-    </div>
-    {% elif report == True and not role in ['admin','role']%}
-    <div class="center">
-        <div class="disabled">
-            <a href="/report/{{year}}/{{month}}/{{id}}" aria-disabled="true">Export PDF</a>
-        </div>
-    </div>
-    {% endif %}
-    
-    <div class="pull-right">
-        <a class="" href="/user/signout">Sign Out</a>
-    </div>
-</div>
 
 </div>
 

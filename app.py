@@ -201,11 +201,25 @@ def providers():
     entries = db.user.find()
     return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=ids, session=session, report=False)
 
-@app.route('/manage_procedure_codes')
+@app.route('/manage_procedure_codes', methods=['GET', 'POST'])
+# @app.route('/manage_procedure_codes', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def procedure_codes():
-    codes = db.procedure_codes.find()
-    
-    return render_template('procedure_codes.html', codes=codes)
+    if request.method == 'POST':
+        print(request.form)
+        db.procedure_codes.insert_one({'code': request.form['code'], 'name': request.form['name']})
+        return redirect(url_for('procedure_codes'))
+    if request.method == 'GET':
+        codes = db.procedure_codes.find()
+        return render_template('procedure_codes.html', codes=list(codes))
+
+@app.route('/del/procedure/<id>')
+@login_required
+@admin_required
+def del_procedure_code(id):
+    db.procedure_codes.delete_one({'_id': ObjectId(id)})
+    return redirect(url_for('procedure_codes'))
 
 @app.route('/user_report/<id>/<alert>', methods=["POST", "GET"])
 @app.route('/user_report/<id>', methods=["POST", "GET"])
