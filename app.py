@@ -533,7 +533,6 @@ def verify(id):
         return redirect(url_for('report', id=rbt['_id']))
 
 
-
 @ app.route('/del/entry/<id>', methods=('GET', 'POST'))
 @ login_required
 def delete_entry(id):
@@ -559,10 +558,12 @@ def edit(id):
         for role in supervisor_roles:
             temp = db.users.find({"role": role})
             supervisors += list(temp)
-            
-        return render_template('edit.html', entry=entry, supervisors=supervisors)
+        
+        user = db.users.find_one({"ProviderId":entry['ProviderId']})
+        
+        return render_template('edit.html', entry=entry, supervisors=supervisors, id = user['_id'])
 
-    else:
+    elif request.method == "POST":
         if entry["ProcedureCodeId"] != request.form.get('ProcedureCodeId') or entry["DateOfService"] != request.form.get('DateOfService') or entry["MeetingDuration"] != request.form.get('MeetingDuration'):
             db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
                 "ProcedureCodeId": int(request.form.get('ProcedureCodeId')),
