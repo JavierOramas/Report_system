@@ -54,7 +54,8 @@ def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId
         return False
     if entry[providerId] in RBTs and i[providerId] in trainees:
         return False
-
+    if procedure in get_ind_sup_meeting() and i[procedureCodeId] in get_ind_sup_meeting():
+        return True
     if procedure in get_trainee_codes() and i[procedureCodeId] in get_supervisor_codes():
         return True
     if procedure in get_rbt_codes() and i[procedureCodeId] in get_supervisor_codes():
@@ -203,6 +204,7 @@ def process(incoming_data, db_providers, fix=False):
     code_doc = np.array(data[[i in get_indirect_codes() for i in data['ProcedureCodeId']]])
     code55 = np.array(data[[i in get_supervisor_codes() for i in data['ProcedureCodeId']]])
     code_meeting = np.array(data[[i in get_group_supervisor_ids() for i in data['ProcedureCodeId']]])
+    code_ind_sup = np.array(data[[i in get_ind_sup_meeting() for i in data['ProcedureCodeId']]])
     
     # print(f"code55: {code55}")
   
@@ -215,10 +217,13 @@ def process(incoming_data, db_providers, fix=False):
 
         non_supervisors.append(i)
 
+    for i in code_ind_sup:
+        if i[providerId] in list(supervisors['ProviderId']) or i[providerId] in list(risen_supervisors['ProviderId']):
+            depured_data.append(i)
+        else:
+            non_supervisors.append(i)
+
     for i in code55:
-        if i[6] == 'Gabriella':
-            print(i)
-        
         if i[providerId] in list(risen_supervisors['ProviderId']):
             depured_data.append(i)
             continue

@@ -70,7 +70,7 @@
                 <div class="center">
                     <table class="table" id="entries">
                         <tr>
-                            {% for i in ["Confirmed ","DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                            {% for i in ["Procedure Code ","DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
                             <th>
                                 {{i}}
                             </th>
@@ -78,7 +78,7 @@
                         </tr>
                         {% for entry in entries %}
                         <tr>
-                            <td> {% if entry['Verified'] == False %} ❌ {% else %} ✅ {% endif %}</td>
+                            <td>{{ entry["ProcedureCodeId"] }}</td>
                             <td>{{ entry["DateOfService"] }}</td>
                             <td>{{ entry["MeetingDuration"] }}</td>
                             <td>{{ entry["Individual"] }}</td>

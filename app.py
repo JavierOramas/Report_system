@@ -622,6 +622,14 @@ def signout():
 def logout():
     pass
 
+@ app.route('/procedures/')
+def procedures():
+    if request.method == 'GET':
+        pass
+    
+    else:
+        pass
+
 
 @ app.route('/upload', methods=['POST', 'GET'])
 def upload():
