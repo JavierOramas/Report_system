@@ -12,7 +12,13 @@
                 <input type="number" step="0.1" name="MeetingDuration" value={{entry['MeetingDuration']}} class="field" required>
 
                 <label for="ProcedureCodeId">Procedure Code</label>
-                <input type="text" class="field" name="ProcedureCodeId" value="{{ entry['ProcedureCodeId'] }}" required>
+                <select id="ProcedureCodeId" name="ProcedureCodeId" class="form-select">
+                    {% for code in codes %}
+                        <option value={{code['code']}}>
+                            {{code['name']}}
+                        </option>
+                    {% endfor %}
+                </select>
 
                 <label for="sup">Supervisor</label>
                 <select id="sup" name="sup" class="form-select">

@@ -68,7 +68,7 @@
                 </div>
                 <p>{{user['name']}}</p>
                 <div class="center">
-                    <table class="table" id="entries">
+                    <table class="table table-hover" id="entries">
                         <tr>
                             {% for i in ["Procedure Code ","DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
                             <th>
@@ -121,7 +121,7 @@
 
             <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
                 <div class="center">
-                    <table class="table" id="pending">
+                    <table class="table table-hover" id="pending">
                         <tr>
                             {% for i in ["DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
                             <th>
