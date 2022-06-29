@@ -9,7 +9,7 @@
     
   <div class='add_code'>
     <div class='card-header'>
-      <h3>Add Code</h3>
+      <h3>Procedure Codes</h3>
     </div>
     <div class='card-body'>
       <form action='/manage_procedure_codes' method='POST'>
@@ -40,19 +40,18 @@
       </form>
     </div>
   <div class="table-responsive">
-      <table class="table">
+      <table class="table table-hover">
           <thead>
             <tr>
-              <th>Code Name</th>
               <th>Code ID</th>
-              <th></th>
+              <th>Code Name</th>
             </tr>
           </thead>
           <tbody>
             {% for code in codes %}
             <tr>
-              <td>{{ code['name'] }}</td>
               <td>{{ code['code'] }}</td>
+              <td>{{ code['name'] }}</td>
               <td>
                 <button type="button" class="btn btn-none" data-bs-toggle="modal" data-bs-target="#delete{{codes['_id']}}">
                     🗑️
