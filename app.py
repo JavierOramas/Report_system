@@ -347,7 +347,7 @@ def config(id):
                 if is_admin:
                     log('user is admin')
                     data = {
-                    "name": request.form.get('name'),
+                    "name": f'{request.form.get("first_name")} {request.form.get("last_name")} {request.form.get("credential")}',
                     "ProviderId": prov_id,
                     "email": request.form.get('email'),
                     "first_name": request.form.get('first_name'),
@@ -363,7 +363,7 @@ def config(id):
                     }
                 else:
                     data = {
-                    "name": request.form.get('name'),
+                    "name": f'{request.form.get("first_name")} {request.form.get("last_name")} {request.form.get("credential")}',
                     "ProviderId": prov_id,
                     "email": request.form.get('email'),
                     "first_name": request.form.get('first_name'),
@@ -383,7 +383,7 @@ def config(id):
                 db.users.update_one({"_id": ObjectId(str(id))}, {'$set': data})
             except:
                 data = {
-                    "name": request.form.get('name'),
+                    "name": f'{request.form.get("first_name")} {request.form.get("last_name")} {request.form.get("credential")}',
                     "ProviderId": prov_id,
                     "first_name": request.form.get('first_name'),
                     "last_name": request.form.get('last_name'),
@@ -439,7 +439,7 @@ def new_user():
     if request.method == 'POST':
 
         db.users.insert_one({
-            "name": request.form.get('name'),
+            "name": f'{request.form.get("first_name")} {request.form.get("last_name")} {request.form.get("credential")}',
             "email": request.form.get('email'),
             "first_name": request.form.get('first_name'),
             "last_name": request.form.get('last_name'),

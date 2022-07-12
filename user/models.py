@@ -71,7 +71,7 @@ class User:
         for index, entry in data.iterrows():
             item = {
                 "ProviderId": entry['ProviderId'],
-                "name": entry["Name and Credential"],
+                "name": f'{entry["ProviderFirstName"]} {entry["ProviderLastName"]} {entry["Credential"]}',
                 "email": entry["Email"],
                 "first_name": entry["ProviderFirstName"],
                 "last_name": entry["ProviderLastName"],
