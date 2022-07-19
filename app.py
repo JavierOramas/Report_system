@@ -252,7 +252,7 @@ def report(id, alert=None):
 
         missing = []
 
-        for i in ["ProviderId","name","email","first_name","last_name","BACB_id","credential","background_date","hired_date","background_screening_type","background_exp_date"]:
+        for i in ["ProviderId","name","email","first_name","last_name","credential","background_date","hired_date","background_screening_type","background_exp_date"]:
 
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue
