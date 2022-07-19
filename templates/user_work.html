@@ -78,7 +78,16 @@
                         </tr>
                         {% for entry in entries %}
                         <tr>
-                            <td>{{ entry["ProcedureCodeId"] }}</td>
+                            {% if entry['ProcedureCodeId']|int in code_id%}
+                            {% for i in codes %}
+                                {% if i['code']|int == entry['ProcedureCodeId']|int %}
+                                    <td>{{ i['name'] }}</td>
+                                {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                            {% if not entry['ProcedureCodeId']|int in code_id%}
+                                <td>{{ entry['ProcedureCodeId'] }}</td>
+                            {% endif %}
                             <td>{{ entry["DateOfService"] }}</td>
                             <td>{{ entry["MeetingDuration"] }}</td>
                             <td>{{ entry["Individual"] }}</td>
