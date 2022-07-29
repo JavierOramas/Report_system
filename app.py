@@ -650,7 +650,7 @@ def procedures():
 
 @ app.route('/upload', methods=['POST', 'GET'])
 def upload():
-    Registry().add_data(db)
+    status_code = Registry().add_data(db)
     alert = {"correct":'File uploaded and processed successfully'}
     print(alert)
     session['messages'] = alert

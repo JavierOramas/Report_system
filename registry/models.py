@@ -34,18 +34,22 @@ class Registry:
             return 'no', 'yes'
 
     def add_data(self, db):
+        print("start")
         # Load data from csv pre-loaded from the client
         try:
             data = pd.read_csv('static/files/data.csv')
         except:
             return {'status': 500}
         labels = ['ProviderId', 'TimeWorkedInHours']
+        print("labels")
 
         month = datetime.datetime.strptime(
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').month
         year = datetime.datetime.strptime(
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
         data = data.drop(data.columns.difference(labels), 1)
+        print("time")
+        
         try:
             data['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(
                 lambda x: x.replace(',', '.')).astype(float)
@@ -64,9 +68,10 @@ class Registry:
 
             if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}):
                 db.TotalHours.insert_one(item)
-
+        print("for")
         data = process('static/files/data.csv', 'providers.csv')
         # crete the collection entries
+        print("process")
         for index, entry in data.iterrows():
             entry = {
                 "entryId": entry["Id"],
