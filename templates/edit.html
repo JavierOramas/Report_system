@@ -14,7 +14,7 @@
                 <label for="ProcedureCodeId">Procedure Code</label>
                 <select id="ProcedureCodeId" name="ProcedureCodeId" class="form-select">
                     {% for code in codes %}
-                        <option value={{code['code']}}>
+                        <option value={{code['code']}} {% if entry['ProcedureCodeId']|string == code['code']|string %} selected {% endif%}>
                             {{code['name']}}
                         </option>
                     {% endfor %}
@@ -23,7 +23,7 @@
                 <label for="sup">Supervisor</label>
                 <select id="sup" name="sup" class="form-select">
                     {% for supervisor in supervisors %}
-                        <option value={{supervisor['ProviderId']}}>
+                        <option value={{supervisor['ProviderId']}} {% if entry['Supervisor']|string == supervisor['ProviderId']|string %} selected {% endif %}>
                             {{supervisor['name']}}
                         </option>
                     {% endfor %}

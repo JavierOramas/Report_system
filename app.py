@@ -579,7 +579,7 @@ def edit(id):
             supervisors += list(temp)
         
         user = db.users.find_one({"ProviderId":entry['ProviderId']})
-        
+        print(entry)
         return render_template('edit.html', entry=entry, supervisors=supervisors, id = user['_id'],codes=list(db.procedure_codes.find()))
 
     elif request.method == "POST":
