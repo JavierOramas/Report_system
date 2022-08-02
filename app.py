@@ -476,6 +476,7 @@ def add(id=None):
         except:
             user = db.users.find_one({"_id": id})
 
+    print("HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
     if request.method == 'GET':
         entry = {
             # "entryId": entry["Id"],
@@ -504,7 +505,9 @@ def add(id=None):
         return render_template('edit.html', entry=entry, supervisors=supervisors, codes=list(db.procedure_codes.find()))
         # return redirect(url_for('/', message={'error':'you cant edit that entry'}))
     else:
-        group= individual = 'no'
+        print("HEREEEEEE")
+        group = individual = 'no'
+        print(request.form.get("supervision_type"))
         if request.form.get("supervision_type") == 'yes':
             group = 'yes'
         if request.form.get("supervision_type") == 'no':
@@ -584,11 +587,12 @@ def edit(id):
             db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
                 "ProcedureCodeId": int(request.form.get('ProcedureCodeId')),
                 "MeetingDuration": float(request.form.get("MeetingDuration")),
-                "Group": 'yes' if request.form.get('supervision_type_group') == 'on' else 'no',
-                "Individual": 'yes' if request.form.get('supervision_type_individual') else 'no',
+                "Group": 'yes' if request.form.get('supervision_type') == 'yes' else 'no',
+                "Individual": 'yes' if request.form.get('supervision_type') == 'no' else 'no',
                 "ObservedwithClient": request.form.get('observed'),
                 "ModeofMeeting": request.form.get('meeting_type'),
                 "DateOfService": request.form.get('DateOfService'),
+                "Supervisor": int(request.form.get('sup')),
                 "Verified": False
             }})
       
