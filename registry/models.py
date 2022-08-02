@@ -68,6 +68,7 @@ class Registry:
 
             if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}) and not int(entry['ProcedureCodeId']) in [194642]:
                 db.TotalHours.insert_one(item)
+                
         data = process('static/files/data.csv', 'providers.csv')
         # crete the collection entries
         print("process")
