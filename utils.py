@@ -2,7 +2,7 @@ import math
 import calendar 
 import datetime
 
-def round_half_up(n, decimals=0):
+def round_half_up(n, decimals=2):
     multiplier = 10 ** decimals
     return math.floor(int(n)*multiplier + 0.5) / multiplier
 

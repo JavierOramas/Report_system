@@ -49,7 +49,7 @@ class Registry:
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
         data = data.drop(data.columns.difference(labels), 1)
         print("time")
-        
+
         try:
             data['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(
                 lambda x: x.replace(',', '.')).astype(float)
@@ -66,9 +66,8 @@ class Registry:
                 'TotalTime': entry['TimeWorkedInHours']
             }
 
-            if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}):
+            if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}) and not int(entry['ProcedureCodeId']) in [194642]:
                 db.TotalHours.insert_one(item)
-        print("for")
         data = process('static/files/data.csv', 'providers.csv')
         # crete the collection entries
         print("process")
