@@ -118,17 +118,19 @@ def get_entries(role, year, month, user):
             ids += list(set([i['ProviderId'] for i in entries]))
         # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
         if role == 'basic':
+            print("here")
             # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
-            total_hours = db.TotalHours.find_one({'ProviderId': int(
-            user['providerId']), 'Month': month, 'Year': year})
-        if total_hours == None:
-            total_hours = 0
+            total_hours = db.TotalHours.find_one({'ProviderId': 
+            user['providerId'], 'Month': month, 'Year': year})
+            print(total_hours)
+            if total_hours == None:
+                total_hours = 0
+            else:
+                # log(total_hours, year ,month)
+                total_hours = total_hours['TotalTime']
         else:
-            # log(total_hours, year ,month)
-            total_hours = total_hours['TotalTime']
-    else:
-        total_hours = 0
-
+            total_hours = 0
+    print(total_hours)
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors), observed_with_client
 
 

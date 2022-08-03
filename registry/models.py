@@ -40,7 +40,7 @@ class Registry:
             data = pd.read_csv('static/files/data.csv')
         except:
             return {'status': 500}
-        labels = ['ProviderId', 'TimeWorkedInHours']
+        labels = ['ProviderId', 'TimeWorkedInHours', 'ProcedureCodeId']
         print("labels")
 
         month = datetime.datetime.strptime(
@@ -48,14 +48,15 @@ class Registry:
         year = datetime.datetime.strptime(
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
         data = data.drop(data.columns.difference(labels), 1)
-        print("time")
+        print(data)
+        data_for_time = data[data['ProcedureCodeId'] != 194642]
 
         try:
-            data['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(
+            data_for_time['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(
                 lambda x: x.replace(',', '.')).astype(float)
         except:
-            data['TimeWorkedInHours'] = data['TimeWorkedInHours'].astype(float)
-        total_time = data.groupby(['ProviderId']).sum()
+            data_for_time['TimeWorkedInHours'] = data['TimeWorkedInHours'].astype(float)
+        total_time = data_for_time.groupby(['ProviderId']).sum()
 
         for name, entry in total_time.iterrows():
             # entry['ProviderId'] = entry['Name']
@@ -65,10 +66,9 @@ class Registry:
                 'Year': year,
                 'TotalTime': entry['TimeWorkedInHours']
             }
-
-            if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}) and not int(entry['ProcedureCodeId']) in [194642]:
+            if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}):
                 db.TotalHours.insert_one(item)
-                
+    
         data = process('static/files/data.csv', 'providers.csv')
         # crete the collection entries
         print("process")
