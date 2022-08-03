@@ -33,3 +33,6 @@ class Role:
             return {'status': 200}
         else:
             return {'status': 400}
+
+def get_all_roles(db):
+    return list(db.roles.find())

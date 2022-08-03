@@ -7,26 +7,26 @@
 
 <div class='card' style='margin-top:75px' >
     
-  <div class='add_code'>
+  <div class='add_role'>
     <div class='card-header'>
-      <h3>Procedure Codes</h3>
+      <h3>Role Manager</h3>
     </div>
     <div class='card-body'>
-      <form action='/manage_procedure_codes' method='POST'>
+      <form action='/manage_roles' method='POST'>
         <table>
         <tr>
           <td>
             <div class='form-group'>
-              <label for='code'>Code</label>
-              <input type='number' required pattern="[0-9]+" class='form-control' id='code' name='code' placeholder='Code'>
+              <label for='role'>Role Name</label>
+              <input type='text' required class='form-control' id='role' name='role' placeholder='role'>
             </div>
           </td>
           <td>
           </td>
           <td>
             <div class='form-group'>
-              <label for='name'>Name</label>
-              <input type='text' required class='form-control' id='name' name='name' placeholder='Code Name'>
+              <label for='id'>Admin Privilege</label>
+              <input class="form-check-input" type="checkbox" value="yes" id="admin", name='admin'>
             </div>
           </td>
           <td>
@@ -43,34 +43,34 @@
       <table class="table table-hover">
           <thead>
             <tr>
-              <th>Code ID</th>
-              <th>Code Name</th>
+              <th>Role Name</th>
+              <th>Admin Privileges</th>
             </tr>
           </thead>
           <tbody>
-            {% for code in codes %}
+            {% for role in roles %}
             <tr>
-              <td>{{ code['code'] }}</td>
-              <td>{{ code['name'] }}</td>
+              <td>{{ role['name'] }}</td>
+              <td>{{ role['admin'] }}</td>
               <td>
-                <button type="button" class="btn btn-none" data-bs-toggle="modal" data-bs-target="#delete{{code['_id']}}">
+                <button type="button" class="btn btn-none" data-bs-toggle="modal" data-bs-target="#delete{{role['_id']}}">
                     🗑️
                   </button>
                   
                   <!-- Modal -->
-                  <div class="modal fade" id="delete{{code['_id']}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal fade" id="delete{{role['_id']}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                       <div class="modal-content">
                         <div class="modal-header">
-                          <h5 class="modal-title" id="exampleModalLabel">Code will be deleted</h5>
+                          <h5 class="modal-title" id="exampleModalLabel">role will be deleted</h5>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                          Are You sure you want to DELETE code {{code['name']}}?
+                          Are You sure you want to DELETE role {{role['name']}}?
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <a class="btn btn-primary" href='/del/procedure/{{code["_id"]}}'>Delete</a>
+                            <a class="btn btn-primary" href='/del/role/{{role["_id"]}}'>Delete</a>
                         </div>
                       </div>
                     </div>

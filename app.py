@@ -19,6 +19,7 @@ import datetime_format
 import pdfkit
 from passlib.hash import pbkdf2_sha256
 from utils import get_rbt_coordinator, get_second_monday, round_half_up
+from roles.models import get_all_roles
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -206,6 +207,33 @@ def upload_file():
 def providers():
     entries = db.user.find()
     return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=ids, session=session, report=False)
+
+@app.route('/manage_roles', methods=['GET', 'POST'])
+# @app.route('/manage_procedure_codes', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def role_manager():
+    if request.method == 'POST':
+        if 'admin' in request.form:
+            admin = request.form['admin']
+        else:
+            admin ='no'
+        db.roles.insert_one(
+            {'name': request.form['role'], 'admin': admin})
+        return redirect(url_for('role_manager'))
+    
+    if request.method == 'GET':
+        roles = db.roles.find()
+        roles = list(roles)
+        print(roles)
+        return render_template('roles.html', roles=list(roles))
+
+@app.route('/del/role/<id>')
+@login_required
+@admin_required
+def del_role(id):
+    db.roles.delete_one({'_id': ObjectId(id)})
+    return redirect(url_for('role_manager'))
 
 
 @app.route('/manage_procedure_codes', methods=['GET', 'POST'])
@@ -420,10 +448,10 @@ def config(id):
             try:
                 user = db.users.find_one({'_id': str(id)})
                 if user:
-                    return render_template('edit_user.html', user=user, admin=is_admin)
+                    return render_template('edit_user.html', user=user, admin=is_admin, roles=get_all_roles(db))
                 else:
                     user = db.users.find_one({'_id': ObjectId(str(id))})
-                    return render_template('edit_user.html', user=user, admin=is_admin)
+                    return render_template('edit_user.html', user=user, admin=is_admin, roles=get_all_roles(db))
 
             except:
                 user = db.users.find_one({'_id': ObjectId(str(id))})
@@ -448,7 +476,7 @@ def new_user():
             "background_date": '',
             "background_exp_date": '',
         }
-        return render_template('edit_user.html', user=user, admin=True)
+        return render_template('edit_user.html', user=user, admin=True, roles=get_all_roles(db))
 
     if request.method == 'POST':
 

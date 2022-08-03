@@ -3,7 +3,10 @@
 <div class="topnav">
     <a class='active' href="/">Home</a>
     <a href="/user/edit/{{id}}">Edit account</a>
-    <a href="/manage_procedure_codes">Procedure Codes</a>
+    {% if role in ['admin', 'BCBA', 'BCBA (L)'] %}
+        <a href="/manage_procedure_codes">Procedure Codes</a>
+        <a href="/manage_roles">Role Manager</a>
+    {% endif %}
     {% if report == True and supervised_hours >= minimum_supervised and observed_with_client >= 1  %}
     <div class="center">
         <a href="/report/{{year}}/{{month}}/{{id}}" class="">Export PDF</a>
