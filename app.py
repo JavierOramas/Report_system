@@ -300,6 +300,7 @@ def report(id, alert=None):
             missing.append(i)
 
         log("missing:", missing)
+
         return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()])
 
     return redirect("/")
@@ -590,7 +591,9 @@ def verify(id):
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         # print(rbt)
-        return redirect(url_for('report', id=rbt['_id']))
+        month = request.form.get('month')
+        year = request.form.get('year')
+        return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
 
 
 @ app.route('/del/entry/<id>', methods=('GET', 'POST'))
