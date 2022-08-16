@@ -48,8 +48,18 @@ class Registry:
         year = datetime.datetime.strptime(
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
         data = data.drop(data.columns.difference(labels), 1)
-        print(data)
-        data_for_time = data[data['ProcedureCodeId'] != 194642]
+
+        labels = [150580, 150582, 150583, 150553, 194640, 194641, 194641, 235184, 255975, 255910, 241573]
+
+        df = data[data['ProcedureCodeId'] != 194642 ]
+        idx = 0
+        for i in labels:
+            if idx != 0:
+                data_for_time.append(df[df['ProcedureCodeId'] == i], ingnore_index=True)
+            else:
+                data_for_time = df[df['ProcedureCodeId'] == i]
+
+        data_for_time = df
 
         try:
             data_for_time['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(
