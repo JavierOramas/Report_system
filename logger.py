@@ -1,4 +1,5 @@
 import datetime
+import pandas as pd
 
 # log function to recieve mutiple arguments
 def log(*args):

@@ -1,3 +1,4 @@
+from logger import log
 from flask import Flask, jsonify, request, session, redirect
 import uuid
 # from passlib.hash import pbkdf2_sha256
@@ -52,6 +53,10 @@ class Registry:
         labels = [150580, 150582, 150583, 150553, 194640, 194641, 194641, 235184, 255975, 255910, 241573]
 
         df = data[data['ProcedureCodeId'] != 194642 ]
+        df = df[df['ProcedureCodeId'] != 208672 ]
+        df = df[df['ProcedureCodeId'] != 232824 ]
+        df = df[df['ProcedureCodeId'] != 189444 ]
+        df = df[df['ProcedureCodeId'] != 256962 ]
         idx = 0
         for i in labels:
             if idx != 0:
@@ -69,6 +74,8 @@ class Registry:
         total_time = data_for_time.groupby(['ProviderId']).sum()
 
         for name, entry in total_time.iterrows():
+            log(f"\n\n\n Sum Data for {name}")
+            log(data_for_time["ProcedureCodeId"].to_string())
             # entry['ProviderId'] = entry['Name']
             item = {
                 'ProviderId': name,
