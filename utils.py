@@ -1,5 +1,5 @@
 import math
-import calendar 
+import calendar
 import datetime
 
 def round_half_up(n, decimals=2):
@@ -13,7 +13,7 @@ def get_rbt_coordinator(db):
 
 def get_second_monday(year, month):
     c = calendar.Calendar(firstweekday=calendar.MONDAY)
-    monthcal = c.monthdatescalendar(year, month)
+    monthcal = c.monthdatescalendar(year, month+1)
     d = monthcal[1][0].day
     if d > 7:
         return datetime.datetime.strftime(monthcal[1][0], "%m/%d/%Y")
