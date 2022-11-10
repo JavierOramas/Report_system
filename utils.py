@@ -12,6 +12,10 @@ def get_rbt_coordinator(db):
     return coordinator['name']
 
 def get_second_monday(year, month):
-    c = calendar.Calendar(firstweekday=calendar.SATURDAY)
+    c = calendar.Calendar(firstweekday=calendar.MONDAY)
     monthcal = c.monthdatescalendar(year, month)
-    return datetime.datetime.strftime(monthcal[1][-1], "%m/%d/%Y")
+    d = monthcal[1][0].day
+    if d > 7:
+        return datetime.datetime.strftime(monthcal[1][0], "%m/%d/%Y")
+    else:
+        return datetime.datetime.strftime(monthcal[2][0], "%m/%d/%Y")

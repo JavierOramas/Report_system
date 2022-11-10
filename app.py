@@ -206,7 +206,7 @@ def upload_file():
 @admin_required
 def providers():
     entries = db.user.find()
-    return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=ids, session=session, report=False)
+    return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=[], session=session, report=False)
 
 @app.route('/manage_roles', methods=['GET', 'POST'])
 # @app.route('/manage_procedure_codes', methods=['GET', 'POST'])
@@ -367,7 +367,7 @@ def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().
 
 @app.route('/user/edit/<id>', methods=('GET', 'POST'))
 @login_required
-def config(id):
+def config_edit(id):
     log(id)
     log(session['user'])
     try:
@@ -518,7 +518,6 @@ def add(id=None):
         except:
             user = db.users.find_one({"_id": id})
 
-    print("HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
     if request.method == 'GET':
         entry = {
             # "entryId": entry["Id"],

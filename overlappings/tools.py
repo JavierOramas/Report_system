@@ -295,12 +295,12 @@ def process(incoming_data, db_providers, fix=False):
             if len(new_ol) != 0:
                 overlappings[i[providerId]].append(new_ol)
 
-    if len(errors) > 0:
-        pd.DataFrame(errors).to_csv('errors.csv')
-        pd.DataFrame(supervisors_data).to_csv('supervisors_data.csv')
-    if len(notifications) > 0:
-        notifications = pd.DataFrame(np.stack(notifications, axis=0), columns=cols)
-        notifications.to_csv('auto_fixed.csv')
+    # if len(errors) > 0:
+    #     pd.DataFrame(errors).to_csv('errors.csv')
+    #     pd.DataFrame(supervisors_data).to_csv('supervisors_data.csv')
+    # if len(notifications) > 0:
+    #     notifications = pd.DataFrame(np.stack(notifications, axis=0), columns=cols)
+    #     notifications.to_csv('auto_fixed.csv')
 
 
     lab = list(cols)
