@@ -75,18 +75,31 @@ def calculate_overlapping(entry,providerName,providerId,depured_data,procedureCo
             entry_start = datetime.strptime(entry[DateTimeFrom], '%m/%d/%Y %H:%M:%S')
             entry_end = datetime.strptime(entry[timeTo], '%m/%d/%Y %H:%M:%S')
         except:
-            pass
+            try:
+                entry_start = datetime.strptime(entry[DateTimeFrom], '%m/%d/%y %H:%M:%S')
+                entry_end = datetime.strptime(entry[timeTo], '%m/%d/%y %H:%M:%S')
+            except:
+                entry_start = datetime.strptime(entry[DateTimeFrom], '%m/%d/%y %H:%M')
+                entry_end = datetime.strptime(entry[timeTo], '%m/%d/%y %H:%M')
 
     for i in depured_data:
         # print(verify_valid_overlapping(entry,i,providerName,procedureCodeId,providerId, risen_supervisors))
         if  verify_valid_overlapping(entry,i,providerName,procedureCodeId,providerId):
             try:
-                start = datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M')
-                end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')
+                start = datetime.strptime(entry[DateTimeFrom], '%m/%d/%Y %H:%M')
+                end = datetime.strptime(entry[timeTo], '%m/%d/%Y %H:%M')
             except:
-                start = datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M:%S')
-                end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M:%S')
-
+                try:
+                    start = datetime.strptime(entry[DateTimeFrom], '%m/%d/%Y %H:%M:%S')
+                    end = datetime.strptime(entry[timeTo], '%m/%d/%Y %H:%M:%S')
+                except:
+                    try:
+                        start = datetime.strptime(entry[DateTimeFrom], '%m/%d/%y %H:%M:%S')
+                        end = datetime.strptime(entry[timeTo], '%m/%d/%y %H:%M:%S')
+                    except:
+                        start = datetime.strptime(entry[DateTimeFrom], '%m/%d/%y %H:%M')
+                        end = datetime.strptime(entry[timeTo], '%m/%d/%y %H:%M')
+ 
             if not i[client] == entry[client]:
                 continue
 
@@ -113,23 +126,18 @@ def calculate_overlapping(entry,providerName,providerId,depured_data,procedureCo
 
     return overlapping
 
-def process(incoming_data, db_providers, fix=False):
+def process(incoming_data, db_providers):
 
     final_ol = pd.DataFrame()
 
     providers_data = get_providers(db_providers)
-    
-    print(providers_data.columns)
-    
+       
     supervisors = providers_data[providers_data['Type'] == 'Supervisor']
     risen_supervisors = providers_data[providers_data['Type'] == 'Risen Supervisor']
     # print(risen_supervisors)
     trainees = providers_data[providers_data['Status'] == 'Trainee']
     RBTs = providers_data[providers_data['Status'] == 'RBT']
     data = get_data(incoming_data)
-    print("start")
-    print(data[data['ProviderFirstName'] == 'Gabriella'])
-    
     supervisors_id = get_supervisor_codes()
 
     # eliminar datos no deseados
@@ -137,7 +145,6 @@ def process(incoming_data, db_providers, fix=False):
     data['data_filter1'] = data_filter
     data = data[data.data_filter1]
     data = data.drop('data_filter1', 1)
-    print(data[data['ProviderFirstName'] == 'Gabriella'])
     # st.dataframe(data)
 
     errors = []
