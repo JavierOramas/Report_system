@@ -322,13 +322,13 @@ def process(incoming_data, db_providers):
         final_labels = labels+['MeetingDuration']
         for j in overlappings[i]:
             try:
-                d,i_ol,time = j[0]
+                _,i_ol,time = j[0]
                 if time.seconds == 0:
                     continue
                 i_ol = np.append(i_ol,time.seconds/3600)
                 ol.append(i_ol)
             except:
-                d,i_ol,time = j
+                _,i_ol,time = j
                 i_ol = np.append(i_ol,time.seconds/3600)
                 ol.append(i_ol)
 
