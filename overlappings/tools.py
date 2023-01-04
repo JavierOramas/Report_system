@@ -50,10 +50,10 @@ def get_data(path):
 
 def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId):
     procedure = entry[procedureCodeId]
-    if entry[providerId] == i[providerId]:
-        return False
-    if entry[providerId] in RBTs and i[providerId] in trainees:
-        return False
+    # if entry[providerId] == i[providerId]:
+    #     return False
+    # if entry[providerId] in RBTs and i[providerId] in trainees:
+    #     return False
     if procedure in get_ind_sup_meeting() and i[procedureCodeId] in get_ind_sup_meeting():
         return True
     if procedure in get_trainee_codes() and i[procedureCodeId] in get_supervisor_codes():
@@ -84,7 +84,7 @@ def calculate_overlapping(entry,providerName,providerId,depured_data,procedureCo
 
     for i in depured_data:
         # print(verify_valid_overlapping(entry,i,providerName,procedureCodeId,providerId, risen_supervisors))
-        if  verify_valid_overlapping(entry,i,providerName,procedureCodeId,providerId):
+        if verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId):
             try:
                 start = datetime.strptime(entry[DateTimeFrom], '%m/%d/%Y %H:%M')
                 end = datetime.strptime(entry[timeTo], '%m/%d/%Y %H:%M')
@@ -99,7 +99,7 @@ def calculate_overlapping(entry,providerName,providerId,depured_data,procedureCo
                     except:
                         start = datetime.strptime(entry[DateTimeFrom], '%m/%d/%y %H:%M')
                         end = datetime.strptime(entry[timeTo], '%m/%d/%y %H:%M')
- 
+
             if not i[client] == entry[client]:
                 continue
 
@@ -107,6 +107,7 @@ def calculate_overlapping(entry,providerName,providerId,depured_data,procedureCo
                 time = min(entry_end,end)-max(entry_start, start)
                 if time != 0:
                     overlapping.append((entry,i, time))
+                    
     if len(overlapping) == 0:
         return []
     if len(overlapping) > 1:
@@ -175,10 +176,10 @@ def process(incoming_data, db_providers):
 
         i = supervisors_data[k]
         if i[procedureCodeId] == 150577 and (i[providerId] in list(trainees['ProviderId']) or i[providerId] in list(RBTs['ProviderId'])):
-                notifications.append(i)
-                i[procedureCodeId] = 194642
-                non_supervisors.append(i)
-                continue
+            notifications.append(i)
+            i[procedureCodeId] = 194642
+            non_supervisors.append(i)
+            continue
 
         if i[procedureCodeId] == 150582:
             if i[providerId] in list(risen_supervisors['ProviderId']+supervisors['ProviderId']) :
@@ -196,10 +197,11 @@ def process(incoming_data, db_providers):
                 # errors.append(i)
                 # providersErrors.append(i[providerId])
                 # continue
+                
         if i[procedureCodeId] == 194640 and i[providerId] in list(RBTs['ProviderId']):
-                errors.append(i)
-                providersErrors.append(i[providerId])
-                continue
+            errors.append(i)
+            providersErrors.append(i[providerId])
+            continue
         # print(i)
         
         depured_data.append(i)
@@ -318,7 +320,7 @@ def process(incoming_data, db_providers):
         os.mkdir('done')
 
     for i in overlappings:
-        ol = []
+        ovl = []
         final_labels = labels+['MeetingDuration']
         for j in overlappings[i]:
             try:
@@ -326,20 +328,19 @@ def process(incoming_data, db_providers):
                 if time.seconds == 0:
                     continue
                 i_ol = np.append(i_ol,time.seconds/3600)
-                ol.append(i_ol)
+                ovl.append(i_ol)
             except:
                 _,i_ol,time = j
                 i_ol = np.append(i_ol,time.seconds/3600)
-                ol.append(i_ol)
+                ovl.append(i_ol)
 
-        if len(ol) > 0:
-            ol = pd.DataFrame(np.stack(ol, axis=0), columns=lab)
-            ol = ol[final_labels] 
-            # ol = ol.drop(['ClientId'], axis=1)
-            ol["ProvId"] = i
-            final_ol = final_ol.append(ol)
+        if len(ovl) > 0:
+            ovl = pd.DataFrame(np.stack(ovl, axis=0), columns=lab)
+            ovl = ovl[final_labels]
+            # ovl = ol.drop(['ClientId'], axis=1)
+            ovl["ProvId"] = i
+            final_ol = final_ol.append(ovl)
             # ol.to_csv(path.join('done',names[i]+' '+str(i)+'.csv'))
 
     # print(final_ol)
     return final_ol
-

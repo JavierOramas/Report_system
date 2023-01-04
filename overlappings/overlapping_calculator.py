@@ -5,7 +5,7 @@ from datetime import datetime
 import streamlit as st
 import json
 import os
-from super_roles import get_supervisors
+# from super_roles import get_supervisors
 from logger import log
 
 risen_supervisors = pd.DataFrame([])
@@ -17,7 +17,7 @@ supervisors = []
 providersErrors = []
 
 
-def get_providers(db):
+def get_providers():
     # return db.users.find_all()
     return pd.read_csv('providers.csv', sep=',')
 
@@ -68,7 +68,7 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
             try:
                 start = datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M')
                 end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M')
-            except(e):
+            except:
                 start = datetime.strptime(i[DateTimeFrom], '%m/%d/%Y %H:%M:%S')
                 end = datetime.strptime(i[timeTo], '%m/%d/%Y %H:%M:%S')
 
@@ -159,7 +159,7 @@ def process(entries, fix=False):
                 notifications.append(i)
                 i[procedureCodeId] = 194640
                 depured_data.append(i)
-                continueimage.png
+                continue
 
             if i[providerId] in list(RBTs['ProviderId']):
                 errors.append(i)
@@ -261,7 +261,7 @@ def process(entries, fix=False):
 
         # names[i[providerId]] = i[providerName]
 
-        new_ol = calculate_overlapping(i, providerName=providerName, providerId=providerId, depured_data=depured_data, procedureCodeId=procedureCodeId,
+        new_ol = calculate_overlapping(i, providerName=i['providerName'], providerId=providerId, depured_data=depured_data, procedureCodeId=procedureCodeId,
                                        client=client, DateTimeFrom=DateTimeFrom, timeTo=timeTo, risen_supervisors=risen_supervisors)
 
         if i[providerId] in providersErrors:
@@ -318,7 +318,3 @@ def process(entries, fix=False):
             final_overlappings.append(ol)
 
     return errors, notifications, final_overlappings
-
-
-if __name__ == '__main__':
-    process()

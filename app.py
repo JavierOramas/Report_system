@@ -77,17 +77,22 @@ def get_entries(role, year, month, user):
     clients = []
     dates = []
     supervisors = []
+    min_year = int(datetime.datetime.now().year)
+    
 
     for entry in entries:
-
+        if int(datetime_format.get_date(entry["DateOfService"]).year) < min_year:
+            min_year = int(
+            datetime_format.get_date(entry["DateOfService"]).year)
+            
         if (datetime_format.get_date(entry["DateOfService"]).year == year or datetime_format.get_date(entry["DateOfService"]).year + 2000 == year) and datetime_format.get_date(entry["DateOfService"]).month == month:
             entry['ProviderId'] = int(entry['ProviderId'])
             if 'providerId' in user:
                 if "ClientId" in entry:
                     clients.append(entry['ClientId'])
-                supervisors.append(entry['Supervisor'])
-                dates.append(entry['DateOfService'])
-                temp.append(entry)
+                    supervisors.append(entry['Supervisor'])
+                    dates.append(entry['DateOfService'])
+                    temp.append(entry)
     entries = temp
     entries = sorted(entries, key=lambda d: d['DateOfService'])
 
@@ -95,16 +100,13 @@ def get_entries(role, year, month, user):
     supervised_time = 0
     observed_with_client = 0
     meetings = 0
-    min_year = int(datetime.datetime.now().year)
     total_hours = 0
+    print(len(entries))
     for i in entries:
         # log(i)
         if i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes':
             observed_with_client += 1
-
-        min_year = min(min_year, int(
-            datetime_format.get_date(i["DateOfService"]).year))
-
+        
         i['MeetingDuration'] = i['MeetingDuration']
         # print(i['MeetingDuration'])
         if i['Verified'] == True:
@@ -132,6 +134,7 @@ def get_entries(role, year, month, user):
         else:
             total_hours = 0
     print(total_hours)
+    print(min_year)
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors), observed_with_client
 
 
