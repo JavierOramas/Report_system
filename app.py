@@ -72,28 +72,30 @@ def get_entries(role, year, month, user):
     entries = db.Registry.find(
         {'ProviderId': int(str(user['providerId'])), 'Verified': True})
     entries = [entry for entry in entries]
+    print(entries, len(entries))
 
     temp = []
     clients = []
     dates = []
     supervisors = []
     min_year = int(datetime.datetime.now().year)
-    
 
     for entry in entries:
         if int(datetime_format.get_date(entry["DateOfService"]).year) < min_year:
             min_year = int(
-            datetime_format.get_date(entry["DateOfService"]).year)
-            
+                datetime_format.get_date(entry["DateOfService"]).year)
+        print(datetime_format.get_date(entry["DateOfService"]).year, datetime_format.get_date(
+            entry["DateOfService"]).month)
         if (datetime_format.get_date(entry["DateOfService"]).year == year or datetime_format.get_date(entry["DateOfService"]).year + 2000 == year) and datetime_format.get_date(entry["DateOfService"]).month == month:
             entry['ProviderId'] = int(entry['ProviderId'])
             if 'providerId' in user:
                 if "ClientId" in entry:
                     clients.append(entry['ClientId'])
-                    supervisors.append(entry['Supervisor'])
-                    dates.append(entry['DateOfService'])
-                    temp.append(entry)
+                supervisors.append(entry['Supervisor'])
+                dates.append(entry['DateOfService'])
+                temp.append(entry)
     entries = temp
+    print(temp)
     entries = sorted(entries, key=lambda d: d['DateOfService'])
 
     ids = []
@@ -101,12 +103,12 @@ def get_entries(role, year, month, user):
     observed_with_client = 0
     meetings = 0
     total_hours = 0
-    print(len(entries))
+    print(entries, len(entries))
     for i in entries:
         # log(i)
         if i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes':
             observed_with_client += 1
-        
+
         i['MeetingDuration'] = i['MeetingDuration']
         # print(i['MeetingDuration'])
         if i['Verified'] == True:
@@ -123,8 +125,8 @@ def get_entries(role, year, month, user):
         if role == 'basic':
             print("here")
             # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
-            total_hours = db.TotalHours.find_one({'ProviderId': 
-            user['providerId'], 'Month': month, 'Year': year})
+            total_hours = db.TotalHours.find_one({'ProviderId':
+                                                  user['providerId'], 'Month': month, 'Year': year})
             print(total_hours)
             if total_hours == None:
                 total_hours = 0
@@ -211,6 +213,7 @@ def providers():
     entries = db.user.find()
     return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=[], session=session, report=False)
 
+
 @app.route('/manage_roles', methods=['GET', 'POST'])
 # @app.route('/manage_procedure_codes', methods=['GET', 'POST'])
 @login_required
@@ -220,16 +223,17 @@ def role_manager():
         if 'admin' in request.form:
             admin = request.form['admin']
         else:
-            admin ='no'
+            admin = 'no'
         db.roles.insert_one(
             {'name': request.form['role'], 'admin': admin})
         return redirect(url_for('role_manager'))
-    
+
     if request.method == 'GET':
         roles = db.roles.find()
         roles = list(roles)
         print(roles)
         return render_template('roles.html', roles=list(roles))
+
 
 @app.route('/del/role/<id>')
 @login_required
