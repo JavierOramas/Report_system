@@ -72,7 +72,7 @@ def get_entries(role, year, month, user):
     entries = db.Registry.find(
         {'ProviderId': int(str(user['providerId'])), 'Verified': True})
     entries = [entry for entry in entries]
-    print(entries, len(entries))
+    # print(entries, len(entries))
 
     temp = []
     clients = []
@@ -84,8 +84,6 @@ def get_entries(role, year, month, user):
         if int(datetime_format.get_date(entry["DateOfService"]).year) < min_year:
             min_year = int(
                 datetime_format.get_date(entry["DateOfService"]).year)
-        print(datetime_format.get_date(entry["DateOfService"]).year, datetime_format.get_date(
-            entry["DateOfService"]).month)
         if (datetime_format.get_date(entry["DateOfService"]).year == year or datetime_format.get_date(entry["DateOfService"]).year + 2000 == year) and datetime_format.get_date(entry["DateOfService"]).month == month:
             entry['ProviderId'] = int(entry['ProviderId'])
             if 'providerId' in user:
@@ -95,7 +93,7 @@ def get_entries(role, year, month, user):
                 dates.append(entry['DateOfService'])
                 temp.append(entry)
     entries = temp
-    print(temp)
+    # print(temp)
     entries = sorted(entries, key=lambda d: d['DateOfService'])
 
     ids = []
@@ -103,7 +101,7 @@ def get_entries(role, year, month, user):
     observed_with_client = 0
     meetings = 0
     total_hours = 0
-    print(entries, len(entries))
+    # print(entries, len(entries))
     for i in entries:
         # log(i)
         if i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes':
