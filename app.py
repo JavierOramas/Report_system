@@ -322,7 +322,7 @@ def get_roles(users):
 
 @app.route('/dashboard', methods=['GET'])
 @login_required
-def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=None):
+def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now().year, alert=None):
 
     if 'month' in session and session['month'] != None:
         month = session['month']
@@ -833,7 +833,7 @@ def get_report(year, month, id):
         return send_file('report.pdf', as_attachment=True)
     else:
         log("Something went Wrong!")
-        return dashboard(month, month, alert=alert)
+        return dashboard(month, month, alert=None)
 
 
 @app.errorhandler(404)
