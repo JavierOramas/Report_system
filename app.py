@@ -323,7 +323,17 @@ def get_roles(users):
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=None):
-
+    
+    if 'month' in session and session['month'] != None:
+        month = session['month']
+    else:
+        session['month'] = month
+    
+    if 'year' in session and session['year'] != None:
+        month = session['year']
+    else:
+        session['year'] = year
+    
     if alert == None:
         alert = session['messages'] if 'messages' in session else None
         session['messages'] = None
@@ -462,7 +472,6 @@ def config_edit(id):
             except:
                 user = db.users.find_one({'_id': ObjectId(str(id))})
                 return render_template('edit_user.html', user=user, admin=is_admin)
-
 
 @ app.route('/user/new', methods=('GET', 'POST'))
 @ login_required
@@ -727,9 +736,18 @@ def filter_data():
     # log(month)
 
     if not month:
-        month = datetime.datetime.now().month-1
+        if 'month' in session and session['month'] != None:
+            month = session['month']
+        else:
+            month = datetime.datetime.now().month-1
+            session['month'] = month
+    
     if not year:
-        year = datetime.datetime.now().year
+        if 'year' in session and session['year'] != None:
+            month = session['year']
+        else:
+            year = datetime.datetime.now().year
+            session['year'] = year
 
     return dashboard(int(month), int(year))
 
@@ -737,6 +755,9 @@ def filter_data():
 @ app.route("/filter/<year>/<month>", methods=['POST', 'GET'])
 def filter_data_args(year, month):
     # return redirect(url_for('dashboard', year=year, month=month))
+    session['month'] = month
+    session['year'] = year
+    
     return dashboard(int(month), int(year))
 
 
