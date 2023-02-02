@@ -736,18 +736,12 @@ def filter_data():
     # log(month)
 
     if not month:
-        if 'month' in session and session['month'] != None:
-            month = session['month']
-        else:
-            month = datetime.datetime.now().month-1
-            session['month'] = month
-    
+        month = datetime.datetime.now().month-1
     if not year:
-        if 'year' in session and session['year'] != None:
-            month = session['year']
-        else:
             year = datetime.datetime.now().year
-            session['year'] = year
+    
+    session['month'] = month
+    session['year'] = year
 
     return dashboard(int(month), int(year))
 
