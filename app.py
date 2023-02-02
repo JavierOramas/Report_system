@@ -269,10 +269,8 @@ def del_procedure_code(id):
 @login_required
 def report(id, alert=None):
 
-    year = int(request.form.get("year")) if request.form.get(
-        "year") else datetime.datetime.now().year
-    month = int(request.form.get("month")) if request.form.get(
-        "month") else datetime.datetime.now().month-1
+    year = session['year'] or datetime.datetime.now().year
+    month = session['month'] or datetime.datetime.now().month-1
 
     try:
         user = db.users.find_one({"_id": ObjectId(id)})
@@ -323,17 +321,17 @@ def get_roles(users):
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=None):
-    
+
     if 'month' in session and session['month'] != None:
         month = session['month']
     else:
         session['month'] = month
-    
+
     if 'year' in session and session['year'] != None:
         month = session['year']
     else:
         session['year'] = year
-    
+
     if alert == None:
         alert = session['messages'] if 'messages' in session else None
         session['messages'] = None
@@ -472,6 +470,7 @@ def config_edit(id):
             except:
                 user = db.users.find_one({'_id': ObjectId(str(id))})
                 return render_template('edit_user.html', user=user, admin=is_admin)
+
 
 @ app.route('/user/new', methods=('GET', 'POST'))
 @ login_required
@@ -738,8 +737,8 @@ def filter_data():
     if not month:
         month = datetime.datetime.now().month-1
     if not year:
-            year = datetime.datetime.now().year
-    
+        year = datetime.datetime.now().year
+
     session['month'] = month
     session['year'] = year
 
@@ -751,7 +750,7 @@ def filter_data_args(year, month):
     # return redirect(url_for('dashboard', year=year, month=month))
     session['month'] = month
     session['year'] = year
-    
+
     return dashboard(int(month), int(year))
 
 
