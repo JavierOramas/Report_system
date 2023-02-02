@@ -269,9 +269,11 @@ def del_procedure_code(id):
 @login_required
 def report(id, alert=None):
 
-    year = session['year'] or datetime.datetime.now().year
-    month = session['month'] or datetime.datetime.now().month-1
-
+    year = int(request.form.get("year")) if request.form.get(
+        "year") else session['year']
+    month = int(request.form.get("month")) if request.form.get(
+        "month") else session['month']
+    print(session)
     try:
         user = db.users.find_one({"_id": ObjectId(id)})
     except:
@@ -302,9 +304,9 @@ def report(id, alert=None):
                 continue
             missing.append(i)
 
-        log("missing:", missing)
+        print("missing:", missing)
 
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()])
+        return render_template("user_work.html", id=id, session=session, year=session['year'], month=session['month'], entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()])
 
     return redirect("/")
 
@@ -730,7 +732,8 @@ def upload_provider():
 def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
-
+    print("======")
+    print(year, month, session)
     # log(year)
     # log(month)
 
