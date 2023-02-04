@@ -270,10 +270,10 @@ def del_procedure_code(id):
 def report(id, alert=None):
 
     year = int(request.form.get("year")) if request.form.get(
-        "year") else session['year']
+        "year") else datetime.datetime.now().year
     month = int(request.form.get("month")) if request.form.get(
-        "month") else session['month']
-    print(session)
+        "month") else datetime.datetime.now().month-1
+
     try:
         user = db.users.find_one({"_id": ObjectId(id)})
     except:
@@ -304,9 +304,9 @@ def report(id, alert=None):
                 continue
             missing.append(i)
 
-        print("missing:", missing)
+        log("missing:", missing)
 
-        return render_template("user_work.html", id=id, session=session, year=session['year'], month=session['month'], entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()])
+        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()])
 
     return redirect("/")
 
@@ -322,17 +322,7 @@ def get_roles(users):
 
 @app.route('/dashboard', methods=['GET'])
 @login_required
-def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now().year, alert=None):
-
-    if 'month' in session and session['month'] != None:
-        month = session['month']
-    else:
-        session['month'] = month
-
-    if 'year' in session and session['year'] != None:
-        month = session['year']
-    else:
-        session['year'] = year
+def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=None):
 
     if alert == None:
         alert = session['messages'] if 'messages' in session else None
@@ -732,8 +722,7 @@ def upload_provider():
 def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
-    print("======")
-    print(year, month, session)
+
     # log(year)
     # log(month)
 
@@ -742,18 +731,12 @@ def filter_data():
     if not year:
         year = datetime.datetime.now().year
 
-    session['month'] = month
-    session['year'] = year
-
     return dashboard(int(month), int(year))
 
 
 @ app.route("/filter/<year>/<month>", methods=['POST', 'GET'])
 def filter_data_args(year, month):
     # return redirect(url_for('dashboard', year=year, month=month))
-    session['month'] = month
-    session['year'] = year
-
     return dashboard(int(month), int(year))
 
 
@@ -826,14 +809,14 @@ def get_report(year, month, id):
                 return redirect(url_for('report', id=id, alert=alert))
                 # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
             # return dashboard(year, month, alert={'error': 'Error generating report'})
-        config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
-        pdfkit.from_string(template, 'report.pdf', options=options, configuration=config)
+
+        pdfkit.from_string(template, 'report.pdf', options=options)
         log("pdf generated")
         sleep(1)
         return send_file('report.pdf', as_attachment=True)
     else:
         log("Something went Wrong!")
-        return dashboard(month, month, alert=None)
+        return dashboard(month, month, alert=alert)
 
 
 @app.errorhandler(404)

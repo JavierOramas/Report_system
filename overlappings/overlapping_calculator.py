@@ -36,14 +36,12 @@ def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId
     procedure = entry[procedureCodeId]
     if entry[providerId] == i[providerId]:
         return False
-    if entry[providerId] in RBTs and i[providerId] in trainees:
-        return False
 
     if procedure in [150582, 194640] and i[procedureCodeId] in [150582, 194640]:
         return True
     if procedure in [150580] and i[procedureCodeId] in [150582, 194640]:
         return True
-    if procedure in [194642, 150577] and i[procedureCodeId] == 150577:
+    if procedure in [150577] and i[procedureCodeId] == 150577:
         return True
     return False
 
@@ -120,7 +118,8 @@ def process(entries, fix=False):
     data['data_filter1'] = data_filter
     data = data[data.data_filter1]
     data = data.drop('data_filter1', 1)
-
+    data["DateOfService"] = [dt.to_datetime().date()
+                             for dt in data["DateOfService"]]
     # st.dataframe(data)
 
     errors = []
@@ -187,7 +186,10 @@ def process(entries, fix=False):
                             for i in data['ProcedureCodeId']]])
     code_ind_sup = np.array(data[[i in [150577]
                             for i in data['ProcedureCodeId']]])
-
+    
+    for i in code_ind_sup:
+        depured_data.append(i)
+    
     for i in code_doc:
         if i[procedureCodeId] == 194642 and (i[providerId] in list(supervisors['ProviderId']) or i[providerId] in list(risen_supervisors['ProviderId'])):
             notifications.append(i)
