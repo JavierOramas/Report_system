@@ -790,6 +790,7 @@ def get_report(year, month, id):
                 'debug-javascript': None,
                 'enable-javascript': None
             }
+            config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
         except:
             # if False:
             log("exception")
@@ -802,7 +803,7 @@ def get_report(year, month, id):
                 # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
             # return dashboard(year, month, alert={'error': 'Error generating report'})
 
-        pdfkit.from_string(template, 'report.pdf', options=options)
+        pdfkit.from_string(template, 'report.pdf', options=options,configuration=config)
         log("pdf generated")
         sleep(1)
         return send_file('report.pdf', as_attachment=True)
