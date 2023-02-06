@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta name="pdfkit-orientation" content="Landscape" />
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
 </head>
 <body>
   <style>
@@ -41,14 +41,15 @@
       border-top: 2px solid;
     }
 
-    .borderless, .borderless tr, .borderless td{
-
+    .borderless,
+    .borderless tr,
+    .borderless td {
       border-right: 0px;
       border-bottom: 0px;
       border-top: 0px;
       border-left: 0px;
       margin-top: 25px;
-  }
+    }
   </style>
   <table>
     <tr>
@@ -67,17 +68,17 @@
   <table class="rbtData abs_table">
     <tr>
       <td width="30%">
-        <div class="name"  style="color: red">
+        <div class="name" style="color: red">
           <p>{{ rbt_name }}</p>
         </div>
       </td>
       <td width="30%">
-        <div class="hired_date"  style="color: red">
+        <div class="hired_date" style="color: red">
           <p>Hired Date: {{hired_date}}</p>
         </div>
       </td>
       <td width="40%">
-        <div class="month"  style="color: red">
+        <div class="month" style="color: red">
           <p>Month of Supervision: {{month_year}}</p>
         </div>
       </td>
@@ -109,17 +110,15 @@
       <td>{{entry["ObservedwithClient"]}}</td>
       <td>{{ entry["Supervisor"]}}</td>
     </tr>
-    {% endfor %}
-
-    {% for i in range(3) %}
+    {% endfor %} {% for i in range(3) %}
     <tr style="height: 22px">
-      <td>  </td>
-      <td>  </td>
-      <td>  </td>
-      <td>  </td>
-      <td>  </td>
-      <td>  </td>
-      <td>  </td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
     {% endfor %}
   </table>
@@ -128,16 +127,16 @@
     <tr>
       <td class="header">Total RBT Behavioral analytic hrs</td>
       <td>{{total_hours}}</td>
-      <td style='width: 60px'> </td>
-      <td style='width: 60px'> </td>
+      <td style="width: 60px"></td>
+      <td style="width: 60px"></td>
       <td class="header">Face to Face minimum requirement met</td>
       <td style="color: red">Requirement met</td>
     </tr>
     <tr>
       <td class="header">Total Supervisor Hours</td>
       <td>{{supervised_hours}}</td>
-      <td style='width: 60px'> </td>
-      <td style='width: 60px'> </td>
+      <td style="width: 60px"></td>
+      <td style="width: 60px"></td>
       <td class="header">Individual Supervision minimum requirement met</td>
       <td style="color: red">Requirement met</td>
     </tr>
@@ -145,8 +144,8 @@
     <tr>
       <td class="header">Supervision minimum requirement met</td>
       <td>{{minimum_supervised}}</td>
-      <td style='width: 60px'> </td>
-      <td style='width: 60px'> </td>
+      <td style="width: 60px"></td>
+      <td style="width: 60px"></td>
       <td class="header">Observation minimum requirement met</td>
       <td style="color: red">Requirement met</td>
     </tr>
@@ -170,38 +169,38 @@
 
   <table class="borderless abs_table">
     <tr>
-      <td style="text-align: right;" class="header">RBT Coordinator Name and Credential:</td>
-      <td style="text-align: left; border-bottom: 0.5px solid; min-width: 300px">
-        {{coordinator}}
+      <td style="text-align: right" class="header">
+        RBT Coordinator Name and Credential:
       </td>
-      <td class="header" style="margin-left: 10px">Signature & Date:</td>
       <td
-        style="text-align: right; border-bottom: 0.5px solid; min-width: 350px"
+        style="text-align: left; border-bottom: 0.5px solid; min-width: 300px"
       >
-        {{signature}}
+        {{coordinator}}
       </td>
     </tr>
 
     {% for sup in supervisors %}
     <tr>
-      <td style="text-align: right;" class="header">Supervisor Name and Credential:</td>
-      <td style="text-align: left; border-bottom: 0.5px solid; min-width: 300px">
-        {{sup["name"]}}
+      <td style="text-align: right" class="header">
+        Supervisor Name and Credential:
       </td>
-      <td class="header" style="margin-left: 10px">Signature & Date:</td>
       <td
-        style="text-align: right; border-bottom: 0.5px solid; min-width: 350px"
+        style="text-align: left; border-bottom: 0.5px solid; min-width: 300px"
       >
-        {{signature}}
+        {{sup["name"]}}
       </td>
     </tr>
     {% endfor %}
-    <tr >
-      <td style="text-align: right;" class="header">RBT Name and Credential:</td>
-      <td style="text-align: left; border-bottom: 0.5px solid; min-width: 300px">
+    <tr>
+      <td style="text-align: right" class="header">RBT Name and Credential:</td>
+      <td
+        style="text-align: left; border-bottom: 0.5px solid; min-width: 300px"
+      >
         {{rbt_name}}
       </td>
-      <td style="margin-left: 10px" class="header">Signature & Date:</td>
+    </tr>
+    <tr>
+      <td class="header" style="text-align: right">Date:</td>
       <td
         style="text-align: right; border-bottom: 0.5px solid; min-width: 350px"
       >

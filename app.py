@@ -306,7 +306,7 @@ def report(id, alert=None):
 
         log("missing:", missing)
 
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=minimum_supervised, ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()])
+        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()])
 
     return redirect("/")
 
@@ -742,17 +742,8 @@ def filter_data_args(year, month):
 
 @ app.route("/report/<year>/<month>/<id>")
 def get_report(year, month, id):
-    # try:
-    #     user = db.users.find_one({"_id": str(id)})
-    #     if user is None:
-    #         user = db.users.find_one({"_id": ObjectId(str(id))})
-    # except:
-    #     user = db.users.find_one({"_id": ObjectId(str(id))})
-    # # Detect the role of the loged user to determine the permissions
-    # if 'role' in user and user['role'] != None:
-    #     role = session['user']['role']
-    # else:
-    #     role = 'basic'
+
+    print("hereeeeeeee ============================")
 
     year = int(year)
     month = int(month)
@@ -767,6 +758,7 @@ def get_report(year, month, id):
         entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
             'basic', year, month, user)
 
+    print(total_hours)
     supervisors = []
     if user and entries:
         month_year = f'{month} {year}'
@@ -788,7 +780,7 @@ def get_report(year, month, id):
         exp_date = user['background_exp_date']
         try:
             template = render_template(
-                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=round_half_up(total_hours, 2), minimum_supervised=round_half_up(total_hours*0.05), supervised_hours=round_half_up(supervised_time, 3), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
+                'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=total_hours, minimum_supervised=round(total_hours*0.05, 2), supervised_hours=round(supervised_time, 2), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
             options = {
                 'page-size': 'A4',
                 # 'orientation': ,

@@ -50,17 +50,19 @@ class Registry:
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
         data = data.drop(data.columns.difference(labels), 1)
 
-        labels = [150580, 150582, 150583, 150553, 194640, 194641, 194641, 235184, 255975, 255910, 241573]
+        labels = [150580, 150582, 150583, 150553, 194640,
+                  194641, 194641, 235184, 255975, 255910, 241573]
 
-        df = data[data['ProcedureCodeId'] != 194642 ]
-        df = df[df['ProcedureCodeId'] != 208672 ]
-        df = df[df['ProcedureCodeId'] != 232824 ]
-        df = df[df['ProcedureCodeId'] != 189444 ]
-        df = df[df['ProcedureCodeId'] != 256962 ]
+        df = data[data['ProcedureCodeId'] != 194642]
+        df = df[df['ProcedureCodeId'] != 208672]
+        df = df[df['ProcedureCodeId'] != 232824]
+        df = df[df['ProcedureCodeId'] != 189444]
+        df = df[df['ProcedureCodeId'] != 256962]
         idx = 0
         for i in labels:
             if idx != 0:
-                data_for_time.append(df[df['ProcedureCodeId'] == i], ingnore_index=True)
+                data_for_time.append(
+                    df[df['ProcedureCodeId'] == i], ingnore_index=True)
             else:
                 data_for_time = df[df['ProcedureCodeId'] == i]
 
@@ -70,22 +72,24 @@ class Registry:
             data_for_time['TimeWorkedInHours'] = data['TimeWorkedInHours'].apply(
                 lambda x: x.replace(',', '.')).astype(float)
         except:
-            data_for_time['TimeWorkedInHours'] = data['TimeWorkedInHours'].astype(float)
+            data_for_time['TimeWorkedInHours'] = data['TimeWorkedInHours'].astype(
+                float)
         total_time = data_for_time.groupby(['ProviderId']).sum()
 
         for name, entry in total_time.iterrows():
-            log(f"\n\n\n Sum Data for {name}")
-            log(data_for_time["ProcedureCodeId"].to_string())
+            print(f"\n\n\n Sum Data for {name}")
+            print(data_for_time["ProcedureCodeId"].to_string(),
+                  entry['TimeWorkedInHours'])
             # entry['ProviderId'] = entry['Name']
             item = {
                 'ProviderId': name,
                 'Month': month,
                 'Year': year,
-                'TotalTime': entry['TimeWorkedInHours']
+                'TotalTime': round(entry['TimeWorkedInHours'], 2)
             }
             if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}):
                 db.TotalHours.insert_one(item)
-    
+
         data = process('static/files/data.csv', 'providers.csv')
         # crete the collection entries
         print("process")
@@ -118,7 +122,7 @@ class Registry:
             # print(entry['Supervisor'])
             # print(supervisor)
             if not entry['MeetingDuration'] < 1 and supervisor != None and supervisor['role'] in get_supervisors():
-        # Insert the data and log to the console the action
+                # Insert the data and log to the console the action
                 if not db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']}):
                     db.Registry.insert_one(entry)
             # print('Log: ' + colored('Entry added successfully', 'green'))
