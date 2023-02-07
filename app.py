@@ -743,8 +743,6 @@ def filter_data_args(year, month):
 @ app.route("/report/<year>/<month>/<id>")
 def get_report(year, month, id):
 
-    print("hereeeeeeee ============================")
-
     year = int(year)
     month = int(month)
 
@@ -806,12 +804,15 @@ def get_report(year, month, id):
                 return redirect(url_for('report', id=id, alert=alert))
                 # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
             # return dashboard(year, month, alert={'error': 'Error generating report'})
-
-        pdfkit.from_string(template, 'report.pdf',
+        nm = month
+        if nm < 10:
+            nm = '0'+str(nm)
+        filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker"
+        pdfkit.from_string(template, f'reports/{filename}.pdf',
                            options=options, configuration=config)
         log("pdf generated")
         sleep(1)
-        return send_file('report.pdf', as_attachment=True)
+        return send_file(f'reports/{filename}.pdf', as_attachment=True)
     else:
         log("Something went Wrong!")
         return dashboard(month, month, alert=alert)

@@ -48,9 +48,9 @@
     <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours: {{total_hours or 0}}h</p>
     <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours/Minimum Requirement: {{supervised_hours or 0}}h / {{minimum_supervised or 0}}h </p>
     <p data-bs-toggle="tooltip" data-bs-placement="right" >Group Supervision Meetings: {{meeting_group or 0}}</p>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">Sessions observed with client/minimum requirement: {{observed_with_client or 0}} / 2 </p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">Sessions observed with client/minimum requirement: {{observed_with_client or 0}} / 1 </p>
     
-    {% if meeting_group and supervised_hours and supervised_hours < minimum_supervised and meeting_group < 2 %}
+    {% if meeting_group and supervised_hours and supervised_hours < minimum_supervised and meeting_group < 1 %}
         <p>You have not met the minimum supervised hours requirement</p>
     {% endif %}
 </div>
