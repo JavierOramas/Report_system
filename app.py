@@ -121,11 +121,11 @@ def get_entries(role, year, month, user):
             ids += list(set([i['ProviderId'] for i in entries]))
         # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
         if role == 'basic':
-            print("here")
+            # print("here")
             # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
             total_hours = db.TotalHours.find_one({'ProviderId':
                                                   user['providerId'], 'Month': month, 'Year': year})
-            print(total_hours)
+            # print(total_hours)
             if total_hours == None:
                 total_hours = 0
             else:
@@ -133,8 +133,8 @@ def get_entries(role, year, month, user):
                 total_hours = total_hours['TotalTime']
         else:
             total_hours = 0
-    print(total_hours)
-    print(min_year)
+    # print(total_hours)
+    # print(min_year)
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors), observed_with_client
 
 
@@ -761,7 +761,7 @@ def get_report(year, month, id):
     print(total_hours)
     supervisors = []
     if user and entries:
-        month_year = f'{month} {year}'
+        month_year = f'{month}/{year}'
 
         providers = []
         for entry in entries:
@@ -778,6 +778,10 @@ def get_report(year, month, id):
         company = user['background_screening_type']
         date = user['background_date']
         exp_date = user['background_exp_date']
+        for e in entries:
+            e['DateOfService'] = datetime_format.get_date(
+                e['DateOfService']).date()
+            print(e['DateOfService'])
         try:
             template = render_template(
                 'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=total_hours, minimum_supervised=round(total_hours*0.05, 2), supervised_hours=round(supervised_time, 2), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
@@ -803,7 +807,8 @@ def get_report(year, month, id):
                 # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
             # return dashboard(year, month, alert={'error': 'Error generating report'})
 
-        pdfkit.from_string(template, 'report.pdf', options=options,configuration=config)
+        pdfkit.from_string(template, 'report.pdf',
+                           options=options, configuration=config)
         log("pdf generated")
         sleep(1)
         return send_file('report.pdf', as_attachment=True)
