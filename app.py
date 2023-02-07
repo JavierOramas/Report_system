@@ -780,7 +780,7 @@ def get_report(year, month, id):
         exp_date = user['background_exp_date']
         for e in entries:
             e['DateOfService'] = datetime_format.get_date(
-                e['DateOfService']).date()
+                e['DateOfService']).strftime("%m/%d/%Y")
             print(e['DateOfService'])
         try:
             template = render_template(
