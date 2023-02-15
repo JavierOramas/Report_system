@@ -21,6 +21,7 @@ from passlib.hash import pbkdf2_sha256
 from utils import get_rbt_coordinator, get_second_monday, round_half_up
 from roles.models import get_all_roles
 
+
 app = Flask(__name__)
 app.config["DEBUG"] = True
 app.secret_key = 'testing'
@@ -120,7 +121,7 @@ def get_entries(role, year, month, user):
         if 'ProviderId' in i:
             ids += list(set([i['ProviderId'] for i in entries]))
         # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
-        if role == 'basic':
+        if role != None:
             # print("here")
             # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
             total_hours = db.TotalHours.find_one({'ProviderId':
@@ -141,7 +142,7 @@ def get_entries(role, year, month, user):
 def get_pending(role, user):
     if role.lower() in ['admin', 'bcba', 'bcba (l)']:
         entries = list(db.Registry.find({'Verified': False}))
-    elif role.lower() in ['basic', 'rbt', 'rbt/trainee']:
+    elif role.lower() in ['basic', 'rbt', 'rbt/trainee', 'rbt/ba trainee']:
         try:
             entries = list(db.Registry.find(
                 {'Verified': False, 'ProviderId': int(user['providerId'])}))
@@ -629,7 +630,9 @@ def edit(id):
 
         user = db.users.find_one({"ProviderId": entry['ProviderId']})
         print(entry)
-        return render_template('edit.html', entry=entry, supervisors=supervisors, id=user['_id'], codes=list(db.procedure_codes.find()))
+        date = datetime_format.get_date(entry['DateOfService'])
+        year,month = date.year, date.month,
+        return render_template('edit.html', entry=entry, supervisors=supervisors, id=user['_id'], codes=list(db.procedure_codes.find()), year=year, month=month)
 
     elif request.method == "POST":
         if entry["ProcedureCodeId"] != request.form.get('ProcedureCodeId') or entry["DateOfService"] != request.form.get('DateOfService') or entry["MeetingDuration"] != request.form.get('MeetingDuration'):

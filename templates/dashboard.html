@@ -28,7 +28,7 @@
         </li>
         {% endif %}
 
-        {% if not role.lower() in ['rbt', 'rbt/trainee', 'basic', 'role']%}
+        {% if not role.lower() in ['rbt', 'rbt/trainee', 'rbt/ba trainee', 'basic', 'role']%}
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">Pending</button>
         </li>
@@ -163,7 +163,7 @@
                     {% for user in users %}
                     <tr {% if "active" in user and user["active"] == False %} id="hidethis" style={'display': 'none'}{% endif %}>
                         <td>
-                            {% if user['role'] == None or user['role'].lower() in ['rbt', 'rbt/trainee', 'basic', 'trainee'] %}
+                            {% if user['role'] == None or user['role'].lower() in ['rbt', 'rbt/trainee', 'basic', 'trainee' , 'rbt/ba trainee'] %}
                             <a href='/user_report/{{user["_id"]}}'>View</a>
                             {% endif %}
                         </td>
