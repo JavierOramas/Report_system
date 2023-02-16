@@ -101,7 +101,9 @@ def get_entries(role, year, month, user):
     supervised_time = 0
     observed_with_client = 0
     meetings = 0
-    total_hours = 0
+    total_hours = 0            # print(entry['Supervisor'])
+    # print(supervisor)
+
     # print(entries, len(entries))
     for i in entries:
         # log(i)
@@ -110,7 +112,7 @@ def get_entries(role, year, month, user):
 
         i['MeetingDuration'] = i['MeetingDuration']
         # print(i['MeetingDuration'])
-        if i['Verified'] == True:
+        if i['Verified'] == True and i['MeetingForm'] == True:
             supervised_time += i['MeetingDuration']
 
         # TODO get this condition from other table that gives clinical meeting info
@@ -323,7 +325,7 @@ def get_roles(users):
 
 @app.route('/dashboard', methods=['GET'])
 @login_required
-def dashboard(month=datetime.datetime.now().month, year=datetime.datetime.now().year, alert=None):
+def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now().year, alert=None):
 
     if alert == None:
         alert = session['messages'] if 'messages' in session else None
@@ -540,7 +542,8 @@ def add(id=None):
             "ModeofMeeting": '',
             "Group":  '',
             "Individual": '',
-            "Verified": True
+            "Verified": True,
+            "MeetingForm": False
         }
 
         supervisor_roles = ["BCBA (L)", "BCBA", "BCaBA"]
@@ -591,13 +594,40 @@ def verify(id):
             "Verified": True,
         }})
     # log(db.Registry.find_one({"_id": ObjectId(id)}))
+    month = request.form.get('month')
+    year = request.form.get('year')
+    # log(db.Registry.find_one({"_id": ObjectId(id)}))
     if not session['user']['role'] in get_admins():
-        return redirect('/')
+        return redirect(url_for('dashboard', month=month, year=year))
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         # print(rbt)
         month = request.form.get('month')
         year = request.form.get('year')
+        return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
+
+
+@ app.route('/meeting/<id>', methods=('GET', 'POST'))
+@ login_required
+def meeting(id):
+    # log('verifying')
+    entry = db.Registry.find_one({"_id": ObjectId(id)})
+    # print(entry)
+    if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['ProviderId']:
+        # log('here')
+        en = db.Registry.find_one({"_id": ObjectId(id)})
+        db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
+            "MeetingForm": not en["MeetingForm"],
+        }})
+
+    month = request.form.get('month')
+    year = request.form.get('year')
+    # log(db.Registry.find_one({"_id": ObjectId(id)}))
+    if not session['user']['role'] in get_admins():
+        return redirect(url_for('dashboard', month=month, year=year))
+    else:
+        rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
+        # print(rbt)
         return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
 
 
@@ -631,7 +661,7 @@ def edit(id):
         user = db.users.find_one({"ProviderId": entry['ProviderId']})
         print(entry)
         date = datetime_format.get_date(entry['DateOfService'])
-        year,month = date.year, date.month,
+        year, month = date.year, date.month,
         return render_template('edit.html', entry=entry, supervisors=supervisors, id=user['_id'], codes=list(db.procedure_codes.find()), year=year, month=month)
 
     elif request.method == "POST":
@@ -726,8 +756,8 @@ def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
 
-    # log(year)
-    # log(month)
+    print(year)
+    print(month)
 
     if not month:
         month = datetime.datetime.now().month-1

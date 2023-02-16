@@ -109,7 +109,8 @@ class Registry:
                 "ModeofMeeting": self.get_observed(entry)[1],
                 "Group":  self.get_group_individual(entry)[0],
                 "Individual": self.get_group_individual(entry)[1],
-                "Verified": True
+                "Verified": True,
+                "MeetingForm": False
             }
 
             entry['DateTimeFrom'] = datetime_format.format(
@@ -119,17 +120,11 @@ class Registry:
                 entry['DateOfService'])
 
             supervisor = db.users.find_one({'ProviderId': entry['Supervisor']})
-            # print(entry['Supervisor'])
-            # print(supervisor)
             if not entry['MeetingDuration'] < 1 and supervisor != None and supervisor['role'] in get_supervisors():
-                # Insert the data and log to the console the action
+
                 if not db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']}):
                     db.Registry.insert_one(entry)
-            # print('Log: ' + colored('Entry added successfully', 'green'))
-        # else:
-            # print('Log: ' + colored(f'Error adding entry to database \n {entry}', 'red'))
-    # Return success code
-    # errors, notif, ol = process(db.Registry.find())
+                    
         return {'status': 200}
     # except:
         # pass
