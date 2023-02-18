@@ -803,9 +803,7 @@ def get_report(year, month, id):
                 providers.append(entry["Supervisor"])
                 supervisors.append(superv)
 
-        # log(supervisors)
-        # supervisors = list(set(superviso
-        # rs))
+
         company = user['background_screening_type']
         date = user['background_date']
         exp_date = user['background_exp_date']
@@ -834,6 +832,13 @@ def get_report(year, month, id):
             if not session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)']:
                 return redirect(url_for('dashboard', year=year, month=month, alert=alert, report=False))
             else:
+                report_obj = {
+                    "providerId":user['providerId'],
+                    "year": year,
+                    "month": month
+                }
+                
+                db.PDFReport.insert_one(report_obj)
                 return redirect(url_for('report', id=id, alert=alert))
                 # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
             # return dashboard(year, month, alert={'error': 'Error generating report'})
