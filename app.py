@@ -211,6 +211,7 @@ def upload_file():
 @admin_required
 def providers():
     entries = db.user.find()
+    entries = sorted(entries, key=lambda d: (d['first_name'], d['role']))
     return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=[], session=session, report=False)
 
 
@@ -635,14 +636,14 @@ def meeting(id):
 @ login_required
 def delete_entry(id):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
-    rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-
     db.Registry.delete_one({"_id": ObjectId(id)})
 
-    if not session['user']['role'] in get_admins():
-        return redirect('/')
-    else:
-        return redirect(url_for('report', id=rbt['_id']))
+    if entry:
+        if not session['user']['role'] in get_admins():
+            return redirect('/')
+        else:
+            rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
+            return redirect(url_for('report', id=rbt['_id']))
 
 
 @ app.route('/edit/<id>', methods=('GET', 'POST'))
