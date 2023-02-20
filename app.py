@@ -19,7 +19,9 @@ import datetime_format
 import pdfkit
 from passlib.hash import pbkdf2_sha256
 from utils import get_rbt_coordinator, get_second_monday, round_half_up
-from roles.models import get_all_roles, 
+from roles.models import get_all_roles
+
+app = Flask(__name__)
 app.config["DEBUG"] = True
 app.secret_key = 'testing'
 
