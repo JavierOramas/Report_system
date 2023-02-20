@@ -19,10 +19,7 @@ import datetime_format
 import pdfkit
 from passlib.hash import pbkdf2_sha256
 from utils import get_rbt_coordinator, get_second_monday, round_half_up
-from roles.models import get_all_roles
-
-
-app = Flask(__name__)
+from roles.models import get_all_roles, 
 app.config["DEBUG"] = True
 app.secret_key = 'testing'
 
@@ -36,7 +33,7 @@ with open('config.json', 'r') as file:
     config = json.load(file)
 
 client = pymongo.MongoClient(
-    config['database']['addr'], config['database']['port'])
+    config['database']['addr'], config['database']['port'], connect=False)
 db = client.abs_tracking_db
 
 
