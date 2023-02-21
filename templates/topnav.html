@@ -7,12 +7,8 @@ missing) %}
   <a href="/user/edit/{{id}}">Edit account</a>
   {% if role in ['admin', 'BCBA', 'BCBA (L)'] %}
   <a href="/manage_procedure_codes">Procedure Codes</a>
-  {% endif %} {% if report == True and supervised_hours >= minimum_supervised
-  and observed_with_client >= 1 %}
-  <div class="center">
-    <a href="/report/{{year}}/{{month}}/{{id}}" class="">Export PDF</a>
-  </div>
-  {% elif report == True and not role in ['admin','role']%}
+  {% endif %} {% if report == True and ( supervised_hours < minimum_supervised
+  or observed_with_client < 1 )1 %}
   <div class="center">
     <div class="disabled">
       <a href="/report/{{year}}/{{month}}/{{id}}" aria-disabled="true"

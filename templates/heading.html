@@ -1,7 +1,7 @@
 {% from 'topnav.html' import topnav %}
 {% macro heading(id,user ,session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing) %}
 
-{% if report == True and ( supervised_hours < minimum_supervised or observed_with_client < 2 ) %}
+{% if report == True and ( supervised_hours < minimum_supervised or observed_with_client < 1 ) %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
     <p> Some requirements are not met or entries have not been verified by supervisor </p>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

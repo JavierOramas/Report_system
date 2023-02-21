@@ -5,16 +5,8 @@
         <div class="card">
 
             <form name="edit_form" method="POST">
-                <label for="DateOfService">Date Of Service (MM/DD/YYYY HH:MM)</label>
+                <label for="DateOfService">Date Of Service (MM/DD/YYYY)</label>
                 <input type="text" class="field" name="DateOfService" value="{% if entry['DateOfService'] != '' %}{{entry['DateOfService']}}{% endif %}"  required>
-
-                <div class="form-group">
-                    <div class='input-group date' id='datetimepicker1'>
-                        <input type='text' class="form-control" />
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
-                        </span>
-                    </div>
-                </div>
 
                 <label for="MeetingDuration">MeetingDuration</label>
                 <input type="number" step="0.1" name="MeetingDuration" value={{entry['MeetingDuration']}} class="field" required>

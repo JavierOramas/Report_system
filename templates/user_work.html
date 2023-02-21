@@ -1,4 +1,4 @@
-    {% extends "base.html" %}
+{% extends "base.html" %}
 {% from 'heading.html' import heading %}
 
 {% block content %}
@@ -70,7 +70,7 @@
                 <div class="center">
                     <table class="table table-hover" id="entries">
                         <tr>
-                            {% for i in ["MeetingForm", "Procedure Code ","DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                            {% for i in ["MeetingForm", "Procedure Code ","Date Of Service","Meeting Duration","Individual","Group","Mode of Meeting","Observed with Client","Supervisor"] %}
                             <th>
                                 {{i}}
                             </th>
@@ -78,8 +78,8 @@
                         </tr>
                         {% for entry in entries %}
                         <tr>
-                            {% if entry['ProcedureCodeId']|int in code_id%}
                             <td> <a type="button" href="/meeting/{{ entry['_id'] }}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
+                            {% if entry['ProcedureCodeId']|int in code_id%}
                             {% for i in codes %}
                                 {% if i['code']|int == entry['ProcedureCodeId']|int %}
                                     <td>{{ i['name'] }}</td>
