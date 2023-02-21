@@ -36,10 +36,12 @@
     </ul>
 
     <div class="tab-content" style="margin-top: 10px;" id="myTabContent">
-        {% if not role in ['admin', 'bcba', 'bcba (L)'] %}
+        {% if not role in ['BCBA', 'BCBA (L)', 'BCaBA', 'admin'] %}
             <div class="tab-pane fade show active" id="ovl" role="tabpanel" aria-labelledby="home-tab">
-
+        {% endif %}
             <div class="table-preferences">
+                
+                {% if not role in ['admin'] %}
                 <form method="POST" action="/filter/" method="POST" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-sm-3">
@@ -66,7 +68,7 @@
                             
                             <div class="col-sm-3">
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-sm">Fiter</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">Filter</button>
                                 </div>
                             </div>
                             
@@ -78,10 +80,12 @@
                         </div>
                     </form>
                 </div>
+                {% endif %}
+        {% if not role in ['BCBA', 'BCBA (L)', 'BCaBA', 'admin'] %}
                 <div class="center">
                     <table class="table table-hover" id="entries">
                         <tr>
-                            {% for i in ["Confirmed", "Meeting Form","DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                            {% for i in ["Confirmed", "Meeting Form","Date Of Service","Meeting Duration","Individual","Group","Mode of Meeting","Observed with Client","Supervisor"] %}
                             <th>
                                 {{i}}
                             </th>
@@ -90,7 +94,7 @@
 
                         {% for entry in entries %}
                         <tr>
-                            <td> {% if entry['Verified'] == False %} ❌ {% else %} ✅ {% endif %}</td>
+                            <td> {% if entry['Verified'] == False %} ✖️ {% else %} ✔️ {% endif %}</td>
                             <td> <a type="button" href="/meeting/{{ entry['_id'] }}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
                             <td>{{ entry["DateOfService"] }}</td>
                             <td>{{ entry["MeetingDuration"] }}</td>
@@ -110,7 +114,7 @@
             </div>
         {% endif %}
 
-        {% if role in ['admin', 'bcba', 'bcba (l)'] %}
+        {% if role in ['BCBA', 'BCBA (L)', 'BCaBA', 'admin'] %}
             <script>
             function toggle() {
              if( document.getElementById("hidethis").style.display=='none' ){

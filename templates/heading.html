@@ -22,7 +22,7 @@
 
 </div>
 
- {% if role in ['admin','bcba', 'bcba (l)'] %}
+ {% if role in ['admin'] %}
  <div class="container card">
     <div class='row' >
         <div class="col-sm">
@@ -42,11 +42,11 @@
 
     </div>
 
- {% else %}
+ {% elif role not in ['BCBA', 'BCBA (L)', 'BCaBA'] %}
  <div class="row card">
     <h1>This Month Report Status:</h1>
     <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours: {{total_hours or 0}}h</p>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours / Minimum Requirement: {{supervised_hours or 0}}h / {{minimum_supervised or 0}}h </p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours with Meeting Form / Minimum Requirement: {{supervised_hours or 0}}h / {{minimum_supervised or 0}}h </p>
     <p data-bs-toggle="tooltip" data-bs-placement="right" >Group Supervision Meetings: {{meeting_group or 0}}</p>
     <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">Sessions observed with client / Minimum requirement: {{observed_with_client or 0}} / 1 </p>
     

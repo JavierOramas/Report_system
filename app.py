@@ -4,7 +4,7 @@ from time import sleep
 from logger import log
 from colorama import Cursor
 from registry.models import Registry
-from super_roles.super_roles import get_admins
+from super_roles.super_roles import get_admins, get_supervisors
 from user import routes
 from user.models import User
 from flask import Flask, render_template, redirect, session, request, url_for, jsonify, send_file
@@ -20,6 +20,7 @@ import pdfkit
 from passlib.hash import pbkdf2_sha256
 from utils import get_rbt_coordinator, get_second_monday, round_half_up
 from roles.models import get_all_roles
+from sup_view import inspect_supervisor
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -70,7 +71,7 @@ def get_entries(role, year, month, user):
             return [], 0, 0, [], 0, 0, [], 0
 
     entries = db.Registry.find(
-        {'ProviderId': int(str(user['providerId'])), 'Verified': True})
+        {'ProviderId': int(str(user['providerId']))})
     entries = [entry for entry in entries]
     # print(entries, len(entries))
 
@@ -106,17 +107,17 @@ def get_entries(role, year, month, user):
     # print(entries, len(entries))
     for i in entries:
         # log(i)
-        if i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes':
+        if (i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes') and i["Verified"] == True:
             observed_with_client += 1
 
-        i['MeetingDuration'] = i['MeetingDuration']
+        # i['MeetingDuration'] = i['MeetingDuration']
         # print(i['MeetingDuration'])
         if i['Verified'] == True and i['MeetingForm'] == True:
             supervised_time += i['MeetingDuration']
 
         # TODO get this condition from other table that gives clinical meeting info
         condition = True
-        if int(i['ProcedureCodeId']) == 194641 and condition == True:
+        if int(i['ProcedureCodeId']) == 194641 and condition == True and i["Verified"] == True and i['MeetingForm'] == True:
             meetings += 1
 
         if 'ProviderId' in i:
@@ -210,8 +211,8 @@ def upload_file():
 @login_required
 @admin_required
 def providers():
-    entries = db.user.find()
-    entries = sorted(entries, key=lambda d: (d['first_name'], d['role']))
+    entries = db.users.find()
+    # entries = sorted(entries, key=lambda d: (d['first_name'], d['role']))
     return render_template('dashboard.html', roles=get_roles(entries), role='admin', entries=entries, providerIds=[], session=session, report=False)
 
 
@@ -343,8 +344,19 @@ def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now(
     # If user is not admin, remove the entries that dont belong to him/her
     # if role == 'basic':
     users = db.users.find()
+    users = sorted(users, key=lambda d: (d['role'], d['name']))
     entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
         role, year, month, session['user'])
+
+    if role in get_supervisors():
+        us = inspect_supervisor(
+            db=db, year=year, month=month, pid=session['user']['providerId'])
+        nus = []
+        for it in users:
+            if 'ProviderId' in it and it['ProviderId'] in us and it['ProviderId'] != session['user']['providerId']:
+                nus.append(it)
+        users = nus
+
     pending = get_pending(role, session['user'])
 
     for entry in entries:
@@ -368,6 +380,7 @@ def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now(
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue
             missing.append(i)
+
     return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 3), minimum_supervised=round_half_up(5/100*total_hours, 3), supervised_hours=round_half_up(supervised_time, 3), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
 
 # Only admins will see this page and it will let edit users and provider ids
@@ -450,7 +463,7 @@ def config_edit(id):
                     data['password'] = pbkdf2_sha256.encrypt(pwd)
 
                 db.users.update_one({"_id": str(id)}, {
-                    '$set': {"password": data}})
+                    '$set': data})
             return redirect("/")
 
         if request.method == 'GET':
