@@ -81,7 +81,7 @@
                     </form>
                 </div>
                 {% endif %}
-        {% if not role in ['BCBA', 'BCBA (L)', 'BCaBA', 'admin'] %}
+                {% if not role in ['BCBA', 'BCBA (L)', 'BCaBA', 'admin'] %}
                 <div class="center">
                     <table class="table table-hover" id="entries">
                         <tr>
@@ -112,105 +112,103 @@
                 </div>
 
             </div>
-        {% endif %}
 
-        {% if role in ['BCBA', 'BCBA (L)', 'BCaBA', 'admin'] %}
-            <script>
-            function toggle() {
-             if( document.getElementById("hidethis").style.display=='none' ){
-               document.getElementById("hidethis").style.display = '';
-             }else{
-               document.getElementById("hidethis").style.display = 'none';
-             }
-            }
-            </script>
+            {% else %}
+                <script>
+                function toggle() {
+                if( document.getElementById("hidethis").style.display=='none' ){
+                document.getElementById("hidethis").style.display = '';
+                }else{
+                document.getElementById("hidethis").style.display = 'none';
+                }
+                }
+                </script>
 
-            <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="profile-tab">
-                <div class="center">
-                    <div class="table-preferences">
-                        <form method="POST" action="/filter" method="POST" enctype="multipart/form-data">
-                            <div class="row">
+                <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class="center">
+                        <div class="table-preferences">
+                            <form method="POST" action="/filter" method="POST" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <!-- <div class="form-group">
+                                            <label for="sel_role">Role</label>
+                                            <select class="form-select form-control form-select-sm" style="width:25%" id="sel_role" name="role">
+                                        {% for i in roles %}
+                                        <option value="{{i}}">{{i}}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div> -->
+                                </div>
+
                                 <div class="col-sm-3">
-                                    <!-- <div class="form-group">
-                                        <label for="sel_role">Role</label>
-                                        <select class="form-select form-control form-select-sm" style="width:25%" id="sel_role" name="role">
-                                      {% for i in roles %}
-                                      <option value="{{i}}">{{i}}</option>
-                                      {% endfor %}
-                                    </select>
-                                </div> -->
+                                    <div class="form-group">
+                                        <a type="button" class="btn btn-primary btn-sm" href="/user/new">Add New</a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="custom-control custom-checkbox checkbox-xl">
+                                        <input type="checkbox" value="off" name='show_inactive' onchange="toggle()"/>
+                                        <label for="show_inactive">Show Hidden</label>
+                                    </div>
+                                    
+                                </div>
                             </div>
+                        </form>
+                    </div>
+                    <table class="table table-hover" id="entries">
+                        <tr>
+                            {% for i in ['', 'ProviderId', 'Name' ,'Email', 'Role']%}
+                            <th>
+                                {{i}}
+                            </th>
+                            {% endfor %}
+                        </tr>
 
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <a type="button" class="btn btn-primary btn-sm" href="/user/new">Add New</a>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <div class="custom-control custom-checkbox checkbox-xl">
-                                    <input type="checkbox" value="off" name='show_inactive' onchange="toggle()"/>
-                                    <label for="show_inactive">Show Hidden</label>
-                                </div>
+                        {% for user in users %}
+                        <tr {% if "active" in user and user["active"] == False %} id="hidethis" style={'display': 'none'}{% endif %}>
+                            <td>
+                                {% if user['role'] == None or user['role'].lower() in ['rbt', 'rbt/trainee', 'basic', 'trainee' , 'rbt/ba trainee'] %}
+                                <a href='/user_report/{{user["_id"]}}'>View</a>
+                                {% endif %}
+                            </td>
+                            <td>{{ user['ProviderId'] }}</td>
+                            <td>{{ user['name'] }}</td>
+                            <td>{{ user['email'] }}</td>
+                            <td>{{ user["role"] }}</td>
+                            <td>
+                                <button type="button" class="btn btn-none" data-bs-toggle="modal" data-bs-target="#delete{{user['_id']}}">
+                                    🗑️
+                                </button>
                                 
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <table class="table table-hover" id="entries">
-                    <tr>
-                        {% for i in ['', 'ProviderId', 'Name' ,'Email', 'Role']%}
-                        <th>
-                            {{i}}
-                        </th>
-                        {% endfor %}
-                    </tr>
-
-                    {% for user in users %}
-                    <tr {% if "active" in user and user["active"] == False %} id="hidethis" style={'display': 'none'}{% endif %}>
-                        <td>
-                            {% if user['role'] == None or user['role'].lower() in ['rbt', 'rbt/trainee', 'basic', 'trainee' , 'rbt/ba trainee'] %}
-                            <a href='/user_report/{{user["_id"]}}'>View</a>
-                            {% endif %}
-                        </td>
-                        <td>{{ user['ProviderId'] }}</td>
-                        <td>{{ user['name'] }}</td>
-                        <td>{{ user['email'] }}</td>
-                        <td>{{ user["role"] }}</td>
-                        <td>
-                            <button type="button" class="btn btn-none" data-bs-toggle="modal" data-bs-target="#delete{{user['_id']}}">
-                                🗑️
-                              </button>
-                              
-                              <!-- Modal -->
-                              <div class="modal fade" id="delete{{user['_id']}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                  <div class="modal-content">
-                                    <div class="modal-header">
-                                      <h5 class="modal-title" id="exampleModalLabel">User will be deleted</h5>
-                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="delete{{user['_id']}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">User will be deleted</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                        Are You Sure you want to delete user {{user['name']}}?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <a class="btn btn-primary" href='/del/{{user["_id"]}}'>Delete</a>
+                                        </div>
                                     </div>
-                                    <div class="modal-body">
-                                      Are You Sure you want to delete user {{user['name']}}?
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <a class="btn btn-primary" href='/del/{{user["_id"]}}'>Delete</a>
-                                    </div>
-                                  </div>
                                 </div>
-                              </div>
-                        </td>
-                        <td>
-                            <a class="icon" href='/user/edit/{{user["_id"]}}'>✏️</a>
-                        </td>
-                    </tr>
+                            </td>
+                            <td>
+                                <a class="icon" href='/user/edit/{{user["_id"]}}'>✏️</a>
+                            </td>
+                        </tr>
 
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-
-        {% endif %}
+                        {% endfor %}
+                    </table>
+                </div>
+                
+            {% endif %}
 
             <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
                 <div class="center">
@@ -238,11 +236,9 @@
                         </tr>
                         {% endfor %}
                     </table>
+                </div>
             </div>
-        
-    </div>
-    </div>
-    
+        </div>
     </div>
 
 {% endblock %}
