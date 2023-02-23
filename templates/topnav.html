@@ -8,16 +8,14 @@ missing) %}
   {% if role != None and role.lower() in ['admin', 'bcba', 'bcba (l)', 'bcaba']
   %}
   <a href="/manage_procedure_codes">Procedure Codes</a>
-  {% endif %} {% if report == True and supervised_hours >= minimum_supervised
-  and observed_with_client >= 1 %}
+  {% endif %}
   <div class="center">
-    <div class="disabled">
+    <div>
       <a href="/report/{{year}}/{{month}}/{{id}}" aria-disabled="true"
         >Export PDF</a
       >
     </div>
   </div>
-  {% endif %}
 
   <div class="pull-right">
     <a class="" href="/user/signout">Sign Out</a>
