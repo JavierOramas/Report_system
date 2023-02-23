@@ -14,134 +14,122 @@
 
     <div class="center card-wrapper">
 
-    <div class="card-table">
+        <div class="card-table">
 
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-        {% if not role in ['admin', 'bcba', 'bcba (l)'] %}
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+            {% if not role.lower() in ['admin', 'bcba', 'bcba (l)','bcaba'] %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="olv-tab" data-bs-toggle="tab" data-bs-target="#ovl" type="button" role="tab" aria-controls="ovl" aria-selected="true">Overlappings</button>
+                </li>
+            {% endif %}
+            {% if role.lower() in ['admin', 'bcba', 'bcba (l)','bcaba','role'] %}
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="olv-tab" data-bs-toggle="tab" data-bs-target="#ovl" type="button" role="tab" aria-controls="ovl" aria-selected="true">Overlappings</button>
+                <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="true">Users</button>
             </li>
-        {% endif %}
-        {% if role in ['admin','role'] %}
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="true">Users</button>
-        </li>
-        {% endif %}
+            {% endif %}
 
-        {% if not role.lower() in ['rbt', 'rbt/trainee', 'rbt/ba trainee', 'basic', 'role']%}
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">Pending</button>
-        </li>
-        {% endif %}
-    </ul>
+            {% if not role.lower() in ['rbt', 'rbt/trainee', 'rbt/ba trainee', 'basic', 'role']%}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">Pending</button>
+            </li>
+            {% endif %}
+            </ul>
 
-    <div class="tab-content" style="margin-top: 10px;" id="myTabContent">
-        {% if not role in ['BCBA', 'BCBA (L)', 'BCaBA', 'admin'] %}
-            <div class="tab-pane fade show active" id="ovl" role="tabpanel" aria-labelledby="home-tab">
-        
-            <div class="table-preferences">
-                
-                {% if not role in ['admin'] %}
-                <form method="POST" action="/filter/" method="POST" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label for="sel_year">Year</label>
-                                <select class="form-select form-control form-select-sm" style="width:40%" id="sel_year" name="year">
-                                    {% for i in range(min_year, year+1) %}
-                                    <option value="{{i}}" {{'selected' if i == year }}>{{i}}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            </div>
-                            
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <label for="sel_month">Month</label>
-                                    <select class="form-select form-control form-select-sm" style="width:40%" id="sel_month" name="month">
-                                        {% for i in range(1,13) %}
-                                        <option value="{{i}}" {{'selected' if i == month }}>{{i}}</option>
-                                        {% endfor %}
-                                    </select>
+            <div class="tab-content" style="margin-top: 10px;" id="myTabContent">
+            {% if not role.lower() in ['bcba', 'bcba (l)', 'bcaba', 'admin'] %}
+                <div class="tab-pane fade show active" id="ovl" role="tabpanel" aria-labelledby="home-tab">
+            
+                    <div class="table-preferences">
+                        
+                        {% if not role in ['admin'] %}
+                        <form method="POST" action="/filter/" method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label for="sel_year">Year</label>
+                                        <select class="form-select form-control form-select-sm" style="width:40%" id="sel_year" name="year">
+                                            {% for i in range(min_year, year+1) %}
+                                            <option value="{{i}}" {{'selected' if i == year }}>{{i}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    </div>
+                                    
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label for="sel_month">Month</label>
+                                            <select class="form-select form-control form-select-sm" style="width:40%" id="sel_month" name="month">
+                                                {% for i in range(1,13) %}
+                                                <option value="{{i}}" {{'selected' if i == month }}>{{i}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <a type="button" class="btn btn-primary btn-sm" href="/edit/new">Add New</a>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
+                            {% endif %}
+                            {% endif %}
                             
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-                                </div>
-                            </div>
-                            
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <a type="button" class="btn btn-primary btn-sm" href="/edit/new">Add New</a>
-                                </div>
-                            </div>
                         </div>
-                    </form>
-                    {% endif %}
-                    {% endif %}
-                    
-                </div>
-                {% if not role in ['BCBA', 'BCBA (L)', 'BCaBA', 'admin'] %}
-                <div class="center">
-                    <table class="table table-hover" id="entries">
-                        <tr>
-                            {% for i in ["Confirmed", "Meeting Form","Date Of Service","Meeting Duration","Individual","Group","Mode of Meeting","Observed with Client","Supervisor"] %}
-                            <th>
-                                {{i}}
-                            </th>
-                            {% endfor %}
-                        </tr>
+                        {% if not role in ['BCBA', 'BCBA (L)', 'BCaBA', 'admin'] %}
+                        <div class="center">
+                            <table class="table table-hover" id="entries">
+                                <tr>
+                                    {% for i in ["Confirmed", "Meeting Form","Date Of Service","Meeting Duration","Individual","Group","Mode of Meeting","Observed with Client","Supervisor"] %}
+                                    <th>
+                                        {{i}}
+                                    </th>
+                                    {% endfor %}
+                                </tr>
 
-                        {% for entry in entries %}
-                        <tr>
-                            <td> {% if entry['Verified'] == False %} ✖️ {% else %} ✔️ {% endif %}</td>
-                            <td> <a type="button" href="/meeting/{{ entry['_id'] }}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
-                            <td>{{ entry["DateOfService"] }}</td>
-                            <td>{{ entry["MeetingDuration"] }}</td>
-                            <td>{{ entry["Individual"] }}</td>
-                            <td>{{ entry["Group"] }}</td>
-                            <td>{{ entry["ModeofMeeting"] }}</td>
-                            <td>{{ entry["ObservedwithClient"] }}</td>
-                            <td>{{ entry["Supervisor"] }}</td>
-                            <td>
-                                <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </table>
+                                {% for entry in entries %}
+                                <tr>
+                                    <td> {% if entry['Verified'] == False %} ✖️ {% else %} ✔️ {% endif %}</td>
+                                    <td> <a type="button" href="/meeting/{{ entry['_id'] }}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
+                                    <td>{{ entry["DateOfService"] }}</td>
+                                    <td>{{ entry["MeetingDuration"] }}</td>
+                                    <td>{{ entry["Individual"] }}</td>
+                                    <td>{{ entry["Group"] }}</td>
+                                    <td>{{ entry["ModeofMeeting"] }}</td>
+                                    <td>{{ entry["ObservedwithClient"] }}</td>
+                                    <td>{{ entry["Supervisor"] }}</td>
+                                    <td>
+                                        <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
 
             {% else %}
                 <script>
-                function toggle() {
-                if( document.getElementById("hidethis").style.display=='none' ){
-                document.getElementById("hidethis").style.display = '';
-                }else{
-                document.getElementById("hidethis").style.display = 'none';
-                }
-                }
+                        function toggle() {
+                        if( document.getElementById("hidethis").style.display=='none' ){
+                        document.getElementById("hidethis").style.display = '';
+                        }else{
+                        document.getElementById("hidethis").style.display = 'none';
+                        }
+                        }
                 </script>
 
                 <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="profile-tab">
                     <div class="center">
                         <div class="table-preferences">
                             <form method="POST" action="/filter" method="POST" enctype="multipart/form-data">
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <!-- <div class="form-group">
-                                            <label for="sel_role">Role</label>
-                                            <select class="form-select form-control form-select-sm" style="width:25%" id="sel_role" name="role">
-                                        {% for i in roles %}
-                                        <option value="{{i}}">{{i}}</option>
-                                        {% endfor %}
-                                        </select>
-                                    </div> -->
-                                </div>
-
                                 <div class="col-sm-3">
                                     <div class="form-group">
                                         <a type="button" class="btn btn-primary btn-sm" href="/user/new">Add New</a>
@@ -154,18 +142,17 @@
                                     </div>
                                     
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                     <table class="table table-hover" id="entries">
                         <tr>
-                            {% for i in ['', 'ProviderId', 'Name' ,'Email', 'Role']%}
+                        {% for i in ['', 'ProviderId', 'Name' ,'Email', 'Role']%}
                             <th>
                                 {{i}}
                             </th>
-                            {% endfor %}
+                        {% endfor %}
                         </tr>
-
                         {% for user in users %}
                         <tr {% if "active" in user and user["active"] == False %} id="hidethis" style={'display': 'none'}{% endif %}>
                             <td>
@@ -205,43 +192,42 @@
                                 <a class="icon" href='/user/edit/{{user["_id"]}}'>✏️</a>
                             </td>
                         </tr>
-
-                        {% endfor %}
+                    {% endfor %}
                     </table>
                 </div>
-                
             {% endif %}
 
-            <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
-                <div class="center">
-                    <table class="table table-hover" id="pending">
-                        <tr>
-                            {% for i in ["DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
-                            <th>
-                                {{i}}
-                            </th>
+                <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                    <div class="center">
+                        <table class="table table-hover" id="pending">
+                            <tr>
+                                {% for i in ["DateOfService","MeetingDuration","Individual","Group","ModeofMeeting","ObservedwithClient","Supervisor"] %}
+                                <th>
+                                    {{i}}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                            
+                            {% for entry in pending %}
+                            <tr>
+                                <td>{{ entry["DateOfService"] }}</td>
+                                <td>{{ entry["MeetingDuration"] }}</td>
+                                <td>{{ entry["Individual"] }}</td>
+                                <td>{{ entry["Group"] }}</td>
+                                <td>{{ entry["ModeofMeeting"] }}</td>
+                                <td>{{ entry["ObservedwithClient"] }}</td>
+                                <td>{{ entry["Supervisor"] }}</td>
+                                <td>
+                                    <a type="button" class="btn btn-primary btn-sm" href="/verify/{{ entry['_id'] }}">Verify</a>
+                                </td>
+                            </tr>
                             {% endfor %}
-                        </tr>
-                        
-                        {% for entry in pending %}
-                        <tr>
-                            <td>{{ entry["DateOfService"] }}</td>
-                            <td>{{ entry["MeetingDuration"] }}</td>
-                            <td>{{ entry["Individual"] }}</td>
-                            <td>{{ entry["Group"] }}</td>
-                            <td>{{ entry["ModeofMeeting"] }}</td>
-                            <td>{{ entry["ObservedwithClient"] }}</td>
-                            <td>{{ entry["Supervisor"] }}</td>
-                            <td>
-                                <a type="button" class="btn btn-primary btn-sm" href="/verify/{{ entry['_id'] }}">Verify</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </table>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
+</div>
 {% endblock %}
 

@@ -142,8 +142,11 @@ def get_entries(role, year, month, user):
 
 
 def get_pending(role, user):
-    if role.lower() in ['admin', 'bcba', 'bcba (l)']:
+    if role.lower() in ['admin']:
         entries = list(db.Registry.find({'Verified': False}))
+    elif role.lower() in get_supervisors():
+        entries = list(db.Registry.find({'Verified': False, "Supervisor": int(user['providerId'])}))
+        
     elif role.lower() in ['basic', 'rbt', 'rbt/trainee', 'rbt/ba trainee']:
         try:
             entries = list(db.Registry.find(
