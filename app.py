@@ -145,8 +145,9 @@ def get_pending(role, user):
     if role.lower() in ['admin']:
         entries = list(db.Registry.find({'Verified': False}))
     elif role.lower() in get_supervisors():
-        entries = list(db.Registry.find({'Verified': False, "Supervisor": int(user['providerId'])}))
-        
+        entries = list(db.Registry.find(
+            {'Verified': False, "Supervisor": int(user['providerId'])}))
+
     elif role.lower() in ['basic', 'rbt', 'rbt/trainee', 'rbt/ba trainee']:
         try:
             entries = list(db.Registry.find(
@@ -312,8 +313,8 @@ def report(id, alert=None):
             missing.append(i)
 
         log("missing:", missing)
-
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()])
+        role = user['role'] or 'rbt'     
+        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role)
 
     return redirect("/")
 
@@ -856,7 +857,6 @@ def get_report(year, month, id):
 
                 db.PDFReport.insert_one(report_obj)
                 return redirect(url_for('report', id=id, alert=alert))
-                # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
             # return dashboard(year, month, alert={'error': 'Error generating report'})
         nm = month
         if nm < 10:

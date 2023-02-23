@@ -5,10 +5,11 @@ missing) %}
 <div class="topnav">
   <a class="active" href="/">Home</a>
   <a href="/user/edit/{{id}}">Edit account</a>
-  {% if role in ['admin', 'BCBA', 'BCBA (L)'] %}
+  {% if role != None and role.lower() in ['admin', 'bcba', 'bcba (l)', 'bcaba']
+  %}
   <a href="/manage_procedure_codes">Procedure Codes</a>
-  {% endif %} {% if report == True and ( supervised_hours < minimum_supervised
-  or observed_with_client < 1 ) %}
+  {% endif %} {% if report == True and supervised_hours >= minimum_supervised
+  and observed_with_client >= 1 %}
   <div class="center">
     <div class="disabled">
       <a href="/report/{{year}}/{{month}}/{{id}}" aria-disabled="true"
