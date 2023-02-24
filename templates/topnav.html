@@ -1,6 +1,6 @@
-{% macro topnav(id,user ,session, role, total_hours, supervised_hours,
+{% macro topnav(id,user ,session, role, total_hours, supervised_time,
 meeting_group, minimum_supervised, year, month, report, observed_with_client,
-missing) %}
+missing, exp) %}
 
 <div class="topnav">
   <a class="active" href="/">Home</a>
@@ -10,11 +10,21 @@ missing) %}
   <a href="/manage_procedure_codes">Procedure Codes</a>
   {% endif %}
   <div class="center">
-    <div>
-      <a href="/report/{{year}}/{{month}}/{{id}}" aria-disabled="true"
-        >Export PDF</a
-      >
-    </div>
+    {% if report == True %}
+    <a
+      href="/report/{{year}}/{{month}}/{{id}}"
+      {%
+      if
+      not
+      exp
+      %}
+      class="btn disabled"
+      {%
+      endif
+      %}
+      >Export PDF</a
+    >
+    {% endif %}
   </div>
 
   <div class="pull-right">

@@ -311,10 +311,10 @@ def report(id, alert=None):
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue
             missing.append(i)
-
-        log("missing:", missing)
-        role = user['role'] or 'rbt'     
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role)
+        exp = supervised_time >= minimum_supervised and observed_with_client > 1
+        role = user['role'] or 'rbt'
+        print(exp)
+        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
 
     return redirect("/")
 
@@ -807,7 +807,8 @@ def get_report(year, month, id):
         entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
             'basic', year, month, user)
 
-    print(total_hours)
+    entries = [e for e in entries if e['MeetingForm']
+               == True and e['Verified']]
     supervisors = []
     if user and entries:
         month_year = f'{month}/{year}'
@@ -827,7 +828,6 @@ def get_report(year, month, id):
         for e in entries:
             e['DateOfService'] = datetime_format.get_date(
                 e['DateOfService']).strftime("%m/%d/%Y")
-            print(e['DateOfService'])
         try:
             template = render_template(
                 'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=total_hours, minimum_supervised=round(total_hours*0.05, 2), supervised_hours=round(supervised_time, 2), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))

@@ -1,14 +1,14 @@
 {% from 'topnav.html' import topnav %}
-{% macro heading(id,user ,session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing) %}
+{% macro heading(id,user ,session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing, exp) %}
 
-{% if report == True and ( supervised_hours < minimum_supervised or observed_with_client < 1 ) %}
+{% if report == True and ( supervised_time < minimum_supervised or observed_with_client < 1 ) %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <p> Some requirements are not met or entries have not been verified by supervisor </p>
+    <p> Some requirements are not met or entries have not been verified by supervisor</p>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endif %}
 
-{{ topnav(id,user ,session, role, total_hours, supervised_hours, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing) }}
+{{ topnav(id,user ,session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing, exp) }}
 
 {% if report == True and missing != [] %}
 <div class="alert alert-warning alert-dismissible" role="alert">
@@ -46,11 +46,11 @@
 <div class="row card">
     <h1>This Month Report Status:</h1>
     <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours: {{total_hours or 0}}h</p>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours with Meeting Form / Minimum Requirement: {{supervised_hours or 0}}h / {{minimum_supervised or 0}}h </p>
+    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours with Meeting Form / Minimum Requirement: {{supervised_time or 0}}h / {{minimum_supervised or 0}}h </p>
     <p data-bs-toggle="tooltip" data-bs-placement="right" >Group Supervision Meetings: {{meeting_group or 0}}</p>
     <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">Sessions observed with client / Minimum requirement: {{observed_with_client or 0}} / 1 </p>
     
-    {% if meeting_group and supervised_hours and supervised_hours < minimum_supervised and meeting_group < 1 %}
+    {% if meeting_group and supervised_time and supervised_time < minimum_supervised and meeting_group < 1 %}
         <p>You have not met the minimum supervised hours requirement</p>
     {% endif %}
 </div>
