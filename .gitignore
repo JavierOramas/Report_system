@@ -5,3 +5,4 @@ report.pdf
 *.txt
 notebook.ipynb
 *.pdf
+*/__pycache__/*

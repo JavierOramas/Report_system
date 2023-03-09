@@ -261,7 +261,7 @@ def procedure_codes():
         return redirect(url_for('procedure_codes'))
     if request.method == 'GET':
         codes = db.procedure_codes.find()
-        return render_template('procedure_codes.html', codes=list(codes), role=session['role'])
+        return render_template('procedure_codes.html', codes=list(codes), role=session['user']['role'])
 
 
 @app.route('/del/procedure/<id>')
