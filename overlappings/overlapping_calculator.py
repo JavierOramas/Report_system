@@ -1,3 +1,4 @@
+import PIL
 import pandas as pd
 import numpy as np
 from os import path
@@ -37,9 +38,11 @@ def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId
     if entry[providerId] == i[providerId]:
         return False
 
-    if procedure in [150582, 194640] and i[procedureCodeId] in [150582, 194640]:
+    # 
+    if procedure in [150582, 194640] and i[procedureCodeId] in [194640]:
         return True
-    if procedure in [150580] and i[procedureCodeId] in [150582, 194640]:
+    # 53 - 
+    if procedure in [150580,298632] and i[procedureCodeId] in [150582, 194640]:
         return True
     if procedure in [150577] and i[procedureCodeId] == 150577:
         return True
@@ -98,7 +101,8 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
 
 
 def process(entries, fix=False):
-
+    print("ENT")
+    print(entries)
     # fix this to get data from database instead of csv
     supervisors = providers_data[providers_data['Type'] == 'Supervisor']
     risen_supervisors = providers_data[providers_data['Type']
@@ -109,7 +113,7 @@ def process(entries, fix=False):
     RBTs = providers_data[providers_data['Status'] == 'RBT']
     data = get_data(entries)
 
-    valid = [150582, 194640, 150577, 150580, 194642, 194641]
+    valid = [150582, 194640, 150577, 150580, 194642, 194641,298632]
     supervisors_id = [150582, 194640, 150577]
     supervisors_codes = ['risensupervisor', 'supervisor']
 
@@ -186,10 +190,10 @@ def process(entries, fix=False):
                             for i in data['ProcedureCodeId']]])
     code_ind_sup = np.array(data[[i in [150577]
                             for i in data['ProcedureCodeId']]])
-    
+
     for i in code_ind_sup:
         depured_data.append(i)
-    
+
     for i in code_doc:
         if i[procedureCodeId] == 194642 and (i[providerId] in list(supervisors['ProviderId']) or i[providerId] in list(risen_supervisors['ProviderId'])):
             notifications.append(i)
@@ -306,6 +310,7 @@ def process(entries, fix=False):
                     continue
                 i_ol = np.append(i_ol, time.seconds/3600)
                 ol.append(i_ol)
+                print("TEEEEST")
                 print(i_ol)
             except:
                 d, i_ol, time = j
@@ -319,4 +324,5 @@ def process(entries, fix=False):
             # ol.to_csv(path.join('done',names[i]+' '+str(i)+'.csv'))
             final_overlappings.append(ol)
 
+    print(final_overlappings)
     return errors, notifications, final_overlappings

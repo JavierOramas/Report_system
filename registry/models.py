@@ -35,22 +35,22 @@ class Registry:
             return 'no', 'yes'
 
     def add_data(self, db):
-        print("start")
+        # print("start")
         # Load data from csv pre-loaded from the client
         try:
             data = pd.read_csv('static/files/data.csv')
         except:
             return {'status': 500}
         labels = ['ProviderId', 'TimeWorkedInHours', 'ProcedureCodeId']
-        print("labels")
 
         month = datetime.datetime.strptime(
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').month
         year = datetime.datetime.strptime(
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
         data = data.drop(data.columns.difference(labels), 1)
+        print(data)
 
-        labels = [150580, 150582, 150583, 150553, 194640,
+        labels = [150580, 150582, 150583, 150553, 194640,298632,
                   194641, 194641, 235184, 255975, 255910, 241573]
 
         df = data[data['ProcedureCodeId'] != 194642]
@@ -77,9 +77,9 @@ class Registry:
         total_time = data_for_time.groupby(['ProviderId']).sum()
 
         for name, entry in total_time.iterrows():
-            print(f"\n\n\n Sum Data for {name}")
-            print(data_for_time["ProcedureCodeId"].to_string(),
-                  entry['TimeWorkedInHours'])
+            # print(f"\n\n\n Sum Data for {name}")
+            # print(data_for_time["ProcedureCodeId"].to_string(),
+            #       entry['TimeWorkedInHours'])
             # entry['ProviderId'] = entry['Name']
             item = {
                 'ProviderId': name,
@@ -91,7 +91,7 @@ class Registry:
                 db.TotalHours.insert_one(item)
 
         data = process('static/files/data.csv', 'providers.csv')
-        # crete the collection entries
+        # create the collection entries
         print("process")
         for index, entry in data.iterrows():
             entry = {
@@ -124,7 +124,7 @@ class Registry:
 
                 if not db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']}):
                     db.Registry.insert_one(entry)
-                    
+
         return {'status': 200}
     # except:
         # pass

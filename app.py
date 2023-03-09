@@ -193,6 +193,7 @@ def upload_files():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'data.csv')
        # set the file path
         uploaded_file.save(file_path)
+        print('uploaded')
        # save the file
     return redirect(url_for('upload'))
 
@@ -255,13 +256,12 @@ def del_role(id):
 @admin_required
 def procedure_codes():
     if request.method == 'POST':
-        print(request.form)
         db.procedure_codes.insert_one(
             {'code': request.form['code'], 'name': request.form['name']})
         return redirect(url_for('procedure_codes'))
     if request.method == 'GET':
         codes = db.procedure_codes.find()
-        return render_template('procedure_codes.html', codes=list(codes))
+        return render_template('procedure_codes.html', codes=list(codes), role=session['role'])
 
 
 @app.route('/del/procedure/<id>')

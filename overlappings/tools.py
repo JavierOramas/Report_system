@@ -23,7 +23,7 @@ def get_supervisor_codes():
 
 
 def get_rbt_codes():
-    return [150580]
+    return [150580,298632]
 
 
 def get_indirect_codes():
@@ -35,7 +35,7 @@ def get_remote_individual_supervision_codes():
 
 
 def get_valid_ids():
-    return [150582, 194640, 150577, 150580, 194642, 194641, 255975]
+    return [150582, 194640, 150577, 150580, 194642, 194641, 255975,298632]
 
 
 def get_supervisor_ids():
@@ -60,6 +60,7 @@ labels = ['Id', 'DateTimeFrom', 'DateTimeTo', 'TimeWorkedInHours', 'ProviderId',
 
 def get_data(path):
     df = pd.read_csv(path)
+    print(df)
     return df.drop(df.columns.difference(labels), 1)
 
 
@@ -170,13 +171,14 @@ def process(incoming_data, db_providers):
     RBTs = providers_data[providers_data['Status'] == 'RBT']
     data = get_data(incoming_data)
     supervisors_id = get_supervisor_codes()
-
+    print(data)
     # eliminar datos no deseados
-    data_filter = [i in get_valid_ids() for i in data.ProcedureCodeId]
-    data['data_filter1'] = data_filter
-    data = data[data.data_filter1]
-    data = data.drop('data_filter1', 1)
+    # data = data.drop(data[data['ProcedureCodeId'].isin(get_valid_ids()).index, index=True)
+    data.loc[data['ProcedureCodeId'].isin(get_valid_ids())]
+    # data['data_filter1'] = data_filter
+    # data = data.drop('data_filter1', 1)
     # st.dataframe(data)
+    print(data)
 
     errors = []
     notifications = []
