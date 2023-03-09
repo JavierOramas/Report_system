@@ -23,7 +23,7 @@ def get_supervisor_codes():
 
 
 def get_rbt_codes():
-    return [150580,298632]
+    return [150580, 298632]
 
 
 def get_indirect_codes():
@@ -35,7 +35,7 @@ def get_remote_individual_supervision_codes():
 
 
 def get_valid_ids():
-    return [150582, 194640, 150577, 150580, 194642, 194641, 255975,298632]
+    return [150582, 194640, 150577, 150580, 194642, 194641, 255975, 298632]
 
 
 def get_supervisor_ids():
@@ -66,17 +66,17 @@ def get_data(path):
 
 def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId):
     procedure = entry[procedureCodeId]
-    # if entry[providerId] == i[providerId]:
-    #     return False
-    # if entry[providerId] in RBTs and i[providerId] in trainees:
-    #     return False
-    if procedure in get_ind_sup_meeting() and i[procedureCodeId] in get_ind_sup_meeting():
+    if entry[providerId] == i[providerId]:
+        return False
+
+    # 55 55NB - 55NB
+    if procedure in [150582, 194640] and i[procedureCodeId] in [194640]:
         return True
-    if procedure in get_trainee_codes() and i[procedureCodeId] in get_supervisor_codes():
+    # 53 - 55 55NB
+    if procedure in [150580, 298632] and i[procedureCodeId] in [150582, 194640]:
         return True
-    if procedure in get_rbt_codes() and i[procedureCodeId] in get_supervisor_codes():
-        return True
-    if procedure in get_indirect_codes() and i[procedureCodeId] in get_remote_individual_supervision_codes():
+    # Ind Sup - Ind Sup
+    if procedure in [150577] and i[procedureCodeId] == 150577:
         return True
     return False
 

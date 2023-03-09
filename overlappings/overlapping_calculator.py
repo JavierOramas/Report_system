@@ -38,12 +38,13 @@ def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId
     if entry[providerId] == i[providerId]:
         return False
 
-    # 
+    # 55 55NB - 55NB
     if procedure in [150582, 194640] and i[procedureCodeId] in [194640]:
         return True
-    # 53 - 
-    if procedure in [150580,298632] and i[procedureCodeId] in [150582, 194640]:
+    # 53 - 55 55NB
+    if procedure in [150580, 298632] and i[procedureCodeId] in [150582, 194640]:
         return True
+    # Ind Sup - Ind Sup
     if procedure in [150577] and i[procedureCodeId] == 150577:
         return True
     return False
@@ -113,7 +114,7 @@ def process(entries, fix=False):
     RBTs = providers_data[providers_data['Status'] == 'RBT']
     data = get_data(entries)
 
-    valid = [150582, 194640, 150577, 150580, 194642, 194641,298632]
+    valid = [150582, 194640, 150577, 150580, 194642, 194641, 298632]
     supervisors_id = [150582, 194640, 150577]
     supervisors_codes = ['risensupervisor', 'supervisor']
 
