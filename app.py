@@ -569,7 +569,7 @@ def add(id=None):
             temp = db.users.find({"role": role})
             supervisors += list(temp)
 
-        return render_template('edit.html', entry=entry, supervisors=supervisors, codes=list(db.procedure_codes.find()))
+        return render_template('edit.html', role=session['user']['role'], id=user['ProviderId'], entry=entry, supervisors=supervisors, codes=list(db.procedure_codes.find()))
         # return redirect(url_for('/', message={'error':'you cant edit that entry'}))
     else:
         print("HEREEEEEE")
@@ -680,7 +680,7 @@ def edit(id):
         print(entry)
         date = datetime_format.get_date(entry['DateOfService'])
         year, month = date.year, date.month,
-        return render_template('edit.html', entry=entry, supervisors=supervisors, id=user['_id'], codes=list(db.procedure_codes.find()), year=year, month=month)
+        return render_template('edit.html', role=session['user']['role'], entry=entry, supervisors=supervisors, id=user['_id'], codes=list(db.procedure_codes.find()), year=year, month=month)
 
     elif request.method == "POST":
         if entry["ProcedureCodeId"] != request.form.get('ProcedureCodeId') or entry["DateOfService"] != request.form.get('DateOfService') or entry["MeetingDuration"] != request.form.get('MeetingDuration'):
