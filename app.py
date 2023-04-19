@@ -648,7 +648,7 @@ def meeting(id):
         # print(rbt)
         if rbt:
             return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
-        return redirect("/", message=("Invalid action", "warning"))
+        return redirect("/")
 
 
 @ app.route('/del/entry/<id>', methods=('GET', 'POST'))
