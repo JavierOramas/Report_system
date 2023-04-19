@@ -14,3 +14,4 @@ db = client.abs_tracking_db
 db.Registry.update_many({}, {"$set": {
     "MeetingForm": False,
 }})
+

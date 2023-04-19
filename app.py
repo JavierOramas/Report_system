@@ -646,7 +646,9 @@ def meeting(id):
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         # print(rbt)
-        return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
+        if rbt:
+            return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
+        return redirect("/", message=("Invalid action", "warning"))
 
 
 @ app.route('/del/entry/<id>', methods=('GET', 'POST'))
