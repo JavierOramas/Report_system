@@ -37,6 +37,7 @@ class Registry:
     def add_data(self, db):
         # print("start")
         # Load data from csv pre-loaded from the client
+        min_year = db.min_year.find_one({})['year']
         try:
             data = pd.read_csv('static/files/data.csv')
         except:
@@ -47,10 +48,12 @@ class Registry:
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').month
         year = datetime.datetime.strptime(
             data['DateOfService'].iloc[0], '%m/%d/%Y %H:%M').year
+        if int(year) < int(min_year):
+            min_year = year
         data = data.drop(data.columns.difference(labels), 1)
         print(data)
 
-        labels = [150580, 150582, 150583, 150553, 194640,298632,
+        labels = [150580, 150582, 150583, 150553, 194640, 298632,
                   194641, 194641, 235184, 255975, 255910, 241573]
 
         df = data[data['ProcedureCodeId'] != 194642]
@@ -124,7 +127,10 @@ class Registry:
 
                 if not db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']}):
                     db.Registry.insert_one(entry)
-
+        db.min_year.delete_one({})
+        db.min_year.insert_one({
+            'year': min_year
+        })
         return {'status': 200}
     # except:
         # pass

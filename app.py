@@ -79,7 +79,7 @@ def get_entries(role, year, month, user):
     clients = []
     dates = []
     supervisors = []
-    min_year = int(datetime.datetime.now().year)
+    min_year = db.min_year.find_one()['year']
 
     for entry in entries:
         if int(datetime_format.get_date(entry["DateOfService"]).year) < min_year:
