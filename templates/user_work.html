@@ -35,7 +35,7 @@
                                 <div class="form-group">
                                     <label for="sel_year">Year</label>
                                     <select class="form-select form-control form-select-sm" style="width:40%" id="sel_year" name="year">
-                                        {% for i in range(min_year, year|int +1) %}
+                                        {% for i in range(min_year, curr_year|int) %}
                                         <option value="{{i}}" {{'selected' if i == year }}>{{i}}</option>
                                         {% endfor %}
                                     </select>

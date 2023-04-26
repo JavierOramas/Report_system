@@ -601,7 +601,7 @@ def add(id=None):
             return redirect('/')
         else:
             print("here")
-            return redirect(url_for('report', id=user['_id']))
+            return redirect(url_for('report', id=user['_id'], curr_year=datetime.datetime.now().year))
 
 
 @ app.route('/verify/<id>', methods=('GET', 'POST'))
@@ -625,7 +625,7 @@ def verify(id):
         # print(rbt)
         month = request.form.get('month')
         year = request.form.get('year')
-        return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
+        return redirect(url_for('report', id=rbt['_id'], year=year, month=month, curr_year=datetime.datetime.now().year))
 
 
 @ app.route('/meeting/<id>/<year>/<month>', methods=('GET', 'POST'))
@@ -653,7 +653,7 @@ def meeting(id, year, month):
         # print(rbt)
         if rbt:
             # return redirect()
-            return redirect(url_for('report', id =rbt["_id"], alert= None, year=year, month=month))
+            return redirect(url_for('report', id=rbt["_id"], alert=None, year=year, month=month, curr_year=datetime.datetime.now().year))
         return redirect("/")
 
 
@@ -668,7 +668,7 @@ def delete_entry(id):
             return redirect('/')
         else:
             rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-            return redirect(url_for('report', id=rbt['_id']))
+            return redirect(url_for('report', id=rbt['_id'], curr_year=datetime.datetime.now().year))
 
 
 @ app.route('/edit/<id>', methods=('GET', 'POST'))
@@ -708,7 +708,7 @@ def edit(id):
             return redirect('/')
         else:
             rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-            return redirect(url_for('report', id=rbt['_id']))
+            return redirect(url_for('report', id=rbt['_id'], curr_year=datetime.datetime.now().year))
 
 
 @ app.route('/del/<id>', methods=('GET', 'POST'))
@@ -864,7 +864,7 @@ def get_report(year, month, id):
                 }
 
                 db.PDFReport.insert_one(report_obj)
-                return redirect(url_for('report', id=id, alert=alert))
+                return redirect(url_for('report', id=id, alert=alert, curr_year=datetime.datetime.now().year))
             # return dashboard(year, month, alert={'error': 'Error generating report'})
         nm = month
         if nm < 10:
