@@ -657,7 +657,8 @@ def meeting(id, year, month):
         if rbt:
             # return redirect()
             print(year, month)
-            return redirect(url_for('report', id=rbt["_id"], alert=None, year=year, month=month, curr_year=datetime.datetime.now().year))
+            return report(id=rbt['_id'], year=year, month=month)
+            # return redirect(url_for('report', id=rbt["_id"], alert=None, year=year, month=month, curr_year=datetime.datetime.now().year))
         return redirect("/")
 
 
