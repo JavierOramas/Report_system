@@ -78,7 +78,7 @@
                         </tr>
                         {% for entry in entries %}
                         <tr>
-                            <td> <a type="button" href="/meeting/{{ entry['_id'] }}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
+                            <td> <a type="button" href="/meeting/{{ entry['_id'] }}/{{year}}/{{month}}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
                             {% if entry['ProcedureCodeId']|int in code_id%}
                             {% for i in codes %}
                                 {% if i['code']|int == entry['ProcedureCodeId']|int %}
@@ -97,7 +97,7 @@
                             <td>{{ entry["ObservedwithClient"] }}</td>
                             <td>{{ entry["Supervisor"] }}</td>
                             <td>
-                                <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}">Edit</a>
+                                <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}/{{year}}/{{month}}">Edit</a>
                             </td>
                             <td>
                                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#delete{{entry['_id']}}">
@@ -149,7 +149,7 @@
                             <td>{{ entry["ObservedwithClient"] }}</td>
                             <td>{{ entry["Supervisor"] }}</td>
                             <td>
-                                <a type="button" class="btn btn-primary btn-sm" href="/verify/{{ entry['_id'] }}">Verify</a>
+                                <a type="button" class="btn btn-primary btn-sm" href="/verify/{{ entry['_id'] }}/{{year}}/{{month}}">Verify</a>
                             </td>
                         </tr>
                         {% endfor %}
