@@ -35,7 +35,7 @@
                                 <div class="form-group">
                                     <label for="sel_year">Year</label>
                                     <select class="form-select form-control form-select-sm" style="width:40%" id="sel_year" name="year">
-                                        {% for i in range(min_year, year+1) %}
+                                        {% for i in range(min_year, int(year)+1) %}
                                         <option value="{{i}}" {{'selected' if i == year }}>{{i}}</option>
                                         {% endfor %}
                                     </select>
@@ -78,7 +78,6 @@
                         </tr>
                         {% for entry in entries %}
                         <tr>
-                            {{year}} {{month}}
                             <td> <a type="button" href="/meeting/{{ entry['_id'] }}/{{year}}/{{month}}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
                             {% if entry['ProcedureCodeId']|int in code_id%}
                             {% for i in codes %}
