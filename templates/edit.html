@@ -62,7 +62,13 @@
 
                 <div class="center">
                     {% if role in ['admin','bcba', 'bcba (l)'] %}
-                    <a class='btn btn-danger' href='/cancel/{{id}}/{{year}}/{{month}}'>Cancel</a>
+                    <button class='btn btn-danger' onclick="goBack()">Cancel</button>
+                    
+                    <script>
+                        function goBack() {
+                            window.history.back();
+                        }
+                    </script>
                     {% else %}
                     <a class='btn btn-danger' href='/filter/{{year}}/{{month}}'>Cancel</a>
                     {% endif %}
