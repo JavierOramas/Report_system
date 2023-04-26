@@ -291,8 +291,11 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
 
     if user and "ProviderId" in user:
         user['providerId'] = user['ProviderId']
+        log("year:", year)
+        log("month:", month)
         entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
             'basic', year, month, user)
+        log("entries:", len(entries))
 
         for entry in entries:
             name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
@@ -318,6 +321,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
         print(exp)
         curr_year = int(curr_year)+1
         log("year:", year)
+        log("month:", month)
         return render_template("user_work.html", id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
 
     return redirect("/")
