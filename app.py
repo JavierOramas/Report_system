@@ -275,6 +275,7 @@ def del_procedure_code(id):
 
 @app.route('/user_report/<id>/<alert>/<year>/<month>', methods=["POST", "GET"])
 @app.route('/user_report/<id>/<year>/<month>', methods=["POST", "GET"])
+@app.route('/user_report/<id>', methods=["POST", "GET"])
 @login_required
 def report(id, alert=None, year=None, month=None):
     if year is None and month is None:
