@@ -602,12 +602,14 @@ def add(id=None):
             "Verified": False,
             "MeetingForm": False
         })
-
+        date = datetime_format.get_date(request.form.get('DateOfService'))
+        year, month = date.year, date.month
         if not session['user']['role'] in get_admins():
             return redirect('/')
         else:
             print("here")
-            return redirect(url_for('report', id=user['_id'], curr_year=datetime.datetime.now().year))
+            return report(id=rbt['_id'], year=year, month=month)
+            # return redirect(url_for('report', id=user['_id'], curr_year=datetime.datetime.now().year))
 
 
 @ app.route('/verify/<id>', methods=('GET', 'POST'))
@@ -615,32 +617,32 @@ def add(id=None):
 def verify(id):
     # log('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
+    date = datetime_format.get_date(entry['DateOfService'])
+    year, month = date.year, date.month
     if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['Supervisor']:
         # log('here')
         db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
             "Verified": True,
         }})
     # log(db.Registry.find_one({"_id": ObjectId(id)}))
-    month = request.form.get('month')
-    year = request.form.get('year')
+
     # log(db.Registry.find_one({"_id": ObjectId(id)}))
     if not session['user']['role'] in get_admins():
         return redirect(url_for('dashboard', month=month, year=year))
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         # print(rbt)
-        month = request.form.get('month')
-        year = request.form.get('year')
-        return redirect(url_for('report', id=rbt['_id'], year=year, month=month, curr_year=datetime.datetime.now().year))
+
+        return report(id=rbt['_id'], year=year, month=month)
 
 
-@ app.route('/meeting/<id>/<year>/<month>', methods=('GET', 'POST'))
+@ app.route('/meeting/<id>', methods=('GET', 'POST'))
 @ login_required
-def meeting(id, year, month):
+def meeting(id):
     # log('verifying')
-    year = int(year)
-    month = int(month)
     entry = db.Registry.find_one({"_id": ObjectId(id)})
+    date = datetime_format.get_date(entry['DateOfService'])
+    year, month = date.year, date.month
     # print(entry)
     if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['ProviderId']:
         # log('here')
@@ -655,8 +657,6 @@ def meeting(id, year, month):
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         # print(rbt)
         if rbt:
-            # return redirect()
-            print(year, month)
             return report(id=rbt['_id'], year=year, month=month)
             # return redirect(url_for('report', id=rbt["_id"], alert=None, year=year, month=month, curr_year=datetime.datetime.now().year))
         return redirect("/")
@@ -666,6 +666,8 @@ def meeting(id, year, month):
 @ login_required
 def delete_entry(id):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
+    date = datetime_format.get_date(entry['DateOfService'])
+    year, month = date.year, date.month,
     db.Registry.delete_one({"_id": ObjectId(id)})
 
     if entry:
@@ -673,7 +675,8 @@ def delete_entry(id):
             return redirect('/')
         else:
             rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-            return redirect(url_for('report', id=rbt['_id'], curr_year=datetime.datetime.now().year))
+            return report(id=rbt['_id'], year=year, month=month)
+            # return redirect(url_for('report', id=rbt['_id'], curr_year=datetime.datetime.now().year))
 
 
 @ app.route('/edit/<id>', methods=('GET', 'POST'))
@@ -692,7 +695,7 @@ def edit(id):
         user = db.users.find_one({"ProviderId": entry['ProviderId']})
         print(entry)
         date = datetime_format.get_date(entry['DateOfService'])
-        year, month = date.year, date.month,
+        year, month = date.year, date.month
         return render_template('edit.html', role=session['user']['role'], entry=entry, supervisors=supervisors, id=user['_id'], codes=list(db.procedure_codes.find()), year=year, month=month)
 
     elif request.method == "POST":
@@ -713,7 +716,10 @@ def edit(id):
             return redirect('/')
         else:
             rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-            return redirect(url_for('report', id=rbt['_id'], curr_year=datetime.datetime.now().year))
+            date = datetime_format.get_date(entry['DateOfService'])
+            year, month = date.year, date.month,
+            return report(id=rbt['_id'], year=year, month=month)
+            # return redirect(url_for('report', id=rbt['_id'], curr_year=datetime.datetime.now().year))
 
 
 @ app.route('/del/<id>', methods=('GET', 'POST'))
