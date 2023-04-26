@@ -329,6 +329,7 @@ def get_roles(users):
 
 
 @app.route('/dashboard', methods=['GET'])
+@app.route('/dashboard/<month>/<year>', methods=['GET'])
 @login_required
 def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now().year, alert=None):
 
@@ -785,13 +786,13 @@ def filter_data():
     if not year:
         year = datetime.datetime.now().year
 
-    return dashboard(int(month), int(year))
+    return redirect(f"/dashboard/{month}/{year}")
 
 
 @ app.route("/filter/<year>/<month>", methods=['POST', 'GET'])
 def filter_data_args(year, month):
     # return redirect(url_for('dashboard', year=year, month=month))
-    return dashboard(int(month), int(year))
+    return redirect(f"/dashboard/{month}/{year}")
 
 
 @ app.route("/report/<year>/<month>/<id>")
