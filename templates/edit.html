@@ -62,7 +62,7 @@
 
                 <div class="center">
                     {% if role in ['admin','bcba', 'bcba (l)'] %}
-                    <a class='btn btn-danger' href='/user_report/{{id}}'>Cancel</a>
+                    <a class='btn btn-danger' href='/user_report/{{id}}/{{year}}/{{month}}'>Cancel</a>
                     {% else %}
                     <a class='btn btn-danger' href='/filter/{{year}}/{{month}}'>Cancel</a>
                     {% endif %}
