@@ -643,8 +643,8 @@ def meeting(id, year, month):
             "MeetingForm": not en["MeetingForm"],
         }})
 
-    month = request.form.get('month')
-    year = request.form.get('year')
+    # month = request.form.get('month')
+    # year = request.form.get('year')
     # log(db.Registry.find_one({"_id": ObjectId(id)}))
     if not session['user']['role'] in get_admins():
         return redirect(url_for('dashboard', month=month, year=year))
@@ -653,7 +653,7 @@ def meeting(id, year, month):
         # print(rbt)
         if rbt:
             # return redirect()
-            return 
+            return redirect(url_for('report', year=year, month=month))
         return redirect("/")
 
 
