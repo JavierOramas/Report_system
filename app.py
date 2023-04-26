@@ -273,7 +273,7 @@ def del_procedure_code(id):
 
 @app.route('/cancel/<id>/<year>/<month>')
 def redirecting(id,year,month):
-    return report(id=rbt['_id'], year=year, month=month)
+    return report(id=id, year=year, month=month)
 
 @app.route('/user_report/<id>/<year>/<month>/<alert>', methods=["POST", "GET"])
 @app.route('/user_report/<id>/<year>/<month>', methods=["POST", "GET"])
