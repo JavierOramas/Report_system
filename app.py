@@ -272,15 +272,17 @@ def del_procedure_code(id):
     return redirect(url_for('procedure_codes'))
 
 
-@app.route('/user_report/<id>/<alert>', methods=["POST", "GET"])
+@app.route('/user_report/<id>/<year>/<month>/<alert>', methods=["POST", "GET"])
+@app.route('/user_report/<id>/<year>/<month>', methods=["POST", "GET"])
 @app.route('/user_report/<id>', methods=["POST", "GET"])
 @login_required
-def report(id, alert=None):
+def report(id, year=None, month=None, alert=None):
 
-    year = int(request.form.get("year")) if request.form.get(
-        "year") else datetime.datetime.now().year
-    month = int(request.form.get("month")) if request.form.get(
-        "month") else datetime.datetime.now().month-1
+    if year is None and month is None:
+        year = int(request.form.get("year")) if request.form.get(
+            "year") else datetime.datetime.now().year
+        month = int(request.form.get("month")) if request.form.get(
+            "month") else datetime.datetime.now().month-1
 
     try:
         user = db.users.find_one({"_id": ObjectId(id)})
@@ -626,7 +628,7 @@ def verify(id):
         return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
 
 
-@ app.route('/meeting/<id>', methods=('GET', 'POST'))
+@ app.route('/meeting/<id>/<year>/<month>', methods=('GET', 'POST'))
 @ login_required
 def meeting(id):
     # log('verifying')
@@ -648,8 +650,8 @@ def meeting(id):
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         # print(rbt)
         if rbt:
-            return redirect(request.referrer)
-            # return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
+            # return redirect()
+            return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
         return redirect("/")
 
 
