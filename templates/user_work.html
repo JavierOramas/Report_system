@@ -78,7 +78,7 @@
                         </tr>
                         {% for entry in entries %}
                         <tr>
-                            <td> <a type="button" href="/meeting/{{ entry['_id'] }}/{{year}}/{{month}}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
+                            <td> <a type="button" href="/meeting/{{ entry['_id'] }}/{{year}}/{{month}}">{% if entry['MeetingForm'] == False %} ❌ {{year}} {{month}} {% else %} ✅ {% endif %}</a></td>
                             {% if entry['ProcedureCodeId']|int in code_id%}
                             {% for i in codes %}
                                 {% if i['code']|int == entry['ProcedureCodeId']|int %}
