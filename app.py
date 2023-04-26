@@ -647,11 +647,8 @@ def meeting(id):
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         # print(rbt)
         if rbt:
-<<<<<<< HEAD
-            # return redirect(request.url)
-=======
->>>>>>> parent of c837ab5 (meeting url referer)
-            return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
+            return redirect(request.url)
+            # return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
         return redirect("/")
 
 
