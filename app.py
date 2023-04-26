@@ -276,7 +276,7 @@ def del_procedure_code(id):
 @app.route('/user_report/<id>/<year>/<month>', methods=["POST", "GET"])
 @app.route('/user_report/<id>', methods=["POST", "GET"])
 @login_required
-def report(id, year=None, month=None, alert=None):
+def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.now().year):
 
     if year is None and month is None:
         year = int(request.form.get("year")) if request.form.get(
@@ -316,7 +316,7 @@ def report(id, year=None, month=None, alert=None):
         exp = supervised_time >= minimum_supervised and observed_with_client > 1
         role = user['role'] or 'rbt'
         print(exp)
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
+        return render_template("user_work.html", id=id, curr_year=curr_year,session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
 
     return redirect("/")
 
