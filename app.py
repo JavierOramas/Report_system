@@ -317,6 +317,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
         role = user['role'] or 'rbt'
         print(exp)
         curr_year = int(curr_year)+1
+        log("year:", year)
         return render_template("user_work.html", id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
 
     return redirect("/")
@@ -644,9 +645,6 @@ def meeting(id, year, month):
             "MeetingForm": not en["MeetingForm"],
         }})
 
-    # month = request.form.get('month')
-    # year = request.form.get('year')
-    # log(db.Registry.find_one({"_id": ObjectId(id)}))
     if not session['user']['role'] in get_admins():
         return redirect(url_for('dashboard', month=month, year=year))
     else:
@@ -654,6 +652,7 @@ def meeting(id, year, month):
         # print(rbt)
         if rbt:
             # return redirect()
+            print(year, month)
             return redirect(url_for('report', id=rbt["_id"], alert=None, year=year, month=month, curr_year=datetime.datetime.now().year))
         return redirect("/")
 
