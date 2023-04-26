@@ -630,8 +630,10 @@ def verify(id):
 
 @ app.route('/meeting/<id>/<year>/<month>', methods=('GET', 'POST'))
 @ login_required
-def meeting(id):
+def meeting(id, year, month):
     # log('verifying')
+    year = int(year)
+    month = int(month)
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     # print(entry)
     if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['ProviderId']:
