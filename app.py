@@ -884,15 +884,18 @@ def get_report(year, month, id):
         }
         # config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
         filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker.pdf"
-        log(template)
+        # log(template)
         log("pdf")
-        pdf_f = pdfkit.from_string(template, 'report.pdf',
-                                   options=options)
+        pdf_f = False
+        try:
+            pdf_f = pdfkit.from_string(template, f'reports/{filename}',
+                                       options=options)
+        except:
+            pass
         print(pdf_f)
-        if pdf_f:
-            log("pdf generated")
-            sleep(1)
-            return send_file('report.pdf', as_attachment=True)
+        log("pdf generated")
+        sleep(1)
+        return send_file(f'reports/{filename}', as_attachment=True)
         # except:
         #     log("Something went Wrong!")
         #     return dashboard(month, month, alert=None)
