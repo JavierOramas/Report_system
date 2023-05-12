@@ -37,7 +37,14 @@ class Registry:
     def add_data(self, db):
         # print("start")
         # Load data from csv pre-loaded from the client
-        min_year = db.min_year.find_one({})['year']
+        try:
+            min_year = db.min_year.find_one({})['year']
+        except TypeError:
+            min_year = datetime.datetime.now().year
+            db.min_year.delete_one({})
+            db.min_year.insert_one({
+                'year': min_year
+            })
         try:
             data = pd.read_csv('static/files/data.csv')
         except:
