@@ -892,7 +892,7 @@ def get_report(year, month, id):
             return send_file(f'reports/{filename}', as_attachment=True)
         except:
             log("Something went Wrong!")
-            return dashboard(month, month, alert=alert)
+            return dashboard(month, month, alert=None)
     else:
         log("Something went Wrong!")
         return dashboard(month, month, alert=alert)
