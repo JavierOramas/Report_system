@@ -850,6 +850,9 @@ def get_report(year, month, id):
         for e in entries:
             e['DateOfService'] = datetime_format.get_date(
                 e['DateOfService']).strftime("%m/%d/%Y")
+
+        config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
+
         try:
             template = render_template(
                 'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=total_hours, minimum_supervised=round(total_hours*0.05, 2), supervised_hours=round(supervised_time, 2), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
@@ -862,7 +865,6 @@ def get_report(year, month, id):
                 'debug-javascript': None,
                 'enable-javascript': None
             }
-            config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
         except:
             # if False:
             log("exception")
@@ -885,6 +887,7 @@ def get_report(year, month, id):
             nm = '0'+str(nm)
         filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker.pdf"
         try:
+            log("pdf")
             pdfkit.from_string(template, f'reports/{filename}',
                                options=options, configuration=config)
             log("pdf generated")
