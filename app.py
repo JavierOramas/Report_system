@@ -322,7 +322,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue
             missing.append(i)
-        exp = supervised_time >= minimum_supervised and observed_with_client > 1
+        exp = supervised_time >= minimum_supervised and observed_with_client >= 1
         role = user['role'] or 'rbt'
         print(exp)
         curr_year = int(curr_year)+1
