@@ -889,14 +889,14 @@ def get_report(year, month, id):
         log("pdf")
         pdfkit.from_string(template, f'reports/{filename}',
 
-                           try:
+                           # try:
                            options=options, configuration=config)
         log("pdf generated")
         sleep(1)
         return send_file(f'reports/{filename}', as_attachment=True)
-        except:
-            log("Something went Wrong!")
-            return dashboard(month, month, alert=None)
+        # except:
+        #     log("Something went Wrong!")
+        #     return dashboard(month, month, alert=None)
     else:
         log("Something went Wrong!")
         return dashboard(month, month, alert=alert)
