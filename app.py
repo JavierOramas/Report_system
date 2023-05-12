@@ -895,7 +895,7 @@ def get_report(year, month, id):
         log(pdf_f)
         log("pdf generated")
         sleep(1)
-        return send_file(filename_or_fp='./report.pdf', download_name={filename}, as_attachment=True)
+        return send_file('./report.pdf', download_name={filename}, as_attachment=True)
         # except:
         #     log("Something went Wrong!")
         #     return dashboard(month, month, alert=None)
