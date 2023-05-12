@@ -272,12 +272,16 @@ def del_procedure_code(id):
     db.procedure_codes.delete_one({'_id': ObjectId(id)})
     return redirect(url_for('procedure_codes'))
 
+@app.route('/cancel/<id>/<year>/<month>')
+def redirecting(id,year,month):
+    return report(id=id, year=year, month=month)
 
-@app.route('/user_report/<id>/<alert>/<year>/<month>', methods=["POST", "GET"])
+@app.route('/user_report/<id>/<year>/<month>/<alert>', methods=["POST", "GET"])
 @app.route('/user_report/<id>/<year>/<month>', methods=["POST", "GET"])
 @app.route('/user_report/<id>', methods=["POST", "GET"])
 @login_required
-def report(id, alert=None, year=None, month=None):
+def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.now().year):
+
     if year is None and month is None:
         year = int(request.form.get("year")) if request.form.get(
             "year") else datetime.datetime.now().year
@@ -291,8 +295,11 @@ def report(id, alert=None, year=None, month=None):
 
     if user and "ProviderId" in user:
         user['providerId'] = user['ProviderId']
+        log("year:", year)
+        log("month:", month)
         entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
             'basic', year, month, user)
+        log("entries:", len(entries))
 
         for entry in entries:
             name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
@@ -316,7 +323,10 @@ def report(id, alert=None, year=None, month=None):
         exp = supervised_time >= minimum_supervised and observed_with_client > 1
         role = user['role'] or 'rbt'
         print(exp)
-        return render_template("user_work.html", id=id, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
+        curr_year = int(curr_year)+1
+        log("year:", year)
+        log("month:", month)
+        return render_template("user_work.html", id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
 
     return redirect("/")
 
@@ -331,6 +341,7 @@ def get_roles(users):
 
 
 @app.route('/dashboard', methods=['GET'])
+@app.route('/dashboard/<month>/<year>', methods=['GET'])
 @login_required
 def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now().year, alert=None):
 
@@ -594,12 +605,14 @@ def add(id=None):
             "Verified": False,
             "MeetingForm": False
         })
-
+        date = datetime_format.get_date(request.form.get('DateOfService'))
+        year, month = date.year, date.month
         if not session['user']['role'] in get_admins():
             return redirect('/')
         else:
             print("here")
-            return redirect(url_for('report', id=user['_id']))
+            return report(id=rbt['_id'], year=year, month=month)
+            # return redirect(url_for('report', id=user['_id'], curr_year=datetime.datetime.now().year))
 
 
 @ app.route('/verify/<id>/<year>/<month>', methods=('GET', 'POST'))
@@ -607,6 +620,8 @@ def add(id=None):
 def verify(id, year, month):
     # log('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
+    date = datetime_format.get_date(entry['DateOfService'])
+    year, month = date.year, date.month
     if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['Supervisor']:
         # log('here')
         db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
@@ -619,7 +634,8 @@ def verify(id, year, month):
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         # print(rbt)
-        return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
+
+        return report(id=rbt['_id'], year=year, month=month)
 
 
 @ app.route('/meeting/<id>/<year>/<month>', methods=('GET', 'POST'))
@@ -627,6 +643,8 @@ def verify(id, year, month):
 def meeting(id, year, month):
     # log('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
+    date = datetime_format.get_date(entry['DateOfService'])
+    year, month = date.year, date.month
     # print(entry)
     if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['ProviderId']:
         # log('here')
@@ -634,14 +652,14 @@ def meeting(id, year, month):
         db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
             "MeetingForm": not en["MeetingForm"],
         }})
-    # log(db.Registry.find_one({"_id": ObjectId(id)}))
     if not session['user']['role'] in get_admins():
         return redirect(url_for('dashboard', month=month, year=year))
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         # print(rbt)
         if rbt:
-            return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
+            return report(id=rbt['_id'], year=year, month=month)
+            # return redirect(url_for('report', id=rbt["_id"], alert=None, year=year, month=month, curr_year=datetime.datetime.now().year))
         return redirect("/")
 
 
@@ -649,6 +667,8 @@ def meeting(id, year, month):
 @ login_required
 def delete_entry(id):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
+    date = datetime_format.get_date(entry['DateOfService'])
+    year, month = date.year, date.month,
     db.Registry.delete_one({"_id": ObjectId(id)})
 
     if entry:
@@ -656,7 +676,8 @@ def delete_entry(id):
             return redirect('/')
         else:
             rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-            return redirect(url_for('report', id=rbt['_id']))
+            return report(id=rbt['_id'], year=year, month=month)
+            # return redirect(url_for('report', id=rbt['_id'], curr_year=datetime.datetime.now().year))
 
 
 @ app.route('/edit/<id>/<year>/<month>', methods=('GET', 'POST'))
@@ -675,7 +696,7 @@ def edit(id, year, month):
         user = db.users.find_one({"ProviderId": entry['ProviderId']})
         print(entry)
         date = datetime_format.get_date(entry['DateOfService'])
-        year, month = date.year, date.month,
+        year, month = date.year, date.month
         return render_template('edit.html', role=session['user']['role'], entry=entry, supervisors=supervisors, id=user['_id'], codes=list(db.procedure_codes.find()), year=year, month=month)
 
     elif request.method == "POST":
@@ -696,7 +717,10 @@ def edit(id, year, month):
             return redirect('/')
         else:
             rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-            return redirect(url_for('report', id=rbt['_id'], year=year, month=month))
+            date = datetime_format.get_date(entry['DateOfService'])
+            year, month = date.year, date.month,
+            return report(id=rbt['_id'], year=year, month=month)
+            # return redirect(url_for('report', id=rbt['_id'], curr_year=datetime.datetime.now().year))
 
 
 @ app.route('/del/<id>', methods=('GET', 'POST'))
@@ -778,13 +802,13 @@ def filter_data():
     if not year:
         year = datetime.datetime.now().year
 
-    return dashboard(int(month), int(year))
+    return redirect(f"/dashboard/{month}/{year}")
 
 
 @ app.route("/filter/<year>/<month>", methods=['POST', 'GET'])
 def filter_data_args(year, month):
     # return redirect(url_for('dashboard', year=year, month=month))
-    return dashboard(int(month), int(year))
+    return redirect(f"/dashboard/{month}/{year}")
 
 
 @ app.route("/report/<year>/<month>/<id>")
@@ -852,7 +876,7 @@ def get_report(year, month, id):
                 }
 
                 db.PDFReport.insert_one(report_obj)
-                return redirect(url_for('report', id=id, alert=alert))
+                return redirect(url_for('report', id=id, alert=alert, curr_year=datetime.datetime.now().year))
             # return dashboard(year, month, alert={'error': 'Error generating report'})
         nm = month
         if nm < 10:
