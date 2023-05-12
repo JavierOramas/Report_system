@@ -882,11 +882,11 @@ def get_report(year, month, id):
             'debug-javascript': None,
             'enable-javascript': None
         }
-        config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
+        # config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
         filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker.pdf"
         log("pdf")
         pdfkit.from_string(template, f'report.pdf',
-                           options=options, configuration=config)
+                           options=options)
         log("pdf generated")
         sleep(1)
         return send_file(f'report.pdf', as_attachment=True)
