@@ -879,7 +879,7 @@ def get_report(year, month, id):
         nm = month
         if nm < 10:
             nm = '0'+str(nm)
-        filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker"
+        filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker.pdf"
         pdfkit.from_string(template, './report.pdf',
                            options=options)
         log("pdf generated")
