@@ -829,11 +829,10 @@ def get_report(year, month, id):
         entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
             'basic', year, month, user)
 
-    entries = [e for e in entries if e['MeetingForm']
-               == True and e['Verified']]
+    print(total_hours)
     supervisors = []
     if user and entries:
-        month_year = f'{month}/{year}'
+        month_year = f'{month} {year}'
 
         providers = []
         for entry in entries:
@@ -844,15 +843,24 @@ def get_report(year, month, id):
                 providers.append(entry["Supervisor"])
                 supervisors.append(superv)
 
+        # log(supervisors)
+        # supervisors = list(set(superviso
+        # rs))
         company = user['background_screening_type']
         date = user['background_date']
         exp_date = user['background_exp_date']
-        for e in entries:
-            e['DateOfService'] = datetime_format.get_date(
-                e['DateOfService']).strftime("%m/%d/%Y")
         try:
             template = render_template(
                 'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=total_hours, minimum_supervised=round(total_hours*0.05, 2), supervised_hours=round(supervised_time, 2), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
+            options = {
+                'page-size': 'A4',
+                # 'orientation': ,
+                'enable-local-file-access': None,  # to avoid blanks
+                'javascript-delay': 1000,
+                'no-stop-slow-scripts': None,
+                'debug-javascript': None,
+                'enable-javascript': None
+            }
         except:
             # if False:
             log("exception")
@@ -861,40 +869,15 @@ def get_report(year, month, id):
             if not session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)']:
                 return redirect(url_for('dashboard', year=year, month=month, alert=alert, report=False))
             else:
-                report_obj = {
-                    "providerId": user['providerId'],
-                    "year": year,
-                    "month": month
-                }
-
-                db.PDFReport.insert_one(report_obj)
-                return redirect(url_for('report', id=id, alert=alert, curr_year=datetime.datetime.now().year))
+                return redirect(url_for('report', id=id, alert=alert))
+                # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
             # return dashboard(year, month, alert={'error': 'Error generating report'})
-        nm = month
-        if nm < 10:
-            nm = '0'+str(nm)
-        options = {
-            'page-size': 'A4',
-            # 'orientation': ,
-            'enable-local-file-access': None,  # to avoid blanks
-            'javascript-delay': 1000,
-            'no-stop-slow-scripts': None,
-            'debug-javascript': None,
-            'enable-javascript': None
-        }
-        # config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
-        filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker.pdf"
-        # log(template)
-        log("pdf")
-        pdf_f = False
-        try:
-            pdf_f = pdfkit.from_string(template, 'report.pdf',
-                                       options=options)
-        except:
-            pass
-        log(pdf_f)
+
+        pdfkit.from_string(template, 'report.pdf', options=options)
         log("pdf generated")
         sleep(1)
+        return send_file('report.pdf', as_attachment=True)
+
         return send_file('./report.pdf', download_name={filename}, as_attachment=True)
         # except:
         #     log("Something went Wrong!")
