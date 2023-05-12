@@ -886,13 +886,14 @@ def get_report(year, month, id):
         if nm < 10:
             nm = '0'+str(nm)
         filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker.pdf"
-        try:
-            log("pdf")
-            pdfkit.from_string(template, f'reports/{filename}',
-                               options=options, configuration=config)
-            log("pdf generated")
-            sleep(1)
-            return send_file(f'reports/{filename}', as_attachment=True)
+        log("pdf")
+        pdfkit.from_string(template, f'reports/{filename}',
+
+                           try:
+                           options=options, configuration=config)
+        log("pdf generated")
+        sleep(1)
+        return send_file(f'reports/{filename}', as_attachment=True)
         except:
             log("Something went Wrong!")
             return dashboard(month, month, alert=None)
