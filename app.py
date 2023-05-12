@@ -272,9 +272,11 @@ def del_procedure_code(id):
     db.procedure_codes.delete_one({'_id': ObjectId(id)})
     return redirect(url_for('procedure_codes'))
 
+
 @app.route('/cancel/<id>/<year>/<month>')
-def redirecting(id,year,month):
+def redirecting(id, year, month):
     return report(id=id, year=year, month=month)
+
 
 @app.route('/user_report/<id>/<year>/<month>/<alert>', methods=["POST", "GET"])
 @app.route('/user_report/<id>/<year>/<month>', methods=["POST", "GET"])
@@ -881,12 +883,16 @@ def get_report(year, month, id):
         nm = month
         if nm < 10:
             nm = '0'+str(nm)
-        filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker"
-        pdfkit.from_string(template, f'reports/{filename}.pdf',
-                           options=options, configuration=config)
-        log("pdf generated")
-        sleep(1)
-        return send_file(f'reports/{filename}.pdf', as_attachment=True)
+        filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker.pdf"
+        try:
+            pdfkit.from_string(template, f'reports/{filename}',
+                               options=options, configuration=config)
+            log("pdf generated")
+            sleep(1)
+            return send_file(f'reports/{filename}', as_attachment=True)
+        except:
+            log("Something went Wrong!")
+            return dashboard(month, month, alert=alert)
     else:
         log("Something went Wrong!")
         return dashboard(month, month, alert=alert)
