@@ -322,9 +322,10 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue
             missing.append(i)
-        exp = supervised_time >= minimum_supervised and observed_with_client >= 1
+        # exp = supervised_time >= minimum_supervised and observed_with_client >= 1
+        exp = True
         role = user['role'] or 'rbt'
-        print(exp)
+        # print(exp)
         curr_year = int(curr_year)+1
         log("year:", year)
         log("month:", month)
@@ -891,7 +892,7 @@ def get_report(year, month, id):
         #     return dashboard(month, month, alert=None)
     else:
         log("Something went Wrong!")
-        return dashboard(month, month, alert=alert)
+        return dashboard(month, month)
 
 
 @app.errorhandler(404)
