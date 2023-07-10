@@ -6,3 +6,4 @@ report.pdf
 notebook.ipynb
 *.pdf
 */__pycache__/*
+.vscode/
