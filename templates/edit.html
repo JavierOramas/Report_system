@@ -1,82 +1,92 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="card-wrapper">
-        <div class="card">
+<div class="card-wrapper">
+    <div class="card">
 
-            <form name="edit_form" method="POST">
-                <label for="DateOfService">Date Of Service (MM/DD/YYYY)</label>
-                <input type="text" class="field" name="DateOfService" value="{% if entry['DateOfService'] != '' %}{{entry['DateOfService']}}{% endif %}"  required>
+        <form name="edit_form" method="POST">
+            <label for="DateOfService">Date Of Service (MM/DD/YYYY)</label>
+            <input type="text" class="field" name="DateOfService"
+                value="{% if entry['DateOfService'] != '' %}{{entry['DateOfService']}}{% endif %}" required>
 
-                <label for="MeetingDuration">MeetingDuration</label>
-                <input type="number" step="0.1" name="MeetingDuration" value={{entry['MeetingDuration']}} class="field" required>
+            <label for="MeetingDuration">MeetingDuration</label>
+            <input type="number" step="0.01" name="MeetingDuration" value={{entry['MeetingDuration']}} class="field"
+                required>
 
-                <label for="ProcedureCodeId">Procedure Code</label>
-                <select id="ProcedureCodeId" name="ProcedureCodeId" class="form-select">
-                    {% for code in codes %}
-                        <option value={{code['code']}} {% if entry['ProcedureCodeId']|string == code['code']|string %} selected {% endif%}>
-                            {{code['name']}}
-                        </option>
-                    {% endfor %}
-                </select>
+            <label for="ProcedureCodeId">Procedure Code</label>
+            <select id="ProcedureCodeId" name="ProcedureCodeId" class="form-select">
+                {% for code in codes %}
+                <option value={{code['code']}} {% if entry['ProcedureCodeId']|string==code['code']|string %} selected {%
+                    endif%}>
+                    {{code['name']}}
+                </option>
+                {% endfor %}
+            </select>
 
-                <label for="sup">Supervisor</label>
-                <select id="sup" name="sup" class="form-select">
-                    {% for supervisor in supervisors %}
-                        <option value={{supervisor['ProviderId']}} {% if entry['Supervisor']|string == supervisor['ProviderId']|string %} selected {% endif %}>
-                            {{supervisor['name']}}
-                        </option>
-                    {% endfor %}
-                </select>
+            <label for="sup">Supervisor</label>
+            <select id="sup" name="sup" class="form-select">
+                {% for supervisor in supervisors %}
+                <option value={{supervisor['ProviderId']}} {% if
+                    entry['Supervisor']|string==supervisor['ProviderId']|string %} selected {% endif %}>
+                    {{supervisor['name']}}
+                </option>
+                {% endfor %}
+            </select>
 
-                <label for="supervision">Supervision type</label>
-                <fieldset>
-                    <div id="supervision" class="radio_group">
-                        <input type="radio" id="individual" name="supervision_type" value='no' class="radio"  {% if entry['Individual'] == 'yes' %}checked{% endif %}/>
-                        <label for="individual">Individual</label>
-                        <input type="radio" id="group" name="supervision_type" value='yes' class="radio" {% if entry['Group'] == 'yes' %}checked{% endif %}/>
-                        <label for="group">Group</label>
-                    </div>
-                </fieldset>
-
-                <label for="mode_meeting">Mode Of Meeting</label>
-                <fieldset>
-                    <div id="mode_meeting" class="radio_group">
-                        <input type="radio" id="remote" name="meeting_type" value="Remote" class="radio" {% if entry['ModeofMeeting'] in ['Remote', 'remote'] %}checked{% endif %}/>
-                        <label for="remote">Remote</label>
-                        <input type="radio" id="in_person" name="meeting_type" value="In Person" class="radio" {% if entry['ModeofMeeting'] in ['In Person','in person'] %}checked{% endif %}/>
-                        <label for="in_person">In Person</label>
-                    </div>
-                </fieldset>
-
-                <label for="observed">Observed With Client</label>
-                <fieldset>
-                    <div id="observed" class="radio_group">
-                        <input type="radio" id="yes" name="observed" value="yes" class="radio" {% if entry['ObservedwithClient'] == 'yes' %}checked{% endif %}/>
-                        <label for="yes">Yes</label>
-                        <input type="radio" id="no" name="observed" value="no" class="radio" {% if entry['ObservedwithClient'] == 'no' %}checked{% endif %}/>
-                        <label for="no">No</label>
-                    </div>
-                </fieldset>
-
-
-                <div class="center">
-                    {% if role in ['admin','bcba', 'bcba (l)'] %}
-                    <button class='btn btn-danger' onclick="goBack()">Cancel</button>
-                    
-                    <script>
-                        function goBack() {
-                            window.history.back();
-                        }
-                    </script>
-                    {% else %}
-                    <a class='btn btn-danger' href='/filter/{{year}}/{{month}}'>Cancel</a>
-                    {% endif %}
-                        
-                    <input style="float:left; margin:auto" type="submit" value="Submit" class="btn btn-primary">
+            <label for="supervision">Supervision type</label>
+            <fieldset>
+                <div id="supervision" class="radio_group">
+                    <input type="radio" id="individual" name="supervision_type" value='no' class="radio" {% if
+                        entry['Individual']=='yes' %}checked{% endif %} />
+                    <label for="individual">Individual</label>
+                    <input type="radio" id="group" name="supervision_type" value='yes' class="radio" {% if
+                        entry['Group']=='yes' %}checked{% endif %} />
+                    <label for="group">Group</label>
                 </div>
-            </form>
-            
-        </div>
-        </div>
-        {% endblock %}
+            </fieldset>
+
+            <label for="mode_meeting">Mode Of Meeting</label>
+            <fieldset>
+                <div id="mode_meeting" class="radio_group">
+                    <input type="radio" id="remote" name="meeting_type" value="Remote" class="radio" {% if
+                        entry['ModeofMeeting'] in ['Remote', 'remote' ] %}checked{% endif %} />
+                    <label for="remote">Remote</label>
+                    <input type="radio" id="in_person" name="meeting_type" value="In Person" class="radio" {% if
+                        entry['ModeofMeeting'] in ['In Person','in person'] %}checked{% endif %} />
+                    <label for="in_person">In Person</label>
+                </div>
+            </fieldset>
+
+            <label for="observed">Observed With Client</label>
+            <fieldset>
+                <div id="observed" class="radio_group">
+                    <input type="radio" id="yes" name="observed" value="yes" class="radio" {% if
+                        entry['ObservedwithClient']=='yes' %}checked{% endif %} />
+                    <label for="yes">Yes</label>
+                    <input type="radio" id="no" name="observed" value="no" class="radio" {% if
+                        entry['ObservedwithClient']=='no' %}checked{% endif %} />
+                    <label for="no">No</label>
+                </div>
+            </fieldset>
+
+
+            <div class="center">
+                {% if role in ['admin','bcba', 'bcba (l)'] %}
+                <button class='btn btn-danger' onclick="goBack()">Cancel</button>
+
+                <script>
+                    function goBack() {
+                        window.history.back();
+                    }
+                </script>
+                {% else %}
+                <a class='btn btn-danger' href='/filter/{{year}}/{{month}}'>Cancel</a>
+                {% endif %}
+
+                <input style="float:left; margin:auto" type="submit" value="Submit" class="btn btn-primary">
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}
