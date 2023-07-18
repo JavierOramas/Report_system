@@ -349,7 +349,7 @@ def edit_total_hours(id, year, month):
             h = 0
         else:
             h = total_hours['TotalTime']
-        return render_template("edit_total_hours.html", id=session['user']['ProviderId'], month=month, year=year, total_hours=h)
+        return render_template("edit_total_hours.html", id=id, month=month, year=year, total_hours=h)
     else:
         number = request.form.get('number')
         try:
@@ -362,7 +362,7 @@ def edit_total_hours(id, year, month):
         update = {'$set': {'TotalTime': round_half_up(number)}}
         db.TotalHours.update_one(filter, update, upsert=True)
         
-        return redirect(f"/user_report/{id}/{year}/{month}")
+        return redirect(f"/")
 
 def get_roles(users):
     roles = ['all']
