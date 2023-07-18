@@ -337,6 +337,11 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
 
 @app.route("/edit_total_hours/<id>/<year>/<month>", methods=["POST", "GET"])
 def edit_total_hours(id, year, month):
+    
+    if year is None and month is None:
+        year = datetime.datetime.now().year
+        month = datetime.datetime.now().month-1
+
     if request.method == "GET":
         return render_template("edit_total_hours.html", id=id, month=month, year=year)
     else:
