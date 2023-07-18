@@ -351,7 +351,7 @@ def edit_total_hours(id, year, month):
     update = {'$set': {'TotalTime': round_half_up(number)}}
     db.TotalHours.update_one(filter, update, upsert=True)
     
-    return url_for(report, id, year=year, month=month)
+    return url_for('report', id, year=year, month=month)
 
 def get_roles(users):
     roles = ['all']
