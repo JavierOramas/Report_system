@@ -343,7 +343,8 @@ def edit_total_hours(id, year, month):
         month = datetime.datetime.now().month-1
 
     if request.method == "GET":
-        total_hours = db.TotalHours.find_one({'ProviderId': id, 'Month': month, 'Year': year})
+        # total_hours = db.TotalHours.find_one({'ProviderId': id, 'Month': month, 'Year': year})
+        total_hours = db.TotalHours.find_one({'ProviderId': user['providerId'], 'Month': month, 'Year': year})
         if not total_hours:
             h = 0
         else:

@@ -47,6 +47,7 @@ report, observed_with_client, missing, exp) %}
         {% elif role not in ['BCBA', 'BCBA (L)', 'BCaBA'] %}
         <div class="row card">
             <h1>This Month Report Status:</h1>
+        
             <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours:
                 {{total_hours}} {{total_hours or 0}}h <a href="/edit_total_hours/{{user['ProviderId']}}/{{year}}/{{month}}"> edit </a> </p>
             <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours with
