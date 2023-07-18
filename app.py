@@ -343,6 +343,7 @@ def edit_total_hours(id, year, month):
         month = datetime.datetime.now().month-1
 
     if request.method == "GET":
+        total_hours = db.TotalHours.find_one({'ProviderId': id, 'Month': month, 'Year': year})
         return render_template("edit_total_hours.html", id=id, month=month, year=year)
     else:
         number = request.form.get('number')
@@ -352,11 +353,11 @@ def edit_total_hours(id, year, month):
             error = "Invalid number. Please enter a valid float."
     
     # Update the document in the 'TotalHours' collection
-    filter = {'ProviderId': id, 'Month': month, 'Year': year}
-    update = {'$set': {'TotalTime': round_half_up(number)}}
-    db.TotalHours.update_one(filter, update, upsert=True)
-    
-    return redirect(f"/user_report/{id}/{year}/{month}")
+        filter = {'ProviderId': id, 'Month': month, 'Year': year}
+        update = {'$set': {'TotalTime': round_half_up(number)}}
+        db.TotalHours.update_one(filter, update, upsert=True)
+        
+        return redirect(f"/user_report/{id}/{year}/{month}")
 
 def get_roles(users):
     roles = ['all']
