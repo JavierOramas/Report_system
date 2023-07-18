@@ -352,7 +352,7 @@ def edit_total_hours(id, year, month):
         except ValueError:
             error = "Invalid number. Please enter a valid float."
     
-    # Update the document in the 'TotalHours' collection
+        # Update the document in the 'TotalHours' collection
         filter = {'ProviderId': id, 'Month': month, 'Year': year}
         update = {'$set': {'TotalTime': round_half_up(number)}}
         db.TotalHours.update_one(filter, update, upsert=True)

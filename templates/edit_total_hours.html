@@ -3,17 +3,15 @@
 {% block content %}
 <div class="card-wrapper">
     <div class="card">
-            <p>
-                Year:{{year}}
-                month:{month}
-                hours:{{total_hours}}
-            </p>
-            <form action="/edit_total_hours/{{id}}/{{year}}/{{month}}" method="POST">
-                <label for="number">Number:</label>
-                <input type="text" id="number" name="number" required pattern="\d+(\.\d+)?" title="Enter a valid number", value="{{total_hours}}">
-                <br>
-                <input type="submit" value="Update">
-            </form>
+        <p>{{total_hours}}
+        </p>
+        <form action="/edit_total_hours/{{id}}/{{year}}/{{month}}" method="POST">
+            <label for="number">Number:</label>
+            <input type="text" id="number" name="number" required pattern="\d+(\.\d+)?" title="Enter a valid number" ,
+                value="{{total_hours['TotalTime']" ]}}">
+            <br>
+            <input type="submit" value="Update">
+        </form>
     </div>
 </div>
 {% endblock %}
