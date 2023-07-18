@@ -349,7 +349,7 @@ def edit_total_hours(id, year, month):
             h = 0
         else:
             h = total_hours['TotalTime']
-        return render_template("edit_total_hours.html", id=id, month=month, year=year, total_hours=h)
+        return render_template("edit_total_hours.html", id=session['user']['providerId'], month=month, year=year, total_hours=h)
     else:
         number = request.form.get('number')
         try:
