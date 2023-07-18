@@ -344,7 +344,11 @@ def edit_total_hours(id, year, month):
 
     if request.method == "GET":
         total_hours = db.TotalHours.find_one({'ProviderId': id, 'Month': month, 'Year': year})
-        return render_template("edit_total_hours.html", id=id, month=month, year=year, total_hours=total_hours['TotalTime'])
+        if not total_hours:
+            h = 0
+        else:
+            h = total_hours['TotalTime']
+        return render_template("edit_total_hours.html", id=id, month=month, year=year, total_hours=h)
     else:
         number = request.form.get('number')
         try:
