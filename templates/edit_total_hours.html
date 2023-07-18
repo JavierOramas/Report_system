@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card-wrapper">
+    <div class="card">
+            <form action="/edit_total_hours/{{id}}/{{year}}/{{month}}" method="POST">
+                <label for="number">Number:</label>
+                <input type="text" id="number" name="number" required pattern="\d+(\.\d+)?" title="Enter a valid number">
+                <br>
+                <input type="submit" value="Update">
+            </form>
+    </div>
+</div>
+{% endblock %}

@@ -335,6 +335,23 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
 
 # Dashoard for client (login Needed)
 
+@app.route("edit_total_hours/<id>/<year>/<month>", methods=["POST", "GET"])
+def edit_total_hours(id, year, month):
+    if request.method == "GET":
+        return render_template("edit_total_hours.html", id=id, month=month, year=year)
+    else:
+        number = request.form.get('number')
+        try:
+            number = float(number)
+        except ValueError:
+            error = "Invalid number. Please enter a valid float."
+    
+    # Update the document in the 'TotalHours' collection
+    filter = {'ProviderId': id, 'Month': month, 'Year': year}
+    update = {'$set': {'TotalTime': round_half_up(number)}}
+    db.TotalHours.update_one(filter, update, upsert=True)
+    
+    return url_for(report, id, year=year, month=month)
 
 def get_roles(users):
     roles = ['all']

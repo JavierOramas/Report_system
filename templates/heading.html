@@ -1,61 +1,66 @@
 {% from 'topnav.html' import topnav %}
-{% macro heading(id,user ,session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing, exp) %}
+{% macro heading(id,user ,session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month,
+report, observed_with_client, missing, exp) %}
 
-{% if report == True and ( supervised_time < minimum_supervised or observed_with_client < 1 ) %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
+{% if report == True and ( supervised_time < minimum_supervised or observed_with_client < 1 ) %} <div
+    class="alert alert-warning alert-dismissible fade show" role="alert">
     <p> Some requirements are not met or entries have not been verified by supervisor</p>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endif %}
+    </div>
+    {% endif %}
 
-{{ topnav(id,user ,session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing, exp) }}
+    {{ topnav(id,user ,session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month,
+    report, observed_with_client, missing, exp) }}
 
-{% if report == True and missing != [] %}
-<div class="alert alert-warning alert-dismissible" role="alert">
-    <p> The RBT data is incomplete, missing the following info (
-    {% for i in missing %}
-    {{i}}
-    {% endfor %}
-    ) </p>
-</div>
-{% endif %}
-
-</div>
-
- {% if role in ['admin'] %}
- <div class="container card">
-    <div class='row' >
-        <div class="col-sm">
-            <h1>Upload your CSV file</h1>
-            <form method="POST" action="/dashboard" enctype="multipart/form-data">
-                <p><input class='form-control' type="file" accept=".csv" name="file"></p>
-                <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
-            </form>
-        </div>
-        <div class="col-sm">
-            <h1>Upload Users CSV</h1>
-            <form method="POST" action="/dashboard/providers" enctype="multipart/form-data">
-                <p><input class='form-control' type="file" accept=".csv" name="file"></p>
-                <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
-            </form>
-        </div>
+    {% if report == True and missing != [] %}
+    <div class="alert alert-warning alert-dismissible" role="alert">
+        <p> The RBT data is incomplete, missing the following info (
+            {% for i in missing %}
+            {{i}}
+            {% endfor %}
+            ) </p>
+    </div>
+    {% endif %}
 
     </div>
 
- {% elif role not in ['BCBA', 'BCBA (L)', 'BCaBA'] %}
-<div class="row card">
-    <h1>This Month Report Status:</h1>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours: {{total_hours or 0}}h</p>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours with Meeting Form / Minimum Requirement: {{supervised_time or 0}}h / {{minimum_supervised or 0}}h </p>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" >Group Supervision Meetings: {{meeting_group or 0}}</p>
-    <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">Sessions observed with client / Minimum requirement: {{observed_with_client or 0}} / 1 </p>
-    
-    {% if meeting_group and supervised_time and supervised_time < minimum_supervised and meeting_group < 1 %}
-        <p>You have not met the minimum supervised hours requirement</p>
-    {% endif %}
-</div>
+    {% if role in ['admin'] %}
+    <div class="container card">
+        <div class='row'>
+            <div class="col-sm">
+                <h1>Upload your CSV file</h1>
+                <form method="POST" action="/dashboard" enctype="multipart/form-data">
+                    <p><input class='form-control' type="file" accept=".csv" name="file"></p>
+                    <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
+                </form>
+            </div>
+            <div class="col-sm">
+                <h1>Upload Users CSV</h1>
+                <form method="POST" action="/dashboard/providers" enctype="multipart/form-data">
+                    <p><input class='form-control' type="file" accept=".csv" name="file"></p>
+                    <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
+                </form>
+            </div>
 
- {% endif %}
+        </div>
 
- </div>
-{% endmacro %}
+        {% elif role not in ['BCBA', 'BCBA (L)', 'BCaBA'] %}
+        <div class="row card">
+            <h1>This Month Report Status:</h1>
+            <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours:
+                {{total_hours or 0}}h <a href="edit_total_hours/{{id}}/{{year}}/{{month}}"> </p>
+            <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours with
+                Meeting Form / Minimum Requirement: {{supervised_time or 0}}h / {{minimum_supervised or 0}}h </p>
+            <p data-bs-toggle="tooltip" data-bs-placement="right">Group Supervision Meetings: {{meeting_group or 0}}</p>
+            <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">
+                Sessions observed with client / Minimum requirement: {{observed_with_client or 0}} / 1 </p>
+
+            {% if meeting_group and supervised_time and supervised_time < minimum_supervised and meeting_group < 1 %}
+                <p>You have not met the minimum supervised hours requirement</p>
+                {% endif %}
+        </div>
+
+        {% endif %}
+
+    </div>
+    {% endmacro %}
