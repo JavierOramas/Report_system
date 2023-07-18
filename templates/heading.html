@@ -48,7 +48,7 @@ report, observed_with_client, missing, exp) %}
         <div class="row card">
             <h1>This Month Report Status:</h1>
             <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours:
-                {{total_hours or 0}}h <a href="edit_total_hours/{{id}}/{{year}}/{{month}}"> edit </a> </p>
+                {{total_hours or 0}}h <a href="/edit_total_hours/{{id}}/{{year}}/{{month}}"> edit </a> </p>
             <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours with
                 Meeting Form / Minimum Requirement: {{supervised_time or 0}}h / {{minimum_supervised or 0}}h </p>
             <p data-bs-toggle="tooltip" data-bs-placement="right">Group Supervision Meetings: {{meeting_group or 0}}</p>
