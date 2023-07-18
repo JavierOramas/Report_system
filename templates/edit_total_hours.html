@@ -3,7 +3,7 @@
 {% block content %}
 <div class="card-wrapper">
     <div class="card">
-        <form action="/edit_total_hours/{{id}}/{{year}}/{{month}}" method="POST">
+        <form action="/edit_total_hours/{{ProviderId}}/{{year}}/{{month}}" method="POST">
             <label for="number">Number:</label>
             <input type="text" id="number" name="number" required pattern="\d+(\.\d+)?" title="Enter a valid number" ,
                 value="{{total_hours['TotalTime']}}">
