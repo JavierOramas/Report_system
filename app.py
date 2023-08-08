@@ -3,6 +3,7 @@ from inspect import signature
 from time import sleep
 from logger import log
 from colorama import Cursor
+import pandas as pd
 from registry.models import Registry
 from super_roles.super_roles import get_admins, get_supervisors
 from user import routes
