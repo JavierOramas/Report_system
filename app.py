@@ -342,11 +342,6 @@ def edit_total_hours(id, year, month):
         year = datetime.datetime.now().year
         month = datetime.datetime.now().month-1
 
-    try:
-        user = db.users.find_one({"_id": ObjectId(id)})
-    except:
-        user = db.users.find_one({"_id": id})
-
     if request.method == "GET":
         # total_hours = db.TotalHours.find_one({'ProviderId': id, 'Month': month, 'Year': year})
         total_hours = db.TotalHours.find_one({'ProviderId': user['ProviderId'], 'Month': month, 'Year': year})
@@ -810,12 +805,35 @@ def procedures():
     else:
         pass
 
-
+def required_columns(data):
+    
+    columns = [
+        "ProviderId",
+        "ClientId",
+        "ProcedureCodeId",
+        "TimeWorkedInHours",
+        "DateOfService",
+        "DateTimeFrom",
+        "DateTimeTo",
+        "MeetingDuration",
+    ]
+    
+    for i in columns:
+        if not i in data:
+            return False
 @ app.route('/upload', methods=['POST', 'GET'])
 def upload():
+    
+    data = pd.read_csv('static/files/data.csv')
+    
+    if not required_columns(data):
+        alert = {"Error": 'File uploaded is not valid'}
+        session['messages'] = alert
+        return redirect(url_for('dashboard'))
+
+    
     status_code = Registry().add_data(db)
     alert = {"correct": 'File uploaded and processed successfully'}
-    print(alert)
     session['messages'] = alert
     return redirect(url_for('dashboard'))
 
