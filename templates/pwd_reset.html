@@ -1,19 +1,33 @@
-{% extends "base.html" %} {% block content %}
-<div class="card-wrapper">
-  <div class="card">
-    {% if sent == True%}
-    <p>Please check your emil</p>
-    {% else %}
-    <div class="center">
-      <img src="/static/Logo.jpg" alt="logo" class="logo" />
-    </div>
-    <h1 class="center">Enter email</h1>
-    <form name="pwd_reset" method="POST">
-      <label for="email">Email</label>
-      <input type="text" name="email" class="field" required />
+{% extends "base.html" %} 
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="center">
+                        <img src="/static/Logo.jpg" alt="logo" class="logo" />
+                    </div>
+                    <h1 class="text-center">Forgot Password</h1>
+                </div>
+                <div class="card-body">
+                    {% if sent == True %}
+                    <p class="text-success">Please check your email for further instructions.</p>
+                    {% else %}
+                    <form name="pwd_reset" method="POST">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" required />
+                        </div>
 
-      <input type="submit" value="Log In" class="btn btn-primary" />
-    </form>
-    {% endif%}
-  </div>
+                        <div class="d-grid gap-2">
+                            <input type="submit" value="Send Reset Link" class="btn btn-primary" />
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}

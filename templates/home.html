@@ -1,24 +1,35 @@
-{% extends "base.html" %} {% block content %}
-<div class="card-wrapper">
-  {% if register == False %}
-  <div class="card">
-    <div class="center">
-      <img src="/static/Logo.jpg" alt="logo" class="logo" />
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <img src="/static/favicon.png" alt="logo">
+                    <h1 class="text-center">Login</h1>
+                </div>
+                <div class="card-body">
+                    <p class="text-center mb-4">Welcome to AmericanBehavioralSolutions</p>
+                    <form name="login_form" method="POST">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="text" name="email" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" required>
+                        </div>
+
+                        <p class="error error--hidden text-danger"></p>
+
+                        <div class="d-grid gap-2">
+                            <input type="submit" value="Log In" class="btn btn-primary">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <h1 class="center">Login</h1>
-    <form name="login_form" method="POST">
-      <label for="email">Email</label>
-      <input type="text" name="email" class="field" required />
-
-      <label for="password">Password</label>
-      <input type="password" name="password" class="field" required />
-
-      <p class="error error--hidden"></p>
-
-      <input type="submit" value="Log In" class="btn btn-primary" />
-    </form>
-    
-  </div>
-  {% endif %}
 </div>
 {% endblock %}

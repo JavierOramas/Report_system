@@ -2,30 +2,29 @@
 {% macro heading(id,user ,session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month,
 report, observed_with_client, missing, exp, face_to_face) %}
 
-{% if report == True and ( supervised_time < minimum_supervised or observed_with_client < 1 ) %} <div
-    class="alert alert-warning alert-dismissible fade show" role="alert">
-    <p> Some requirements are not met or entries have not been verified by supervisor</p>
+{% if report == True and (supervised_time < minimum_supervised or observed_with_client < 1) %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <p>Some requirements are not met or entries have not been verified by supervisor</p>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endif %}
+</div>
+{% endif %}
 
-    {{ topnav(id,user ,session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month,
-    report, observed_with_client, missing, exp) }}
+{{ topnav(id, user, session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing, exp) }}
 
-    {% if report == True and missing != [] %}
-    <div class="alert alert-warning alert-dismissible" role="alert">
-        <p> The RBT data is incomplete, missing the following info (
-            {% for i in missing %}
-            {{i}}
-            {% endfor %}
-            ) </p>
-    </div>
-    {% endif %}
+{% if report == True and missing != [] %}
+<div class="alert alert-warning alert-dismissible" role="alert">
+    <p>The RBT data is incomplete, missing the following info (
+        {% for i in missing %}
+        {{ i }}
+        {% endfor %}
+        )</p>
+</div>
+{% endif %}
 
-    </div>
+<div class="container">
 
     {% if role in ['admin'] %}
-    <div class="container card">
+    <div class="card">
         <div class="row">
             <div class="col-md">
                 <h1>Upload your CSV file</h1>
@@ -47,10 +46,10 @@ report, observed_with_client, missing, exp, face_to_face) %}
             </div>
         </div>
     </div>
-{% elif role not in ['BCBA', 'BCBA (L)', 'BCaBA'] %}
+    {% elif role not in ['BCBA', 'BCBA (L)', 'BCaBA'] %}
     <div class="row card">
         <h1>This Month Report Status:</h1>
-        <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours:
+        <p data-bs-toggle="tooltip" data-bs-placement="right" title="Total hours this month">Total Hours:
             {{ total_hours or 0 }}h <a href="/edit_total_hours/{{ user['ProviderId'] }}/{{ year }}/{{ month }}">✏️</a>
         </p>
         <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">
@@ -58,15 +57,14 @@ report, observed_with_client, missing, exp, face_to_face) %}
         </p>
         <p data-bs-toggle="tooltip" data-bs-placement="right">Group Supervision Meetings: {{ meeting_group or 0 }}</p>
         <p data-bs-toggle="tooltip" data-bs-placement="right">Face To Face Contacts / Minimum Requirement: {{ face_to_face or 0 }}/2</p>
-        <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">
+        <p data-bs-toggle="tooltip" data-bs-placement="right" title="Needed one meeting observed with client">
             Sessions observed with client / Minimum requirement: {{ observed_with_client or 0 }} / 1
         </p>
         {% if meeting_group and supervised_time and supervised_time < minimum_supervised and meeting_group < 1 %}
-            <p>You have not met the minimum supervised hours requirement</p>
+        <p>You have not met the minimum supervised hours requirement</p>
         {% endif %}
     </div>
-{% endif %}
+    {% endif %}
+</div>
 
-
-    </div>
     {% endmacro %}

@@ -245,7 +245,7 @@ def role_manager():
         roles = db.roles.find()
         roles = list(roles)
         print(roles)
-        return render_template('roles.html', roles=list(roles))
+        return render_template('roles.html', role=session['user']['role'], roles=list(roles))
 
 
 @app.route('/del/role/<id>')
