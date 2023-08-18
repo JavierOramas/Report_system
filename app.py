@@ -127,6 +127,7 @@ def get_entries(role, year, month, user):
         if role != None:
             # print("here")
             # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
+            print(user['providerId'])
             total_hours = db.TotalHours.find_one({'ProviderId':
                                                   user['providerId'], 'Month': month, 'Year': year})
             # print(total_hours)
@@ -344,8 +345,9 @@ def edit_total_hours(id, year, month):
         month = datetime.datetime.now().month-1
 
     if request.method == "GET":
-        # total_hours = db.TotalHours.find_one({'ProviderId': id, 'Month': month, 'Year': year})
-        total_hours = db.TotalHours.find_one({'ProviderId': user['ProviderId'], 'Month': month, 'Year': year})
+        criteria = {'ProviderId': int(id), 'Month': int(month), 'Year': int(year)}
+        total_hours = db.TotalHours.find_one(criteria)
+        
         if not total_hours:
             h = 0
         else:
@@ -359,8 +361,8 @@ def edit_total_hours(id, year, month):
             error = "Invalid number. Please enter a valid float."
     
         # Update the document in the 'TotalHours' collection
-        filter = {'ProviderId': user['ProviderId'],
-                  'Month': month, 'Year': year}
+        filter = {'ProviderId': int(id),
+                  'Month': int(month), 'Year': int(year)}
         update = {'$set': {'TotalTime': round_half_up(number)}}
         db.TotalHours.update_one(filter, update, upsert=True)
         
@@ -397,7 +399,7 @@ def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now(
     users = sorted(users, key=lambda d: (d['role'], d['name']))
     entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
         role, year, month, session['user'])
-
+    
     if role in get_supervisors():
         us = inspect_supervisor(
             db=db, year=year, month=month, pid=session['user']['providerId'])
@@ -430,6 +432,7 @@ def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now(
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue
             missing.append(i)
+
 
     return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 3), minimum_supervised=round_half_up(5/100*total_hours, 3), supervised_hours=round_half_up(supervised_time, 3), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
 
@@ -816,19 +819,25 @@ def required_columns(data):
         "DateOfService",
         "DateTimeFrom",
         "DateTimeTo",
-        "MeetingDuration",
     ]
-    
+    missing = []
     for i in columns:
         if not i in data:
-            return False
+            missing.append(i) 
+    
+    return missing
+            
+            
 @ app.route('/upload', methods=['POST', 'GET'])
 def upload():
     
     data = pd.read_csv('static/files/data.csv')
     
-    if not required_columns(data):
-        alert = {"Error": 'File uploaded is not valid'}
+    
+    missing = required_columns(data)
+    
+    if len(missing) > 0:
+        alert = {"Error": f'File uploaded is not valid, missing: {missing}'}
         session['messages'] = alert
         return redirect(url_for('dashboard'))
 
