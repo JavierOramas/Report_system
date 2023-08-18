@@ -26,43 +26,47 @@ report, observed_with_client, missing, exp, face_to_face) %}
 
     {% if role in ['admin'] %}
     <div class="container card">
-        <div class='row'>
-            <div class="col-sm">
+        <div class="row">
+            <div class="col-md">
                 <h1>Upload your CSV file</h1>
                 <form method="POST" action="/dashboard" enctype="multipart/form-data">
-                    <p><input class='form-control' type="file" accept=".csv" name="file"></p>
-                    <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
+                    <div class="mb-3">
+                        <input class="form-control" type="file" accept=".csv" name="file">
+                    </div>
+                    <button class="btn btn-secondary" type="submit">Submit</button>
                 </form>
             </div>
-            <div class="col-sm">
+            <div class="col-md">
                 <h1>Upload Users CSV</h1>
                 <form method="POST" action="/dashboard/providers" enctype="multipart/form-data">
-                    <p><input class='form-control' type="file" accept=".csv" name="file"></p>
-                    <p><input class='btn btn-secondary' type="submit" value="Submit"></p>
+                    <div class="mb-3">
+                        <input class="form-control" type="file" accept=".csv" name="file">
+                    </div>
+                    <button class="btn btn-secondary" type="submit">Submit</button>
                 </form>
             </div>
-
         </div>
-
-        {% elif role not in ['BCBA', 'BCBA (L)', 'BCaBA'] %}
-        <div class="row card">
-            <h1>This Month Report Status:</h1>
-            <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours:
-            {{total_hours or 0}}h <a href="/edit_total_hours/{{user['ProviderId']}}/{{year}}/{{month}}"> ✏️ </a> </p>
-            <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours with
-                Meeting Form / Minimum Requirement: {{supervised_time or 0}}h / {{minimum_supervised or 0}}h </p>
-            <p data-bs-toggle="tooltip" data-bs-placement="right">Group Supervision Meetings: {{meeting_group or 0}}</p>
-            <p data-bs-toggle="tooltip" data-bs-placement="right">Face To Face Contacts / Minimum Requirement: {{face_to_face or 0}}/2</p>
-            
-            <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">
-                Sessions observed with client / Minimum requirement: {{observed_with_client or 0}} / 1 </p>
-
-            {% if meeting_group and supervised_time and supervised_time < minimum_supervised and meeting_group < 1 %}
-                <p>You have not met the minimum supervised hours requirement</p>
-                {% endif %}
-        </div>
-
+    </div>
+{% elif role not in ['BCBA', 'BCBA (L)', 'BCaBA'] %}
+    <div class="row card">
+        <h1>This Month Report Status:</h1>
+        <p data-bs-toggle="tooltip" data-bs-placement="right" title="total hours this month">Total Hours:
+            {{ total_hours or 0 }}h <a href="/edit_total_hours/{{ user['ProviderId'] }}/{{ year }}/{{ month }}">✏️</a>
+        </p>
+        <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">
+            Supervised Hours with Meeting Form / Minimum Requirement: {{ supervised_time or 0 }}h / {{ minimum_supervised or 0 }}h
+        </p>
+        <p data-bs-toggle="tooltip" data-bs-placement="right">Group Supervision Meetings: {{ meeting_group or 0 }}</p>
+        <p data-bs-toggle="tooltip" data-bs-placement="right">Face To Face Contacts / Minimum Requirement: {{ face_to_face or 0 }}/2</p>
+        <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">
+            Sessions observed with client / Minimum requirement: {{ observed_with_client or 0 }} / 1
+        </p>
+        {% if meeting_group and supervised_time and supervised_time < minimum_supervised and meeting_group < 1 %}
+            <p>You have not met the minimum supervised hours requirement</p>
         {% endif %}
+    </div>
+{% endif %}
+
 
     </div>
     {% endmacro %}

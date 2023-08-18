@@ -77,6 +77,7 @@
                             {% endfor %}
                         </tr>
                         {% for entry in entries %}
+                        {% if entry["Verified"] == True %}
                         <tr>
                             <td> <a type="button" href="/meeting/{{ entry['_id'] }}/{{year}}/{{month}}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
                             {% if entry['ProcedureCodeId']|int in code_id%}
@@ -123,6 +124,7 @@
                                   </div>
                             </td>
                         </tr>
+                        {% endif %}
                         {% endfor %}
                     </table>
                 </div>
