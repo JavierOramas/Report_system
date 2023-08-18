@@ -1,6 +1,6 @@
 {% from 'topnav.html' import topnav %}
 {% macro heading(id,user ,session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month,
-report, observed_with_client, missing, exp) %}
+report, observed_with_client, missing, exp, face_to_face) %}
 
 {% if report == True and ( supervised_time < minimum_supervised or observed_with_client < 1 ) %} <div
     class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -52,6 +52,8 @@ report, observed_with_client, missing, exp) %}
             <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">Supervised Hours with
                 Meeting Form / Minimum Requirement: {{supervised_time or 0}}h / {{minimum_supervised or 0}}h </p>
             <p data-bs-toggle="tooltip" data-bs-placement="right">Group Supervision Meetings: {{meeting_group or 0}}</p>
+            <p data-bs-toggle="tooltip" data-bs-placement="right">Face To Face Contacts / Minimum Requirement: {{face_to_face or 0}}/2</p>
+            
             <p data-bs-toggle="tooltip" data-bs-placement="right" title="needed one meeting observed with client">
                 Sessions observed with client / Minimum requirement: {{observed_with_client or 0}} / 1 </p>
 

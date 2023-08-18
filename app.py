@@ -95,6 +95,7 @@ def get_entries(role, year, month, user):
                 dates.append(entry['DateOfService'])
                 temp.append(entry)
     entries = temp
+    face_to_face = len(entries)
     # print(temp)
     entries = sorted(entries, key=lambda d: d['DateOfService'])
 
@@ -140,7 +141,7 @@ def get_entries(role, year, month, user):
             total_hours = 0
     # print(total_hours)
     # print(min_year)
-    return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors), observed_with_client
+    return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors), observed_with_client, face_to_face
 
 
 def get_pending(role, user):
@@ -301,7 +302,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
         user['providerId'] = user['ProviderId']
         log("year:", year)
         log("month:", month)
-        entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
+        entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face = get_entries(
             'basic', year, month, user)
         log("entries:", len(entries))
 
@@ -331,7 +332,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
         curr_year = int(curr_year)+1
         log("year:", year)
         log("month:", month)
-        return render_template("user_work.html", id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
+        return render_template("user_work.html", face_to_face = face_to_face,  id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
 
     return redirect("/")
 
@@ -397,7 +398,7 @@ def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now(
     # if role == 'basic':
     users = db.users.find()
     users = sorted(users, key=lambda d: (d['role'], d['name']))
-    entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
+    entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face = get_entries(
         role, year, month, session['user'])
     
     if role in get_supervisors():
@@ -434,7 +435,7 @@ def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now(
             missing.append(i)
 
 
-    return render_template('dashboard.html', role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 3), minimum_supervised=round_half_up(5/100*total_hours, 3), supervised_hours=round_half_up(supervised_time, 3), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
+    return render_template('dashboard.html', face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 3), minimum_supervised=round_half_up(5/100*total_hours, 3), supervised_hours=round_half_up(supervised_time, 3), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
 
 # Only admins will see this page and it will let edit users and provider ids
 
@@ -888,7 +889,7 @@ def get_report(year, month, id):
 
     if user and "ProviderId" in user:
         user['providerId'] = user['ProviderId']
-        entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client = get_entries(
+        entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face = get_entries(
             'basic', year, month, user)
 
     print(total_hours)
