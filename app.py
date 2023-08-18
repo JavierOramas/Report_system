@@ -69,7 +69,7 @@ def get_entries(role, year, month, user):
         if 'ProviderId' in user and user['ProviderId'] != '' and user['ProviderId'] != None:
             user['providerId'] = user['ProviderId']
         else:
-            return [], 0, 0, [], 0, 0, [], 0
+            return [], 0, 0, [], 0, 0, [], 0, 0
 
     entries = db.Registry.find(
         {'ProviderId': int(str(user['providerId']))})
@@ -95,7 +95,6 @@ def get_entries(role, year, month, user):
                 dates.append(entry['DateOfService'])
                 temp.append(entry)
     entries = temp
-    face_to_face = len(entries)
     # print(temp)
     entries = sorted(entries, key=lambda d: d['DateOfService'])
 
@@ -103,7 +102,9 @@ def get_entries(role, year, month, user):
     supervised_time = 0
     observed_with_client = 0
     meetings = 0
-    total_hours = 0            # print(entry['Supervisor'])
+    total_hours = 0  
+    face_to_face = 0
+    # print(entry['Supervisor'])
     # print(supervisor)
 
     # print(entries, len(entries))
@@ -115,6 +116,7 @@ def get_entries(role, year, month, user):
         # i['MeetingDuration'] = i['MeetingDuration']
         # print(i['MeetingDuration'])
         if i['Verified'] == True and i['MeetingForm'] == True:
+            face_to_face += 1
             supervised_time += i['MeetingDuration']
 
         # TODO get this condition from other table that gives clinical meeting info
@@ -325,8 +327,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue
             missing.append(i)
-        # exp = supervised_time >= minimum_supervised and observed_with_client >= 1
-        exp = True
+        exp = supervised_time >= minimum_supervised and observed_with_client >= 1 and face_to_face >= 2
         role = user['role'] or 'rbt'
         # print(exp)
         curr_year = int(curr_year)+1
@@ -892,7 +893,6 @@ def get_report(year, month, id):
         entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face = get_entries(
             'basic', year, month, user)
 
-    print(total_hours)
     supervisors = []
     if user and entries:
         month_year = f'{month}/{year}'

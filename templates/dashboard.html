@@ -11,7 +11,7 @@
 
 <div class="card-wrapper">
     
-
+    DASHBOARD!!!!
     <div class="center card-wrapper">
 
         <div class="card-table">
@@ -28,9 +28,9 @@
             </li>
             {% endif %}
 
-            {% if not role.lower() in ['rbt', 'rbt/trainee', 'rbt/ba trainee', 'basic', 'role']%}
+            {% if not role.lower() in ['rbt', 'rbt/trainee', 'rbt/ba trainee', 'basic', 'role'] or len(pending) > 0 %}
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">Pending</button>
+                <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">Pending ({{len(pending)}})</button>
             </li>
             {% endif %}
             </ul>
