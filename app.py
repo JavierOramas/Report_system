@@ -38,7 +38,17 @@ with open('config.json', 'r') as file:
 
 client = pymongo.MongoClient(
     config['database']['addr'], config['database']['port'], connect=False)
-db = client.abs_tracking_db
+
+try: 
+    with open("database_name.txt") as d:
+        name = d.read()
+
+    assert name is not None and not name == '' 
+except:
+    name = 'abs_tracking_db'
+    
+print(name)
+db = client[name]
 
 
 # Decorators
