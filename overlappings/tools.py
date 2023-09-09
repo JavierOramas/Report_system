@@ -162,13 +162,18 @@ def process(incoming_data, db_providers, db=None):
 
     final_ol = pd.DataFrame()
     if db:
-        providers_data = db.users.find({"role" : { '$in' : get_supervisors()}})
+        supervisors = []
+        providers_data = db.users.find()
+
+        for i in providers_data:
+            if i.role in get_supervisors():
+                supervisors.append(i)
     else:
         providers_data = get_providers(db_providers)
-
-    supervisors = providers_data[providers_data['Type'] == 'Supervisor']
-    risen_supervisors = providers_data[providers_data['Type']
+        supervisors = providers_data[providers_data['Type'] == 'Supervisor']
+        risen_supervisors = providers_data[providers_data['Type']
                                        == 'Risen Supervisor']
+
     # print(risen_supervisors)
     trainees = providers_data[providers_data['Status'] == 'Trainee']
     RBTs = providers_data[providers_data['Status'] == 'RBT']
