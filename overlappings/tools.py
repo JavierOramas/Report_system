@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import os
+from super_roles.super_roles import get_supervisors
 
 risen_supervisors = pd.DataFrame([])
 
@@ -157,11 +158,13 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
     return overlapping
 
 
-def process(incoming_data, db_providers):
+def process(incoming_data, db_providers, db=None):
 
     final_ol = pd.DataFrame()
-
-    providers_data = get_providers(db_providers)
+    if db:
+        providers_data = db.users.find({"role" : { '$in' : get_supervisors()}})
+    else:
+        providers_data = get_providers(db_providers)
 
     supervisors = providers_data[providers_data['Type'] == 'Supervisor']
     risen_supervisors = providers_data[providers_data['Type']

@@ -446,7 +446,7 @@ def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now(
             missing.append(i)
 
 
-    return render_template('dashboard.html', face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 3), minimum_supervised=round_half_up(5/100*total_hours, 3), supervised_hours=round_half_up(supervised_time, 3), meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
+    return render_template('dashboard.html', face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 3), minimum_supervised=5/100*total_hours, supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
 
 # Only admins will see this page and it will let edit users and provider ids
 
