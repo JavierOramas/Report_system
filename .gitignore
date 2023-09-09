@@ -7,3 +7,4 @@ notebook.ipynb
 *.pdf
 */__pycache__/*
 .vscode/
+database_name.txt

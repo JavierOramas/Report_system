@@ -87,10 +87,7 @@ class Registry:
         total_time = data_for_time.groupby(['ProviderId']).sum()
 
         for name, entry in total_time.iterrows():
-            # print(f"\n\n\n Sum Data for {name}")
-            # print(data_for_time["ProcedureCodeId"].to_string(),
-            #       entry['TimeWorkedInHours'])
-            # entry['ProviderId'] = entry['Name']
+
             item = {
                 'ProviderId': name,
                 'Month': month,
@@ -100,7 +97,7 @@ class Registry:
             if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}):
                 db.TotalHours.insert_one(item)
 
-        data = process('static/files/data.csv', 'providers.csv')
+        data = process('static/files/data.csv', 'providers.csv', db=db)
         # create the collection entries
         print("process")
         for index, entry in data.iterrows():
