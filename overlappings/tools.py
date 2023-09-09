@@ -173,6 +173,7 @@ def process(incoming_data, db_providers, db=None):
                 supervisors.append(i)
             else: 
                 trainee.appennd(i)
+    
     except:
         providers_data = get_providers(db_providers)
         supervisors = providers_data[providers_data['Type'] == 'Supervisor']
@@ -182,16 +183,13 @@ def process(incoming_data, db_providers, db=None):
         trainees = providers_data[providers_data['Status'] == 'Trainee']
         RBTs = providers_data[providers_data['Status'] == 'RBT']
     # print(risen_supervisors)
+    with open("DEBUG.txt", "w") as f:
+        f.write(supervisors)
     data = get_data(incoming_data)
     supervisors_id = get_supervisor_codes()
-    print(data)
-    # eliminar datos no deseados
-    # data = data.drop(data[data['ProcedureCodeId'].isin(get_valid_ids()).index, index=True)
+    
     data.loc[data['ProcedureCodeId'].isin(get_valid_ids())]
-    # data['data_filter1'] = data_filter
-    # data = data.drop('data_filter1', 1)
-    # st.dataframe(data)
-    print(data)
+    
 
     errors = []
     notifications = []
@@ -253,7 +251,7 @@ def process(incoming_data, db_providers, db=None):
 
 
 # Using procedure code id because its faster and better than procedure code
-    print(data[data['ProviderFirstName'] == 'Gabriella'])
+    # print(data[data['ProviderFirstName'] == 'Gabriella'])
     code53 = np.array(data[[i in get_rbt_codes()
                       for i in data['ProcedureCodeId']]])
     code_doc = np.array(data[[i in get_indirect_codes()
