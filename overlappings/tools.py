@@ -161,22 +161,27 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
 def process(incoming_data, db_providers, db=None):
 
     final_ol = pd.DataFrame()
-    if db:
+    try:
         supervisors = []
+        risen_supervisors = []
+        trainees = []
+        RBTs = []
         providers_data = db.users.find()
 
         for i in providers_data:
             if i.role in get_supervisors():
                 supervisors.append(i)
-    else:
+            else: 
+                trainee.appennd(i)
+    except:
         providers_data = get_providers(db_providers)
         supervisors = providers_data[providers_data['Type'] == 'Supervisor']
         risen_supervisors = providers_data[providers_data['Type']
                                        == 'Risen Supervisor']
 
+        trainees = providers_data[providers_data['Status'] == 'Trainee']
+        RBTs = providers_data[providers_data['Status'] == 'RBT']
     # print(risen_supervisors)
-    trainees = providers_data[providers_data['Status'] == 'Trainee']
-    RBTs = providers_data[providers_data['Status'] == 'RBT']
     data = get_data(incoming_data)
     supervisors_id = get_supervisor_codes()
     print(data)
