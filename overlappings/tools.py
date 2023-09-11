@@ -3,11 +3,9 @@ import numpy as np
 from datetime import datetime
 import os
 from super_roles.super_roles import get_supervisors
-from logging import Logger
-
+from logger import log
 risen_supervisors = pd.DataFrame([])
 
-logger = Logger(name="__main__")
 
 RBTs = []
 trainees = []
@@ -159,7 +157,7 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
 
 
 def process(incoming_data, db_providers, db=None):
-    logger.critical("Start Process")
+    log("Process")
     labels_t = ['ProviderId', 'name', 'email', 'first_name', 'last_name', 'BACB_id', 'credential', 'role', 'background_screening_type', 'hired_date', 'background_date', 'background_exp_date']
     final_ol = pd.DataFrame()
     supervisors = pd.DataFrame(columns=labels_t)
@@ -169,6 +167,7 @@ def process(incoming_data, db_providers, db=None):
     sup = []
     
     try:
+        log("getting users")
         providers_data = db.users.find()
         providers_data = list(providers_data)
         for i in providers_data:
@@ -181,7 +180,7 @@ def process(incoming_data, db_providers, db=None):
                 trainees.append(i, ignore_index=True)
             
         supervisors = pd.DataFrame(sup)
-        logger.critical(supervisors)
+        log(supervisors)
     except:
         providers_data = get_providers(db_providers)
         supervisors = providers_data[providers_data['Type'] == 'Supervisor']
