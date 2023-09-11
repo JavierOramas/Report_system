@@ -58,7 +58,6 @@ class Registry:
         if int(year) < int(min_year):
             min_year = year
         data = data.drop(data.columns.difference(labels), 1)
-        print(data)
 
         labels = [150580, 150582, 150583, 150553, 194640, 298632,
                   194641, 194641, 235184, 255975, 255910, 241573]
@@ -127,10 +126,11 @@ class Registry:
                 entry['DateOfService'])
 
             supervisor = db.users.find_one({'ProviderId': entry['Supervisor']})
-            if not entry['MeetingDuration'] < 1 and supervisor != None and supervisor['role'] in get_supervisors():
+            if not entry['MeetingDuration'] < 0 and supervisor != None:
 
-                if not db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']}):
-                    db.Registry.insert_one(entry)
+                # found = db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']})
+                db.Registry.insert_one(entry)
+                    
         db.min_year.delete_one({})
         db.min_year.insert_one({
             'year': min_year

@@ -176,7 +176,9 @@ def process(incoming_data, db_providers, db=None):
             if i['role'].lower() in lower_case_sups:
                 sup.append(i)
                 # supervisors.append(i,ignore_index=True)
-            else: 
+            if i['role'].lower() == 'rbt':
+                RBTs.append(i)
+            else:
                 trainees.append(i, ignore_index=True)
             
         supervisors = pd.DataFrame(sup)
@@ -230,7 +232,7 @@ def process(incoming_data, db_providers, db=None):
             continue
 
         if i[procedureCodeId] == 150582:
-            if len(risen_supervisors):
+            if len(risen_supervisors) > 0:
                 supervisors += risen_supervisors
             # print(supervisors)
             if supervisors.shape[0] > 0 and i[providerId] in list(supervisors['ProviderId']):

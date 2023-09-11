@@ -851,8 +851,8 @@ def required_columns(data):
             
 @ app.route('/upload', methods=['POST', 'GET'])
 def upload():
-    if os.path.exists('static/files/data.data.csv'):
-        data = pd.read_csv('static/files/data.csv')
+    # if os.path.exists('static/files/data.data.csv'):
+    data = pd.read_csv('static/files/data.csv')
     
     missing = required_columns(data)
     
@@ -956,11 +956,11 @@ def get_report(year, month, id):
         #         # return  render_template('user_work.html', id=id, year=year, month=month, alert='Something went Wrong! Check that all the User info is correct generating report')
         #     # return dashboard(year, month, alert={'error': 'Error generating report'})
         nm = month
+        wkhtmltopdf_path = '/usr/bin/wkhtmltopdf'
         if nm < 10:
             nm = '0'+str(nm)
         filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker.pdf"
-        pdfkit.from_string(template, './report.pdf',
-                           options=options)
+        pdfkit.from_string(template, './report.pdf', options=options, configuration=pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path))
         log("pdf generated")
         sleep(1)
 
