@@ -3,21 +3,44 @@
 report, observed_with_client, missing, exp, face_to_face) %}
 
 {% if report == True and (supervised_time < minimum_supervised or observed_with_client < 1) %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <p>Some requirements are not met or entries have not been verified by supervisor</p>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div class="position-fixed top-0 start-0 translate-middle-y" style="z-index: 999; margin-top:100px; min-width: 25%;">
+    <div class="alert alert-warning" role="alert">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <span class="alert-icon me-2">
+                    &#10003
+                </span>
+                <div class="alert-text">Some requirements are not met or entries have not been verified by supervisor</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
 </div>
 {% endif %}
 
 {{ topnav(id, user, session, role, total_hours, supervised_time, meeting_group, minimum_supervised, year, month, report, observed_with_client, missing, exp) }}
 
+
+
 {% if report == True and missing != [] %}
-<div class="alert alert-warning alert-dismissible" role="alert">
-    <p>The RBT data is incomplete, missing the following info (
-        {% for i in missing %}
-        {{ i }}
-        {% endfor %}
-        )</p>
+<div class="position-fixed top-0 start-0 translate-middle-y" style="z-index: 999; margin-top:100px; min-width: 25%;">
+    <div class="alert alert-warning" role="alert">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <span class="alert-icon me-2">
+                    &#10003
+                </span>
+                <div class="alert-text">
+                    <p>The RBT data is incomplete, missing the following info (
+                    {% for i in missing %}
+                    {{ i }}
+                    {% endfor %}
+                    )</p>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
 </div>
 {% endif %}
 
@@ -31,28 +54,54 @@ report, observed_with_client, missing, exp, face_to_face) %}
                     <h1>Upload Timesheet CSV file</h1>
                     <form id="uploadForm" method="POST" action="/dashboard" enctype="multipart/form-data">
                         <div class="mb-3">
-                            <input class="form-control" type="file" accept=".csv" name="file">
+                            <input class="form-control" type="file" accept=".csv" name="file" id="uploadFile">
                         </div>
-                        <button class="btn btn-secondary" type="submit">Submit</button>
+                        <button class="btn btn-secondary" type="submit" data-bs-toggle="spinner" data-bs-target="#uploadSpinner" disabled>Submit</button>
                     </form>
+                    <div id="uploadSpinner" class="spinner-border text-primary d-none" role="status"></div>
                 </div>
             </div>
             
             <div class="col-md">
                 <div class="container mt-5">
                     <h1>Upload Users CSV</h1>
-                    <form method="POST" action="/dashboard/providers" enctype="multipart/form-data">
+                    <form id="usersUploadForm" method="POST" action="/dashboard/providers" enctype="multipart/form-data">
                         <div class="mb-3">
-                            <input class="form-control" type="file" accept=".csv" name="file">
+                            <input class="form-control" type="file" accept=".csv" name="file" id="userUploadFile">
                         </div>
-                        <button id="submitButton" class="btn btn-secondary" type="submit">Submit</button>
-                        <div id="spinner" class="spinner-border text-primary d-none" role="status">
-                        </div>
+                        <button id="submitButton" class="btn btn-secondary" type="submit" data-bs-toggle="spinner" data-bs-target="#userUploadSpinner" disabled>Submit</button>
                     </form>
+                    <div id="userUploadSpinner" class="spinner-border text-primary d-none" role="status"></div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <script>
+        document.querySelectorAll('[data-bs-toggle="spinner"]').forEach(function(button) {
+            button.addEventListener("click", function () {
+                var targetId = this.getAttribute("data-bs-target");
+                var spinner = document.querySelector(targetId);
+    
+                if (spinner.classList.contains("d-none")) {
+                    spinner.classList.remove("d-none");
+                    this.style.display = "none";
+                }
+            });
+        });
+    
+        document.getElementById("uploadFile").addEventListener("change", function () {
+            var submitButton = document.querySelector('[data-bs-target="#uploadSpinner"]');
+            submitButton.disabled = this.files.length === 0;
+        });
+    
+        document.getElementById("userUploadFile").addEventListener("change", function () {
+            var submitButton = document.querySelector('[data-bs-target="#userUploadSpinner"]');
+            submitButton.disabled = this.files.length === 0;
+        });
+    </script>
+    
+    
     {% elif role not in ['BCBA', 'BCBA (L)', 'BCaBA'] %}
     <div class="row card">
         <h1>This Month Report Status:</h1>
