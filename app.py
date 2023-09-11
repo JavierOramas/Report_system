@@ -8,7 +8,7 @@ from registry.models import Registry
 from super_roles.super_roles import get_admins, get_supervisors
 from user import routes
 from user.models import User
-from flask import Flask, render_template, redirect, session, request, url_for, jsonify, send_file
+from flask import Flask, render_template, redirect, session, request, url_for, jsonify, send_file, flash
 from bson.objectid import ObjectId
 from functools import wraps
 import os
@@ -22,33 +22,47 @@ from passlib.hash import pbkdf2_sha256
 from utils import get_rbt_coordinator, get_second_monday, round_half_up
 from roles.models import get_all_roles
 from sup_view import inspect_supervisor
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+# Configuration
 app.config["DEBUG"] = True
 app.secret_key = 'testing'
 
 UPLOAD_FOLDER = 'static/files'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Database
-config = {}
+def get_database_name():
+    try:
+        with open("database_name.txt") as d:
+            name = d.read().strip()
 
-with open('config.json', 'r') as file:
-    config = json.load(file)
+        if name:
+            return name
+        else:
+            return 'abs_tracking_db'
+    except FileNotFoundError:
+        return 'abs_tracking_db'
 
-client = pymongo.MongoClient(
-    config['database']['addr'], config['database']['port'], connect=False)
+def initialize_database():
+    try:
+        with open('config.json', 'r') as file:
+            config = json.load(file)
+    except FileNotFoundError:
+        print("Error: 'config.json' file not found.")
+        return None
 
-try: 
-    with open("database_name.txt") as d:
-        name = d.read()
+    try:
+        client = pymongo.MongoClient(config['database']['addr'], config['database']['port'], connect=False)
+        db_name = get_database_name()
+        db = client[db_name]
+        return db
+    except Exception as e:
+        print(f"Error initializing the database: {str(e)}")
+        return None
 
-    assert name is not None and not name == '' 
-except:
-    name = 'abs_tracking_db'
-    
-db = client[name]
-
+db = initialize_database()
 
 # Decorators
 def login_required(f):
@@ -64,117 +78,100 @@ def login_required(f):
 def admin_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        if 'role' in session['user']:
-            if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)']:
+        if 'user' in session and 'role' in session['user']:
+            allowed_roles = get_admins()
+            if session['user']['role'].lower() in allowed_roles:
                 return f(*args, **kwargs)
-        else:
-            return redirect('/')
+        return redirect('/')
     return wrap
 
 
-def get_entries(role, year, month, user):
+import datetime
 
-    if not 'providerId' in user:
-        if 'ProviderId' in user and user['ProviderId'] != '' and user['ProviderId'] != None:
+def get_entries(role, year, month, user):
+    entries = []
+    total_hours = 0
+    supervised_time = 0
+    ids = []
+    meetings = 0
+    min_year = datetime.datetime.now().year
+    supervisors = set()
+    observed_with_client = 0
+    face_to_face = 0
+
+    if 'providerId' not in user:
+        if 'ProviderId' in user and user['ProviderId'] != '' and user['ProviderId'] is not None:
             user['providerId'] = user['ProviderId']
         else:
-            return [], 0, 0, [], 0, 0, [], 0, 0
+            return entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face
 
-    entries = db.Registry.find(
-        {'ProviderId': int(str(user['providerId']))})
-    entries = [entry for entry in entries]
-    
-    temp = []
-    clients = []
-    dates = []
-    supervisors = []
-    min_year = db.min_year.find_one()['year']
+    db = initialize_database()
+    entries_query = db.Registry.find({'ProviderId': int(str(user['providerId']))})
 
-    for entry in entries:
-        if int(datetime_format.get_date(entry["DateOfService"]).year) < min_year:
-            min_year = int(
-                datetime_format.get_date(entry["DateOfService"]).year)
-        if (datetime_format.get_date(entry["DateOfService"]).year == year or datetime_format.get_date(entry["DateOfService"]).year + 2000 == year) and datetime_format.get_date(entry["DateOfService"]).month == month:
+    for entry in entries_query:
+        entry_year = datetime_format.get_date(entry["DateOfService"]).year
+        entry_month = datetime_format.get_date(entry["DateOfService"]).month
+
+        if entry_year < min_year:
+            min_year = entry_year
+
+        if (entry_year == year or entry_year + 2000 == year) and entry_month == month:
             entry['ProviderId'] = int(entry['ProviderId'])
-            if 'providerId' in user:
-                if "ClientId" in entry:
-                    clients.append(entry['ClientId'])
-                supervisors.append(entry['Supervisor'])
-                dates.append(entry['DateOfService'])
-                temp.append(entry)
-    entries = temp
+            clients = entry.get('ClientId', None)
+            if clients:
+                clients = [clients]
+            supervisors.add(entry['Supervisor'])
+            dates = entry['DateOfService']
+            entries.append(entry)
+
     entries = sorted(entries, key=lambda d: d['DateOfService'])
 
-    ids = []
-    supervised_time = 0
-    observed_with_client = 0
-    meetings = 0
-    total_hours = 0  
-    face_to_face = 0
-    for i in entries:
-        if (i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes') and i["Verified"] == True:
+    for entry in entries:
+        if (entry['ObservedwithClient'] == True or entry['ObservedwithClient'] == 'yes') and entry["Verified"] == True:
             observed_with_client += 1
 
-        if i['Verified'] == True and i['MeetingForm'] == True:
+        if entry['Verified'] == True and entry['MeetingForm'] == True:
             face_to_face += 1
-            supervised_time += i['MeetingDuration']
+            supervised_time += entry['MeetingDuration']
 
-        # TODO get this condition from other table that gives clinical meeting info
-        condition = True
-        if int(i['ProcedureCodeId']) == 194641 and condition == True and i["Verified"] == True and i['MeetingForm'] == True:
+        if int(entry['ProcedureCodeId']) == 194641 and entry["Verified"] == True and entry['MeetingForm'] == True:
             meetings += 1
 
-        if 'ProviderId' in i:
-            ids += list(set([i['ProviderId'] for i in entries]))
-        # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
-        if role != None:
-            # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
-            total_hours = db.TotalHours.find_one({'ProviderId':
-                                                  user['providerId'], 'Month': month, 'Year': year})
-            if total_hours == None:
-                total_hours = 0
-            else:
-                total_hours = total_hours['TotalTime']
-        else:
-            total_hours = 0
-    
-    return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors), observed_with_client, face_to_face
+        if 'ProviderId' in entry:
+            ids.append(entry['ProviderId'])
+
+    if role is not None:
+        total_hours_data = db.TotalHours.find_one({'ProviderId': user['providerId'], 'Month': month, 'Year': year})
+        total_hours = total_hours_data['TotalTime'] if total_hours_data else 0
+
+    return entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face
 
 
 def get_pending(role, user):
-    if role.lower() in ['admin']:
+    if role.lower() == 'admin':
         entries = list(db.Registry.find({'Verified': False}))
     elif role.lower() in get_supervisors():
-        entries = list(db.Registry.find(
-            {'Verified': False, "Supervisor": int(user['providerId'])}))
-
+        entries = list(db.Registry.find({'Verified': False, "Supervisor": int(user['providerId'])}))
     elif role.lower() in ['basic', 'rbt', 'rbt/trainee', 'rbt/ba trainee']:
-        try:
-            entries = list(db.Registry.find(
-                {'Verified': False, 'ProviderId': int(user['providerId'])}))
-        except:
-            entries = list(db.Registry.find(
-                {'Verified': False, 'ProviderId': int(user['ProviderId'])}))
+        provider_id = user.get('providerId') or user.get('ProviderId')
+        if provider_id is not None:
+            entries = list(db.Registry.find({'Verified': False, 'ProviderId': int(provider_id)}))
+        else:
+            entries = []
     else:
         entries = []
+
     return entries
 
-# routes.
-
-# Home Page        month = request.form.get('month')
-    year = request.form.get('year')
-
 # Home Route with login form
-
-
-@app.route('/')
+@app.route("/")
 def home():
     if 'logged_in' in session:
         return redirect('/dashboard')
+    # Render the home page with the login form
     return render_template('home.html', register=False)
+
 # Home Route With Regiter form
-
-
 @app.route('/register')
 def register():
     types = ['None'] + [i['type'] for i in db.providerType.find()]
@@ -188,16 +185,29 @@ def register():
 @login_required
 @admin_required
 def upload_files():
-    # get the uploaded file
-    uploaded_file = request.files['file']
-    if uploaded_file.filename != '':
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'data.csv')
-       # set the file path
-        uploaded_file.save(file_path)
-        print('uploaded')
-       # save the file
-    return redirect(url_for('upload'))
+    # Check if a file was uploaded
+    if 'file' not in request.files:
+        flash('No file part', 'error')
+        return redirect(request.url)
 
+    uploaded_file = request.files['file']
+
+    # Check if the file has a filename
+    if uploaded_file.filename == '':
+        flash('No selected file', 'error')
+        return redirect(request.url)
+
+    try:
+        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'data.csv')
+        
+        # Save the uploaded file to the specified path
+        uploaded_file.save(file_path)
+        flash('File uploaded successfully', 'success')
+    except Exception as e:
+        flash(f'Error uploading file: {str(e)}', 'error')
+
+    return redirect(url_for('upload'))
 
 @app.route("/dashboard/providers", methods=['POST'])
 @login_required
@@ -206,6 +216,7 @@ def upload_file():
     # get the uploaded file
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
+        os.makedirs( app.config["UPLOAD_FOLDER"],exist_ok=True)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'data.csv')
        # set the file path
         uploaded_file.save(file_path)
@@ -822,9 +833,8 @@ def required_columns(data):
             
 @ app.route('/upload', methods=['POST', 'GET'])
 def upload():
-    
-    data = pd.read_csv('static/files/data.csv')
-    
+    if os.path.exists('static/files/data.data.csv'):
+        data = pd.read_csv('static/files/data.csv')
     
     missing = required_columns(data)
     
