@@ -148,6 +148,7 @@ def get_entries(role, year, month, user):
 
 
 def get_pending(role, user):
+    db = initialize_database()
     if role.lower() == 'admin':
         entries = list(db.Registry.find({'Verified': False}))
     elif role.lower() in get_supervisors():
@@ -174,6 +175,7 @@ def home():
 # Home Route With Regiter form
 @app.route('/register')
 def register():
+    db = initialize_database()
     types = ['None'] + [i['type'] for i in db.providerType.find()]
     return render_template('home.html', register=True, types=types)
 
@@ -212,16 +214,31 @@ def upload_files():
 @app.route("/dashboard/providers", methods=['POST'])
 @login_required
 @admin_required
-def upload_file():
-    # get the uploaded file
+def upload_users_file():
+    # Check if a file was uploaded
+    if 'file' not in request.files:
+        flash('No file part', 'error')
+        return redirect(request.url)
+
     uploaded_file = request.files['file']
-    if uploaded_file.filename != '':
-        os.makedirs( app.config["UPLOAD_FOLDER"],exist_ok=True)
+
+    # Check if the file has a filename
+    if uploaded_file.filename == '':
+        flash('No selected file', 'error')
+        return redirect(request.url)
+
+    try:
+        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'data.csv')
-       # set the file path
+
+        # Save the uploaded file to the specified path
         uploaded_file.save(file_path)
-       # save the file
+        flash('File uploaded successfully', 'success')
+    except Exception as e:
+        flash(f'Error uploading file: {str(e)}', 'error')
+
     return redirect(url_for('upload_provider'))
+
 
 
 @app.route('/providers')
@@ -238,6 +255,7 @@ def providers():
 @login_required
 @admin_required
 def role_manager():
+    
     if request.method == 'POST':
         if 'admin' in request.form:
             admin = request.form['admin']
