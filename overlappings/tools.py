@@ -7,7 +7,7 @@ from logging import Logger
 
 risen_supervisors = pd.DataFrame([])
 
-logger = Logger()
+logger = Logger(name="__main__")
 
 RBTs = []
 trainees = []
