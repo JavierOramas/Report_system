@@ -61,8 +61,7 @@ labels = ['Id', 'DateTimeFrom', 'DateTimeTo', 'TimeWorkedInHours', 'ProviderId',
 
 def get_data(path):
     df = pd.read_csv(path)
-    print(df)
-    return df.drop(df.columns.difference(labels), 1)
+    return df.drop(df.columns.difference(labels), axis=1)
 
 
 def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId):
@@ -133,8 +132,6 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
 
             if (entry_start <= end and entry_end >= start) or (start <= entry_end and end >= entry_start):
                 time = min(entry_end, end) - max(entry_start, start)
-                print(min(entry_end, end), max(entry_start, start))
-                print(time, "===", entry[providerName])
                 if time != 0:
                     overlapping.append((entry, i, time))
 
@@ -160,20 +157,26 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
 
 def process(incoming_data, db_providers, db=None):
 
+    labels_t = ['ProviderId', 'name', 'email', 'first_name', 'last_name', 'BACB_id', 'credential', 'role', 'background_screening_type', 'hired_date', 'background_date', 'background_exp_date']
     final_ol = pd.DataFrame()
+    supervisors = pd.DataFrame(columns=labels_t)
+    risen_supervisors = pd.DataFrame(columns=labels_t)
+    trainees = pd.DataFrame(columns=labels_t)
+    RBTs = pd.DataFrame(columns=labels_t)
+    sup = []
     try:
-        supervisors = []
-        risen_supervisors = []
-        trainees = []
-        RBTs = []
         providers_data = db.users.find()
-
+        providers_data = list(providers_data)
         for i in providers_data:
-            if i.role in get_supervisors():
-                supervisors.append(i)
+            
+            lower_case_sups = [i.lower() for i in get_supervisors()]
+            if i['role'].lower() in lower_case_sups:
+                sup.append(i)
+                # supervisors.append(i,ignore_index=True)
             else: 
-                trainee.appennd(i)
-    
+                trainees.append(i, ignore_index=True)
+            
+        supervisors = pd.DataFrame(sup)
     except:
         providers_data = get_providers(db_providers)
         supervisors = providers_data[providers_data['Type'] == 'Supervisor']
@@ -182,9 +185,7 @@ def process(incoming_data, db_providers, db=None):
 
         trainees = providers_data[providers_data['Status'] == 'Trainee']
         RBTs = providers_data[providers_data['Status'] == 'RBT']
-    # print(risen_supervisors)
-    with open("DEBUG.txt", "w") as f:
-        f.write(supervisors)
+
     data = get_data(incoming_data)
     supervisors_id = get_supervisor_codes()
     
@@ -225,7 +226,10 @@ def process(incoming_data, db_providers, db=None):
             continue
 
         if i[procedureCodeId] == 150582:
-            if i[providerId] in list(risen_supervisors['ProviderId']+supervisors['ProviderId']):
+            if len(risen_supervisors):
+                supervisors += risen_supervisors
+            # print(supervisors)
+            if supervisors.shape[0] > 0 and i[providerId] in list(supervisors['ProviderId']):
                 notifications.append(i)
                 i[procedureCodeId] = 194640
                 depured_data.append(i)
@@ -344,7 +348,6 @@ def process(incoming_data, db_providers, db=None):
             overlappings[i[providerId]] = []
 
         if len(new_ol) != 0:
-            print(new_ol)
             overlappings[i[providerId]].append(new_ol)
 
     # if len(errors) > 0:

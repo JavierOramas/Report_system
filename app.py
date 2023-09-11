@@ -47,7 +47,6 @@ try:
 except:
     name = 'abs_tracking_db'
     
-print(name)
 db = client[name]
 
 
@@ -84,8 +83,7 @@ def get_entries(role, year, month, user):
     entries = db.Registry.find(
         {'ProviderId': int(str(user['providerId']))})
     entries = [entry for entry in entries]
-    # print(entries, len(entries))
-
+    
     temp = []
     clients = []
     dates = []
@@ -105,7 +103,6 @@ def get_entries(role, year, month, user):
                 dates.append(entry['DateOfService'])
                 temp.append(entry)
     entries = temp
-    # print(temp)
     entries = sorted(entries, key=lambda d: d['DateOfService'])
 
     ids = []
@@ -114,17 +111,10 @@ def get_entries(role, year, month, user):
     meetings = 0
     total_hours = 0  
     face_to_face = 0
-    # print(entry['Supervisor'])
-    # print(supervisor)
-
-    # print(entries, len(entries))
     for i in entries:
-        # log(i)
         if (i['ObservedwithClient'] == True or i['ObservedwithClient'] == 'yes') and i["Verified"] == True:
             observed_with_client += 1
 
-        # i['MeetingDuration'] = i['MeetingDuration']
-        # print(i['MeetingDuration'])
         if i['Verified'] == True and i['MeetingForm'] == True:
             face_to_face += 1
             supervised_time += i['MeetingDuration']
@@ -138,21 +128,16 @@ def get_entries(role, year, month, user):
             ids += list(set([i['ProviderId'] for i in entries]))
         # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
         if role != None:
-            # print("here")
             # , 'Year': datetime.datetime.now().year, 'Month': datetime.datetime.now().month})
-            print(user['providerId'])
             total_hours = db.TotalHours.find_one({'ProviderId':
                                                   user['providerId'], 'Month': month, 'Year': year})
-            # print(total_hours)
             if total_hours == None:
                 total_hours = 0
             else:
-                # log(total_hours, year ,month)
                 total_hours = total_hours['TotalTime']
         else:
             total_hours = 0
-    # print(total_hours)
-    # print(min_year)
+    
     return entries, total_hours, supervised_time, ids, meetings, min_year, set(supervisors), observed_with_client, face_to_face
 
 
@@ -254,7 +239,7 @@ def role_manager():
     if request.method == 'GET':
         roles = db.roles.find()
         roles = list(roles)
-        print(roles)
+        # print(roles)
         return render_template('roles.html', role=session['user']['role'], roles=list(roles))
 
 
@@ -327,7 +312,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
         minimum_supervised = round_half_up(total_hours * 0.05, 2)
         if minimum_supervised == 0:
             minimum_supervised = round(total_hours * 0.05, 3)
-        print(minimum_supervised)
+        # print(minimum_supervised)
         log("user:", user)
 
         missing = []
@@ -634,7 +619,6 @@ def add(id=None):
         # return redirect(url_for('/', message={'error':'you cant edit that entry'}))
     else:
         group = individual = 'no'
-        print(request.form.get("supervision_type"))
         if request.form.get("supervision_type") == 'yes':
             group = 'yes'
         if request.form.get("supervision_type") == 'no':
@@ -658,7 +642,6 @@ def add(id=None):
         if not session['user']['role'] in get_admins():
             return redirect('/')
         else:
-            print("here")
             return report(id=user['_id'], year=year, month=month)
             # return redirect(url_for('report', id=user['_id'], curr_year=datetime.datetime.now().year))
 
@@ -681,8 +664,7 @@ def verify(id, year, month):
         return redirect(url_for('dashboard', month=month, year=year))
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-        # print(rbt)
-
+        
         return report(id=rbt['_id'], year=year, month=month)
 
 
@@ -742,7 +724,6 @@ def edit(id, year, month):
             supervisors += list(temp)
 
         user = db.users.find_one({"ProviderId": entry['ProviderId']})
-        print(entry)
         date = datetime_format.get_date(entry['DateOfService'])
         year, month = date.year, date.month
         return render_template('edit.html', role=session['user']['role'], entry=entry, supervisors=supervisors, id=user['_id'], codes=list(db.procedure_codes.find()), year=year, month=month)
@@ -774,7 +755,6 @@ def edit(id, year, month):
 @ app.route('/del/<id>', methods=('GET', 'POST'))
 @ login_required
 def delete(id):
-    # print(id)
     db.users.delete_one({"_id": ObjectId(id)})
     # if session['user']['role'].lower() in ['admin', 'bcba','bcba (l)']:
     #     try:
@@ -871,9 +851,6 @@ def filter_data():
     month = request.form.get('month')
     year = request.form.get('year')
 
-    print(year)
-    print(month)
-
     if not month:
         month = datetime.datetime.now().month-1
     if not year:
@@ -925,7 +902,7 @@ def get_report(year, month, id):
         for e in entries:
             e['DateOfService'] = datetime_format.get_date(
                 e['DateOfService']).strftime("%m/%d/%Y")
-            print(e['DateOfService'])
+            # print(e['DateOfService'])
         # try:
         template = render_template(
             'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=total_hours, minimum_supervised=round(total_hours*0.05, 2), supervised_hours=round(supervised_time, 2), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
