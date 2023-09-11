@@ -85,35 +85,6 @@ report, observed_with_client, missing, exp, face_to_face) %}
                 
                 // Disable the submit button to prevent multiple submissions
                 $("#submitButton").attr("disabled", true);
-
-                // Use AJAX to submit the form data to the server
-                $.ajax({
-                    type: "POST",
-                    url: "/dashboard",
-                    data: new FormData(this),
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        // Handle the response from the server
-                        console.log(response);
-                        
-                        // Hide the spinner
-                        $("#spinner").addClass("d-none");
-                        
-                        // Enable the submit button
-                        $("#submitButton").attr("disabled", false);
-                    },
-                    error: function(error) {
-                        // Handle any errors that occur during the AJAX request
-                        console.error(error);
-                        
-                        // Hide the spinner
-                        $("#spinner").addClass("d-none");
-                        
-                        // Enable the submit button
-                        $("#submitButton").attr("disabled", false);
-                    }
-                });
             });
         });
     </script>
