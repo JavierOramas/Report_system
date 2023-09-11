@@ -177,6 +177,7 @@ def process(incoming_data, db_providers, db=None):
                 trainees.append(i, ignore_index=True)
             
         supervisors = pd.DataFrame(sup)
+        print(supervisors)
     except:
         providers_data = get_providers(db_providers)
         supervisors = providers_data[providers_data['Type'] == 'Supervisor']

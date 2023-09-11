@@ -40,15 +40,17 @@ report, observed_with_client, missing, exp, face_to_face) %}
                 </div>
             </div>
             <div class="col-md">
-                <h1>Upload Users CSV</h1>
-                <form method="POST" action="/dashboard/providers" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <input class="form-control" type="file" accept=".csv" name="file">
-                    </div>
-                    <button id="submitButton" class="btn btn-secondary" type="submit">Submit</button>
-                    <div id="spinner" class="spinner-border text-primary d-none" role="status">
-                    </div>
-                </form>
+                <div class="container mt-5">
+                    <h1>Upload Users CSV</h1>
+                    <form method="POST" action="/dashboard/providers" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <input class="form-control" type="file" accept=".csv" name="file">
+                        </div>
+                        <button id="submitButton" class="btn btn-secondary" type="submit">Submit</button>
+                        <div id="spinner" class="spinner-border text-primary d-none" role="status">
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
