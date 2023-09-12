@@ -91,7 +91,7 @@ class Registry:
                 'ProviderId': name,
                 'Month': month,
                 'Year': year,
-                'TotalTime': round(entry['TimeWorkedInHours'], 2)
+                'TotalTime': round(entry['TimeWorkedInHours'], 4)
             }
             if not db.TotalHours.find_one({'ProviderId': name, 'Month': month, 'Year': year}):
                 db.TotalHours.insert_one(item)
