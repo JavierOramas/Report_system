@@ -51,9 +51,7 @@ class User:
         user = {
             "email": request.form.get('email'),
         }
-        print(user)
         user = db.users.find_one({'email':request.form.get('email')})
-        print(user)
         if user and pbkdf2_sha256.verify(request.form.get('password'), user['password']):
             return self.start_session(user)
 
@@ -85,8 +83,7 @@ class User:
                 if 'Hired Date' in entry and entry['Hired Date'] != None and entry['Hired Date'] != '':
                     item["hired_date"]= datetime.datetime.strptime(entry['Hired Date'], '%m/%d/%Y').strftime('%m/%d/%y')
             except:
-                print("failed to parse date")
-
+                pass
             try:
                 if 'Background Screening Date' in entry and entry['Background Screening Date'] != None and entry['Background Screening Date'] != '':
                     item["background_date"]= datetime.datetime.strptime(str(entry['Background Screening Date']), '%m/%d/%Y').strftime('%m/%d/%Y')
@@ -95,7 +92,8 @@ class User:
                     if 'Background Screening Date' in entry and entry['Background Screening Date'] != None and entry['Background Screening Date'] != '':
                         item["background_date"]= datetime.datetime.strptime(str(entry['Background Screening Date']), '%m/%d/%y').strftime('%m/%d/%Y')
                 except:
-                    print("failed to parse date screening")
+                    # print("failed to parse date screening")
+                    pass
 
             try:
                 if 'Background Screening ' in entry and entry['Background Screening '] != None and entry['Background Screening '] != '':
@@ -105,27 +103,15 @@ class User:
                     if 'Background Screening ' in entry and entry['Background Screening '] != None and entry['Background Screening '] != '':
                         item["background_exp_date"]= datetime.datetime.strptime(str(entry['Background Screening ']), '%m/%d/%y').strftime('%m/%d/%Y')
                 except:
-                   print("failed to parse date background screening")
+                    pass
 
-            # print(db.users.find_one({"ProviderId": [int(item["ProviderId"]), str(item['ProviderId'])]}))
-            # print(item)
             if db.users.find_one({"ProviderId": item["ProviderId"]}) in [[], None, False] and db.users.find_one({"ProviderId": str(item["ProviderId"])}) in [[], None, False]:
                 # Insert the data and log to the console the action
                 try:
-                    print("Inserting user")
-                    if db.users.insert_one(item):
-                        print('Log: ' + colored('Entry added successfully', 'green'))
-                    else:
-                        print(
-                        'Log: ' + colored(f'Error adding entry to database \n {item}', 'red'))
+                    db.users.insert_one(item)
                 except:
                     pass
             else:
-                print("updating user")
-                if db.users.update_one({'ProviderId': item["ProviderId"]}, {'$set': item}):
-                    print('Log: ' + colored('Entry edited successfully', 'yellow'))
-                else:
-                    print(
-                        'Log: ' + colored(f'Error adding entry to database \n {item}', 'red'))
-                # Return success code
+                db.users.update_one({'ProviderId': item["ProviderId"]}, {'$set': item})
+                
         return {'status': 200}

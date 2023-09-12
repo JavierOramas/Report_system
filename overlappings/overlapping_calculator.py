@@ -102,8 +102,6 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
 
 
 def process(entries, fix=False):
-    print("ENT")
-    print(entries)
     # fix this to get data from database instead of csv
     supervisors = providers_data[providers_data['Type'] == 'Supervisor']
     risen_supervisors = providers_data[providers_data['Type']
@@ -311,8 +309,6 @@ def process(entries, fix=False):
                     continue
                 i_ol = np.append(i_ol, time.seconds/3600)
                 ol.append(i_ol)
-                print("TEEEEST")
-                print(i_ol)
             except:
                 d, i_ol, time = j
                 i_ol = np.append(i_ol, time.seconds/3600)
@@ -325,5 +321,4 @@ def process(entries, fix=False):
             # ol.to_csv(path.join('done',names[i]+' '+str(i)+'.csv'))
             final_overlappings.append(ol)
 
-    print(final_overlappings)
     return errors, notifications, final_overlappings

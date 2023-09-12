@@ -35,7 +35,7 @@ class Registry:
             return 'no', 'yes'
 
     def add_data(self, db):
-        # print("start")
+
         # Load data from csv pre-loaded from the client
         try:
             min_year = db.min_year.find_one({})['year']
@@ -98,7 +98,6 @@ class Registry:
 
         data = process('static/files/data.csv', 'providers.csv', db=db)
         # create the collection entries
-        print("process")
         for index, entry in data.iterrows():
             entry = {
                 "entryId": entry["Id"],
@@ -138,6 +137,3 @@ class Registry:
             'year': min_year
         })
         return {'status': 200}
-    # except:
-        # pass
-        # TODO notify errors

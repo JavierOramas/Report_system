@@ -8,7 +8,7 @@ def round_half_up(n, decimals=2):
 
 def get_rbt_coordinator(db):
     coordinator = db.users.find_one({'ProviderId': 1382528})
-    print(coordinator)
+    # print(coordinator)
     return coordinator['name']
 
 def get_second_monday(year, month):

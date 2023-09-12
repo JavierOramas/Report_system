@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, session, redirect
 import uuid
-from termcolor import colored
+# from termcolor import colored
 from app import db
 
 class ProviderType:
@@ -10,6 +10,6 @@ class ProviderType:
             db.ProviderType.insert_one(
                 {"type" : name}
             )
-            print("Log: " + colored("New provider category added", "green"))
+            # print("Log: " + colored("New provider category added", "green"))
             return
-        print("Log: " + colored("Errors Occurred", "red"))
+        # print("Log: " + colored("Errors Occurred", "red"))

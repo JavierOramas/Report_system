@@ -105,7 +105,6 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
                 entry_end = datetime.strptime(entry[timeTo], '%m/%d/%y %H:%M')
 
     for i in depured_data:
-        # print(verify_valid_overlapping(entry,i,providerName,procedureCodeId,providerId, risen_supervisors))
         if verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId):
             try:
                 start = datetime.strptime(
@@ -209,11 +208,10 @@ def process(incoming_data, db_providers, db=None):
     providerId = list(cols).index('ProviderId')
     providerName = list(cols).index('ProviderFirstName')
     procedureCodeId = list(cols).index('ProcedureCodeId')
-    # print(procedureCodeId)
     DateTimeFrom = list(cols).index('DateTimeFrom')
     timeTo = list(cols).index('DateTimeTo')
     client = list(cols).index('ClientId')
-    # clientName = list(cols).index('ClientFirstName')
+    
     filter_supervisors = [i in supervisors_id for i in data.ProcedureCodeId]
 
     supervisors_data = data[filter_supervisors]
@@ -233,7 +231,6 @@ def process(incoming_data, db_providers, db=None):
         if i[procedureCodeId] == 150582:
             if len(risen_supervisors) > 0:
                 supervisors += risen_supervisors
-            # print(supervisors)
             if supervisors.shape[0] > 0 and i[providerId] in list(supervisors['ProviderId']):
                 notifications.append(i)
                 i[procedureCodeId] = 194640

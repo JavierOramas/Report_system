@@ -50,7 +50,7 @@ def initialize_database():
         with open('config.json', 'r') as file:
             config = json.load(file)
     except FileNotFoundError:
-        print("Error: 'config.json' file not found.")
+        # print("Error: 'config.json' file not found.")
         return None
 
     try:
@@ -59,7 +59,7 @@ def initialize_database():
         db = client[db_name]
         return db
     except Exception as e:
-        print(f"Error initializing the database: {str(e)}")
+        # print(f"Error initializing the database: {str(e)}")
         return None
 
 db = initialize_database()
