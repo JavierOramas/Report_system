@@ -128,9 +128,11 @@ class Registry:
             supervisor = db.users.find_one({'ProviderId': entry['Supervisor']})
             if not entry['MeetingDuration'] < 0 and supervisor != None:
 
-                # found = db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']})
-                db.Registry.insert_one(entry)
-                    
+                found = db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']})
+                
+                if found != entry:
+                    db.Registry.insert_one(entry)
+                
         db.min_year.delete_one({})
         db.min_year.insert_one({
             'year': min_year
