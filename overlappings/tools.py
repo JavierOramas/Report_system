@@ -165,29 +165,31 @@ def process(incoming_data, db_providers, db=None):
     RBTs = pd.DataFrame(columns=labels_t)
     sup = []
     
-    try:
-        log("getting users")
+    if True:
+        
         providers_data = db.users.find()
         providers_data = list(providers_data)
+        
+    try:
         for i in providers_data:
-            
             lower_case_sups = [i.lower() for i in get_supervisors()]
+            if not 'role' in i:
+                continue
             if i['role'].lower() in lower_case_sups:
                 sup.append(i)
                 # supervisors.append(i,ignore_index=True)
             if i['role'].lower() == 'rbt':
-                RBTs.append(i)
+                RBTs.append(i, ignore_index=True)
             else:
                 trainees.append(i, ignore_index=True)
             
         supervisors = pd.DataFrame(sup)
-        log(supervisors)
     except:
+        alert = {"warning": "error using providers from database. Fallback to static data, consult manager"}
         providers_data = get_providers(db_providers)
         supervisors = providers_data[providers_data['Type'] == 'Supervisor']
         risen_supervisors = providers_data[providers_data['Type']
                                        == 'Risen Supervisor']
-
         trainees = providers_data[providers_data['Status'] == 'Trainee']
         RBTs = providers_data[providers_data['Status'] == 'RBT']
 
@@ -228,14 +230,14 @@ def process(incoming_data, db_providers, db=None):
             non_supervisors.append(i)
             continue
 
-        if i[procedureCodeId] == 150582:
-            if len(risen_supervisors) > 0:
-                supervisors += risen_supervisors
-            if supervisors.shape[0] > 0 and i[providerId] in list(supervisors['ProviderId']):
-                notifications.append(i)
-                i[procedureCodeId] = 194640
-                depured_data.append(i)
-                continue
+        # if i[procedureCodeId] == 150582:
+        #     if len(risen_supervisors) > 0:
+        #         supervisors += risen_supervisors
+        #     if supervisors.shape[0] > 0 and i[providerId] in list(supervisors['ProviderId']):
+        #         notifications.append(i)
+        #         i[procedureCodeId] = 194640
+        #         depured_data.append(i)
+        #         continue
 
             if i[providerId] in list(RBTs['ProviderId']):
                 errors.append(i)
