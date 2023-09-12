@@ -134,10 +134,12 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
                 time = min(entry_end, end) - max(entry_start, start)
                 if time != 0:
                     overlapping.append((entry, i, time))
-
+                    
     if len(overlapping) == 0:
         return []
     if len(overlapping) > 1:
+        overlapping.sort(key=lambda x: x[1][7] == 194640)
+        print(overlapping)
         new_overlapping = ''
         for i in overlapping:
             if i[1][providerId] in risen_supervisors:
@@ -156,7 +158,7 @@ def calculate_overlapping(entry, providerName, providerId, depured_data, procedu
 
 
 def process(incoming_data, db_providers, db=None):
-    log("Process")
+    
     labels_t = ['ProviderId', 'name', 'email', 'first_name', 'last_name', 'BACB_id', 'credential', 'role', 'background_screening_type', 'hired_date', 'background_date', 'background_exp_date']
     final_ol = pd.DataFrame()
     supervisors = pd.DataFrame(columns=labels_t)

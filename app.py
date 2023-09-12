@@ -326,23 +326,19 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
 
     if user and "ProviderId" in user:
         user['providerId'] = user['ProviderId']
-        log("year:", year)
-        log("month:", month)
         entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face = get_entries(
             'basic', year, month, user)
-        log("entries:", len(entries))
 
         for entry in entries:
             name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
             if name:
                 entry['Supervisor'] = name['name']
-        # log("observed:",observed_with_client)
+
         # 5th percent of total hours
         minimum_supervised = round_half_up(total_hours * 0.05, 3)
         if minimum_supervised == 0:
             minimum_supervised = round(total_hours * 0.05, 3)
         # print(minimum_supervised)
-        log("user:", user)
 
         missing = []
 
@@ -468,26 +464,20 @@ def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now(
 @app.route('/user/edit/<id>', methods=('GET', 'POST'))
 @login_required
 def config_edit(id):
-    log(id)
-    log(session['user'])
     try:
         flag = (session['user']['_id'] == str(id))
     except:
         flag = (session['user']['_id'] == ObjectId(str(id)))
-    log(flag)
     is_admin = ('role' in session['user']
                 and session['user']['role'] in get_admins())
-    log(is_admin)
     if (flag) or is_admin:
         if request.method == 'POST':
-            log('edit')
             try:
                 prov_id = int(request.form.get('provider_id'))
             except:
                 prov_id = ''
             try:
                 if is_admin:
-                    log('user is admin')
                     data = {
                         "name": f'{request.form.get("first_name")} {request.form.get("last_name")} {request.form.get("credential")}',
                         "ProviderId": prov_id,
@@ -518,10 +508,8 @@ def config_edit(id):
                         "background_exp_date": request.form.get('background_exp_date'),
                     }
                 pwd = request.form.get("password")
-                log(pwd)
                 if pwd != '':
                     data['password'] = pbkdf2_sha256.encrypt(pwd)
-                log(data)
                 db.users.update_one({"_id": ObjectId(str(id))}, {'$set': data})
             except:
                 data = {
@@ -600,7 +588,6 @@ def new_user():
 
     if request.method == 'GET':
         user = db.users.find_one({'_id': str(id)})
-        log(user)
         if user:
             return render_template('edit_user.html', user=user)
 
@@ -961,7 +948,6 @@ def get_report(year, month, id):
             nm = '0'+str(nm)
         filename = f"{nm}{year}-{user['name']}-RBT_Service-Delivery_and_Supervision_Hours_Tracker.pdf"
         pdfkit.from_string(template, './report.pdf', options=options, configuration=pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path))
-        log("pdf generated")
         sleep(1)
 
         return send_file('./report.pdf', download_name=filename, as_attachment=True)
@@ -969,7 +955,6 @@ def get_report(year, month, id):
         #     log("Something went Wrong!")
         #     return dashboard(month, month, alert=None)
     else:
-        log("Something went Wrong!")
         return dashboard(month, month)
 
 

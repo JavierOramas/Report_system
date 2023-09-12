@@ -125,17 +125,21 @@ class Registry:
                 entry['DateOfService'])
 
             supervisor = db.users.find_one({'ProviderId': entry['Supervisor']})
-            # print(supervisor)
             if not entry['MeetingDuration'] < 0 and supervisor != None:
 
                 found = db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']})
                 # print(found)
-                if not found:
-                #     print(entry)
+                same = True
+                entry_without_id = {key: entry[key] for key in entry if key != "_id"}
+                found_without_id = {key: found[key] for key in found if key != "_id"} if found else None
+                if entry_without_id != found_without_id:
+                    same = False
+                
+                if not found or not same:
+                    # print(entry)
                     db.Registry.insert_one(entry)
-                elif int(found['ProcedureCodeId']) in [194640, 194592] :
-                    print(found['ProcedureCodeId'])
-                    db.Registry.delete_one({'_id': found['_id']})
+                elif int(found['ProcedureCodeId']) in [194640, 194592] and entry["ProcedureCodeId"] != found['ProcedureCodeId']:
+                    # db.Registry.delete_one({'_id': found['_id']})
                     db.Registry.insert_one(entry)
                 
         db.min_year.delete_one({})
