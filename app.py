@@ -335,9 +335,9 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
                 entry['Supervisor'] = name['name']
 
         # 5th percent of total hours
-        minimum_supervised = round_half_up(total_hours * 0.05, 3)
+        minimum_supervised = total_hours * 0.05
         if minimum_supervised == 0:
-            minimum_supervised = round(total_hours * 0.05, 3)
+            minimum_supervised = total_hours * 0.05
         # print(minimum_supervised)
 
         missing = []
@@ -353,7 +353,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
         curr_year = int(curr_year)+1
         log("year:", year)
         log("month:", month)
-        return render_template("user_work.html", face_to_face = face_to_face,  id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
+        return render_template("user_work.html", face_to_face = face_to_face,  id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 3), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
 
     return redirect("/")
 
