@@ -5,15 +5,20 @@
 
 {% if alert != None and alert != '' %}
 <div class="position-fixed top-0 start-0 translate-middle-y" style="z-index: 999; margin-top:100px; min-width: 25%;">
-    <div class="alert alert-success" role="alert">
+
+    <div class="alert alert-{% if alert['correct'] %}success{% else %}danger{% endif %}" role="alert">
+    
         <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <span class="alert-icon me-2">
                     {% if alert['correct'] %}
                         &#10003;
+                        <div class="alert-text">{{ alert['correct'] }}</div>
+                    {% else %}
+                        <div class="alert-text">{{ alert['Error'] }}</div>
                     {% endif %}
                 </span>
-                <div class="alert-text">{{ alert['correct'] }}</div>
+
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>

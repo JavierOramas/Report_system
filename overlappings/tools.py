@@ -220,7 +220,6 @@ def process(incoming_data, db_providers, db=None):
 
     supervisors_data = np.array(supervisors_data)
 
-    # print(len(supervisors_data))
 
     for k in range(len(supervisors_data)):
 
