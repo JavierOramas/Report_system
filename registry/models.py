@@ -129,8 +129,8 @@ class Registry:
 
                 found = db.Registry.find_one({"ProviderId": entry['ProviderId'], "entryId": entry['entryId']})
                 
-                if found != entry:
-                    db.Registry.insert_one(entry)
+                # if found != entry:
+                db.Registry.insert_one(entry)
                 
         db.min_year.delete_one({})
         db.min_year.insert_one({
