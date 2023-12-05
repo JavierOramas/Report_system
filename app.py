@@ -448,15 +448,14 @@ def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now(
     # log(observed_with_client)
 
     missing = []
+    user = session['user']
     
     if not (role in get_admins()):
-        user = session['user']
         for i in ["ProviderId", "name", "email", "first_name", "last_name", "BACB_id", "credential", "role", "background_screening_type"]:
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue
             missing.append(i)
 
-    user = session['user']
     return render_template('dashboard.html', user=user,  face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 3), minimum_supervised=5/100*total_hours, supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
 
 # Only admins will see this page and it will let edit users and provider ids
