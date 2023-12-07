@@ -151,7 +151,7 @@ def get_pending(role, user):
     db = initialize_database()
     if role.lower() == 'admin':
         entries = list(db.Registry.find({'Verified': False}))
-    elif role.lower() in get_supervisors():
+    elif role.lower() in [i.lower() for i in get_supervisors()]:
         entries = list(db.Registry.find({'Verified': False, "Supervisor": int(user['providerId'])}))
     elif role.lower() in ['basic', 'rbt', 'rbt/trainee', 'rbt/ba trainee']:
         provider_id = user.get('providerId') or user.get('ProviderId')
