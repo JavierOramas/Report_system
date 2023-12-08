@@ -358,7 +358,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
         # print(exp)
         curr_year = int(curr_year)+1
 
-        return render_template("user_work.html", face_to_face = face_to_face,  id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 3), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
+        return render_template("user_work.html", face_to_face = face_to_face,  id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
 
     return redirect("/")
 
@@ -939,7 +939,7 @@ def get_report(year, month, id):
         # try:
         entries = entries_to_print
         template = render_template(
-            'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=total_hours, minimum_supervised=round(total_hours*0.05, 4), supervised_hours=round(supervised_time, 4), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
+            'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=total_hours, minimum_supervised=round(total_hours*0.05, 2), supervised_hours=round(supervised_time, 2), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
         options = {
             'page-size': 'A4',
             # 'orientation': ,
