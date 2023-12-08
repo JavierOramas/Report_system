@@ -611,11 +611,12 @@ def add(id=None):
             user = db.users.find_one({"_id": ObjectId(id)})
         except:
             user = db.users.find_one({"_id": id})
+        id = user['ProviderId']
 
     if request.method == 'GET':
         entry = {
             # "entryId": entry["Id"],
-            "ProviderId": user['ProviderId'],
+            "ProviderId": id,
             "ProcedureCodeId": '',
             "TimeWorkedInHours": 0,
             "MeetingDuration": 0,
@@ -638,7 +639,7 @@ def add(id=None):
             temp = db.users.find({"role": role})
             supervisors += list(temp)
 
-        return render_template('edit.html', role=session['user']['role'], id=user['ProviderId'], entry=entry, supervisors=supervisors, codes=list(db.procedure_codes.find()))
+        return render_template('edit.html', role=session['user']['role'], id=id, entry=entry, supervisors=supervisors, codes=list(db.procedure_codes.find()))
         # return redirect(url_for('/', message={'error':'you cant edit that entry'}))
     else:
         group = individual = 'no'
@@ -734,8 +735,9 @@ def delete_entry(id):
 
 
 @ app.route('/edit/<id>/<year>/<month>', methods=('GET', 'POST'))
+@ app.route('/edit/<id>', methods=('GET', 'POST'))
 @ login_required
-def edit(id, year, month):
+def edit(id, year=None, month=None):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     # log(entry)
     if request.method == 'GET':
