@@ -133,8 +133,9 @@ def get_entries(role, year, month, user):
     for entry in entries:
         if (entry['ObservedwithClient'] == True or entry['ObservedwithClient'] == 'yes') and entry["Verified"] == True:
             observed_with_client += 1
-
-        if entry['Verified'] == True and entry['MeetingForm'] == True:
+            
+        print(entry["ModeofMeeting"], entry["Verified"], entry["MeetingForm"])
+        if entry['Verified'] == True and entry['MeetingForm'] == True and entry["ModeofMeeting"] in ['In Person','in person']:
             face_to_face += 1
             supervised_time += entry['MeetingDuration']
 
@@ -355,8 +356,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
         role = user['role'] or 'rbt'
         # print(exp)
         curr_year = int(curr_year)+1
-        log("year:", year)
-        log("month:", month)
+
         return render_template("user_work.html", face_to_face = face_to_face,  id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 3), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
 
     return redirect("/")
@@ -409,7 +409,7 @@ def dashboard(
     year=(datetime.datetime.now().year if datetime.datetime.now().month-1 else datetime.datetime.now().year-1), 
     alert=None
     ):
-    print("here")
+
     if alert == None:
         alert = session['messages'] if 'messages' in session else None
         session['messages'] = None
@@ -428,7 +428,7 @@ def dashboard(
     print(year, month)
     entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face = get_entries(
         role, year, month, session['user'])
-    print(entries)
+    print(face_to_face)
     if role in get_supervisors():
         us = inspect_supervisor(
             db=db, year=year, month=month, pid=session['user']['providerId'])
@@ -462,8 +462,8 @@ def dashboard(
             if i in user and user[i] != None and user[i] != "" and user[i] != "None" and user[i] != nan:
                 continue
             missing.append(i)
-
-    return render_template('dashboard.html', user=user,  face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 3), minimum_supervised=5/100*total_hours, supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, missing=missing)
+    exp = supervised_time >= 5/100*total_hours and observed_with_client >= 1 and face_to_face >= 2
+    return render_template('dashboard.html', user=user,  face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 3), minimum_supervised=5/100*total_hours, supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client,exp = exp, missing=missing)
 
 # Only admins will see this page and it will let edit users and provider ids
 
@@ -649,7 +649,7 @@ def add(id=None):
             individual = 'yes'
 
         db.Registry.insert_one({
-            "ProviderId": user['ProviderId'],
+            "ProviderId": id,
             "ProcedureCodeId": int(request.form.get('ProcedureCodeId')),
             "MeetingDuration": float(request.form.get("MeetingDuration")),
             "ModeofMeeting": request.form.get("meeting_type"),
@@ -663,9 +663,12 @@ def add(id=None):
         })
         date = datetime_format.get_date(request.form.get('DateOfService'))
         year, month = date.year, date.month
+        
         if not session['user']['role'] in get_admins():
             return redirect('/')
         else:
+            if not user:
+                user = session["user"]
             return report(id=user['_id'], year=year, month=month)
             # return redirect(url_for('report', id=user['_id'], curr_year=datetime.datetime.now().year))
 
@@ -924,11 +927,16 @@ def get_report(year, month, id):
         company = user['background_screening_type']
         date = user['background_date']
         exp_date = user['background_exp_date']
+        entries_to_print = []
+        
         for e in entries:
             e['DateOfService'] = datetime_format.get_date(
                 e['DateOfService']).strftime("%m/%d/%Y")
+            if e['Verified']:
+                entries_to_print.append(e)
             # print(e['DateOfService'])
         # try:
+        entries = entries_to_print
         template = render_template(
             'report_rbt.html', rbt_name=user['name'], hired_date=user['hired_date'], signature=get_second_monday(year, month), date=date, exp_date=exp_date, company=company, month_year=month_year, entries=entries, total_hours=total_hours, minimum_supervised=round(total_hours*0.05, 4), supervised_hours=round(supervised_time, 4), supervisors=supervisors, report=True, observed_with_client=observed_with_client, coordinator=get_rbt_coordinator(db))
         options = {

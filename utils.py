@@ -9,8 +9,10 @@ def round_half_up(n, decimals=2):
 def get_rbt_coordinator(db):
     coordinator = db.users.find_one({'ProviderId': 1382528})
     # print(coordinator)
-    return coordinator['name']
-
+    if coordinator:
+        return coordinator['name']
+    else:
+        return "1382528"
 def get_second_monday(year, month):
     c = calendar.Calendar(firstweekday=calendar.MONDAY)
     if month < 12:
