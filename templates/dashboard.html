@@ -224,7 +224,7 @@
                                     <td>{{ entry["ObservedwithClient"] }}</td>
                                     <td>{{ entry["Supervisor"] }}</td>
                                     
-                                    {% if "rbt" in user["role"].lower() %}
+                                    {% if not "rbt" in user["role"].lower() %}
                                         <td>
                                             <a type="button" class="btn btn-primary btn-sm" href="/verify/{{ entry['_id'] }}/{{year}}/{{month}}">Verify</a>
                                         </td>
