@@ -134,7 +134,7 @@ def get_entries(role, year, month, user):
         if (entry['ObservedwithClient'] == True or entry['ObservedwithClient'] == 'yes') and entry["Verified"] == True:
             observed_with_client += 1
             
-        if entry['Verified'] == True and entry['MeetingForm'] == True and entry["ModeofMeeting"] in ['In Person','in person']:
+        if entry['Verified'] == True and entry['MeetingForm'] == True:
             face_to_face += 1
             
         if entry['Verified'] == True and entry['MeetingForm'] == True:
