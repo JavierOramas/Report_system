@@ -57,6 +57,7 @@ def initialize_database():
         client = pymongo.MongoClient(config['database']['addr'], config['database']['port'], connect=False)
         db_name = get_database_name()
         db = client[db_name]
+        print("OK")
         return db
     except Exception as e:
         # print(f"Error initializing the database: {str(e)}")
@@ -105,13 +106,16 @@ def get_entries(role, year, month, user):
         else:
             return entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face
 
+    year = int(year)
+    month = int(month) 
+    
     db = initialize_database()
-    entries_query = db.Registry.find({'ProviderId': int(str(user['providerId']))})
-
+    entries_query = list(db.Registry.find({'ProviderId': int(user['providerId'])}))
     for entry in entries_query:
         entry_year = datetime_format.get_date(entry["DateOfService"]).year
         entry_month = datetime_format.get_date(entry["DateOfService"]).month
-
+        print(entry_year, entry_month)
+        print("filter", year, month)
         if entry_year < min_year:
             min_year = entry_year
 
@@ -125,7 +129,7 @@ def get_entries(role, year, month, user):
             entries.append(entry)
 
     entries = sorted(entries, key=lambda d: d['DateOfService'])
-
+    print(len(entries))
     for entry in entries:
         if (entry['ObservedwithClient'] == True or entry['ObservedwithClient'] == 'yes') and entry["Verified"] == True:
             observed_with_client += 1
@@ -400,8 +404,12 @@ def get_roles(users):
 @app.route('/dashboard', methods=['GET'])
 @app.route('/dashboard/<month>/<year>', methods=['GET'])
 @login_required
-def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now().year, alert=None):
-
+def dashboard(
+    month=datetime.datetime.now().month-1, 
+    year=(datetime.datetime.now().year if datetime.datetime.now().month-1 else datetime.datetime.now().year-1), 
+    alert=None
+    ):
+    print("here")
     if alert == None:
         alert = session['messages'] if 'messages' in session else None
         session['messages'] = None
@@ -414,14 +422,13 @@ def dashboard(month=datetime.datetime.now().month-1, year=datetime.datetime.now(
         role = session['user']['role']
     else:
         role = 'basic'
-
-    # If user is not admin, remove the entries that dont belong to him/her
-    # if role == 'basic':
+        
     users = db.users.find()
     users = sorted(users, key=lambda d: (d['role'], d['name']))
+    print(year, month)
     entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face = get_entries(
         role, year, month, session['user'])
-    
+    print(entries)
     if role in get_supervisors():
         us = inspect_supervisor(
             db=db, year=year, month=month, pid=session['user']['providerId'])
@@ -869,8 +876,9 @@ def filter_data():
     if not month:
         month = datetime.datetime.now().month-1
     if not year:
-        year = datetime.datetime.now().year
-
+        year = datetime.datetime.now().year 
+        if month == 12:
+            year -= 1
     return redirect(f"/dashboard/{month}/{year}")
 
 
