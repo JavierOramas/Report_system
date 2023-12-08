@@ -129,14 +129,15 @@ def get_entries(role, year, month, user):
             entries.append(entry)
 
     entries = sorted(entries, key=lambda d: d['DateOfService'])
-    print(len(entries))
+
     for entry in entries:
         if (entry['ObservedwithClient'] == True or entry['ObservedwithClient'] == 'yes') and entry["Verified"] == True:
             observed_with_client += 1
             
-        print(entry["ModeofMeeting"], entry["Verified"], entry["MeetingForm"])
         if entry['Verified'] == True and entry['MeetingForm'] == True and entry["ModeofMeeting"] in ['In Person','in person']:
             face_to_face += 1
+            
+        if entry['Verified'] == True and entry['MeetingForm'] == True:
             supervised_time += entry['MeetingDuration']
 
         if int(entry['ProcedureCodeId']) == 194641 and entry["Verified"] == True and entry['MeetingForm'] == True:
@@ -463,7 +464,7 @@ def dashboard(
                 continue
             missing.append(i)
     exp = supervised_time >= 5/100*total_hours and observed_with_client >= 1 and face_to_face >= 2
-    return render_template('dashboard.html', user=user,  face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 3), minimum_supervised=round(5/100*total_hours, 3), supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client,exp = exp, missing=missing)
+    return render_template('dashboard.html', user=user,  face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(5/100*total_hours, 2), supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client,exp = exp, missing=missing)
 
 # Only admins will see this page and it will let edit users and provider ids
 
