@@ -637,7 +637,7 @@ def add(id=None):
         supervisors = []
         for role in supervisor_roles:
             temp = db.users.find({"role": role})
-            supervisors += list(temp)
+            supervisors += list(temp) 
 
         return render_template('edit.html', role=session['user']['role'], id=id, entry=entry, supervisors=supervisors, codes=list(db.procedure_codes.find()))
         # return redirect(url_for('/', message={'error':'you cant edit that entry'}))

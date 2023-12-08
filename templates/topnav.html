@@ -48,9 +48,11 @@ missing, exp) %}
     <div class="ml-auto">
       <ul class="navbar-nav">
         {% if report%}
-        <li class="nav-item">
-          <a class="nav-link" href="/report/{{year}}/{{month}}/{{id}}">Force Export PDF</a>
-        </li>
+          {% if user["role"] == "admin" %}
+            <li class="nav-item">
+              <a class="nav-link" href="/report/{{year}}/{{month}}/{{id}}">Force Export PDF</a>
+            </li>
+          {% endif %}
         {% endif %}
         <li class="nav-item">
           <a class="nav-link" href="/user/signout">Sign Out</a>
