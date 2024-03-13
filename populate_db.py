@@ -36,8 +36,8 @@ with open('config.json', 'r') as file:
 client = pymongo.MongoClient(config['database']['addr'], config['database']['port'])
 db = client.abs_tracking_db
 
-name = input("Admin account name: ")
-passwd = input("Admin account password: ")
-email = input("Admin account email: ")
+name = 'absadmin'
+passwd = 'absadmin'
+email = 'absadmin@americanbehavioralsolutions.com'
 
 print(signup(name, email, passwd))
