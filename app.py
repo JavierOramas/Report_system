@@ -23,12 +23,20 @@ from utils import get_rbt_coordinator, get_second_monday, round_half_up
 from roles.models import get_all_roles
 from sup_view import inspect_supervisor
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi, x_for=1, x_proto=1, x_host=1, x_port=1)
+
 
 # Configuration
 app.config["DEBUG"] = True
 app.secret_key = 'testing'
+
+app.config['APPLICATION_ROOT'] = '/'
+
+app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 UPLOAD_FOLDER = 'static/files'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
