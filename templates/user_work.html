@@ -29,7 +29,7 @@
         <div class="tab-content" style="margin-top: 10px;" id="myTabContent">
             <div class="tab-pane fade show active" id="ovl" role="tabpanel" aria-labelledby="ovl-tab">
                 <div class="table-preferences">
-                    <form method="POST" action="/user_report/{{id}}" method="POST" enctype="multipart/form-data">
+                    <form method="POST" action="https://rbt.americanbehavioralsolutions.com/user_report/{{id}}" method="POST" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-sm-3">
                                 <div class="form-group">
@@ -60,7 +60,7 @@
 
                             <div class="col-sm-3">
                                 <div class="form-group">
-                                    <a type="button" class="btn btn-primary btn-sm" href="/edit/new/{{id}}">Add New</a>
+                                    <a type="button" class="btn btn-primary btn-sm" href="https://rbt.americanbehavioralsolutions.com/edit/new/{{id}}">Add New</a>
                                 </div>
                             </div>
                         </div>
@@ -79,7 +79,7 @@
                         {% for entry in entries %}
                         {% if entry["Verified"] == True %}
                         <tr>
-                            <td> <a type="button" href="/meeting/{{ entry['_id'] }}/{{year}}/{{month}}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
+                            <td> <a type="button" href="https://rbt.americanbehavioralsolutions.com/meeting/{{ entry['_id'] }}/{{year}}/{{month}}">{% if entry['MeetingForm'] == False %} ❌ {% else %} ✅ {% endif %}</a></td>
                             {% if entry['ProcedureCodeId']|int in code_id%}
                             {% for i in codes %}
                                 {% if i['code']|int == entry['ProcedureCodeId']|int %}
@@ -98,7 +98,7 @@
                             <td>{{ entry["ObservedwithClient"] }}</td>
                             <td>{{ entry["Supervisor"] }}</td>
                             <td>
-                                <a type="button" class="btn btn-primary btn-sm" href="/edit/{{ entry['_id'] }}/{{year}}/{{month}}">Edit</a>
+                                <a type="button" class="btn btn-primary btn-sm" href="https://rbt.americanbehavioralsolutions.com/edit/{{ entry['_id'] }}/{{year}}/{{month}}">Edit</a>
                             </td>
                             <td>
                                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#delete{{entry['_id']}}">
@@ -117,7 +117,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <a class="btn btn-primary" href="/del/entry/{{ entry['_id'] }}">Delete</a>
+                                            <a class="btn btn-primary" href="https://rbt.americanbehavioralsolutions.com/del/entry/{{ entry['_id'] }}">Delete</a>
                                         </div>
                                       </div>
                                     </div>
@@ -151,7 +151,7 @@
                             <td>{{ entry["ObservedwithClient"] }}</td>
                             <td>{{ entry["Supervisor"] }}</td>
                             <td>
-                                <a type="button" class="btn btn-primary btn-sm" href="/verify/{{ entry['_id'] }}/{{year}}/{{month}}">Verify</a>
+                                <a type="button" class="btn btn-primary btn-sm" href="https://rbt.americanbehavioralsolutions.com/verify/{{ entry['_id'] }}/{{year}}/{{month}}">Verify</a>
                             </td>
                         </tr>
                         {% endfor %}

@@ -5,14 +5,14 @@ $("form[name=signup_form]").submit(function(e){
     var data = $form.serialize();
 
     $.ajax({
-        url: "/user/signup",
+        url: "https://rbt.americanbehavioralsolutions.com/user/signup",
         type: "POST",
         data: data,
         dataType: "json",
         success: function(resp){
             console.log(resp);
             $error.text(" ").addClass("error--hidden");
-            window.location.href = "/dashboard"
+            window.location.href = "https://rbt.americanbehavioralsolutions.com/dashboard"
         },
         error:function(resp){
             console.log(resp);
@@ -30,14 +30,14 @@ $("form[name=login_form]").submit(function(e){
     var data = $form.serialize();
 
     $.ajax({
-        url: "/user/login",
+        url: "https://rbt.americanbehavioralsolutions.com/user/login",
         type: "POST",
         data: data,
         dataType: "json",
         success: function(resp){
             console.log(resp);
             $error.text(" ").addClass("error--hidden");
-            window.location.href = "/dashboard"
+            window.location.href = "https://rbt.americanbehavioralsolutions.com/dashboard"
         },
         error:function(resp){
             console.log(resp);

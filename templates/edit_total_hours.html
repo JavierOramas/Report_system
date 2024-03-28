@@ -3,7 +3,7 @@
 {% block content %}
 <div class="card-wrapper">
     <div class="card">
-        <form action="/edit_total_hours/{{ id }}/{{ year }}/{{ month }}" method="POST">
+        <form action="https://rbt.americanbehavioralsolutions.com/edit_total_hours/{{ id }}/{{ year }}/{{ month }}" method="POST">
             <div class="mb-3">
                 <label for="number" class="form-label">Total Hours:</label>
                 <input type="text" id="number" name="number" class="form-control" required pattern="\d+(\.\d+)?" title="Enter a valid number" value="{{ total_hours }}">

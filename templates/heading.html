@@ -53,7 +53,7 @@ report, observed_with_client, missing, exp, face_to_face) %}
             <div class="col-md">
                 <div class="container mt-5">
                     <h1>Upload Timesheet CSV file</h1>
-                    <form id="uploadForm" method="POST" action="/dashboard" enctype="multipart/form-data">
+                    <form id="uploadForm" method="POST" action="https://rbt.americanbehavioralsolutions.com/dashboard" enctype="multipart/form-data">
                         <div class="mb-3">
                             <input class="form-control" type="file" accept=".csv" name="file" id="uploadFile">
                         </div>
@@ -66,7 +66,7 @@ report, observed_with_client, missing, exp, face_to_face) %}
             <div class="col-md">
                 <div class="container mt-5">
                     <h1>Upload Users CSV</h1>
-                    <form id="usersUploadForm" method="POST" action="/dashboard/providers" enctype="multipart/form-data">
+                    <form id="usersUploadForm" method="POST" action="https://rbt.americanbehavioralsolutions.com/dashboard/providers" enctype="multipart/form-data">
                         <div class="mb-3">
                             <input class="form-control" type="file" accept=".csv" name="file" id="userUploadFile">
                         </div>
@@ -107,7 +107,7 @@ report, observed_with_client, missing, exp, face_to_face) %}
     <div class="row card">
         <h1>This Month Report Status:</h1>
         <p data-bs-toggle="tooltip" data-bs-placement="right" title="Total hours this month">Total Hours:
-            {{ total_hours or 0 }}h <a href="/edit_total_hours/{{ user['ProviderId'] }}/{{ year }}/{{ month }}">✏️</a>
+            {{ total_hours or 0 }}h <a href="https://rbt.americanbehavioralsolutions.com/edit_total_hours/{{ user['ProviderId'] }}/{{ year }}/{{ month }}">✏️</a>
         </p>
         <p data-bs-toggle="tooltip" data-bs-placement="right" title="5% of total hours needed">
             Supervised Hours with Meeting Form / Minimum Requirement: {{ supervised_time or 0 }}h / {{ minimum_supervised or 0 }}h

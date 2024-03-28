@@ -160,7 +160,6 @@ def get_entries(role, year, month, user):
 
     return entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face
 
-
 def get_pending(role, user):
     db = initialize_database()
     if role.lower() == 'admin':
