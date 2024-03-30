@@ -18,7 +18,7 @@ class User:
         # del user['_id']
         user['_id'] = str(user['_id'])
         session['logged_in'] = True
-        sessiostart_sessionn['user'] = user
+        session['user'] = user
         return jsonify(user), 200
 
     # create new user
