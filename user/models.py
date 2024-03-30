@@ -18,7 +18,7 @@ class User:
         # del user['_id']
         user['_id'] = str(user['_id'])
         session['logged_in'] = True
-        session['user'] = user
+        sessiostart_sessionn['user'] = user
         return jsonify(user), 200
 
     # create new user
@@ -53,6 +53,7 @@ class User:
         }
         user = db.users.find_one({'email':request.form.get('email')})
         if user and pbkdf2_sha256.verify(request.form.get('password'), user['password']):
+            print(user["name"], "logged in")
             return self.start_session(user)
 
         # If this is reached something wrong Happened
