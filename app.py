@@ -40,6 +40,17 @@ app.config['PREFERRED_URL_SCHEME'] = 'https'
 UPLOAD_FOLDER = 'static/files'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+@app.before_request
+def before_request():
+    if app.env == "development":
+        return
+    if request.is_secure:
+        return
+
+    url = request.url.replace("http://", "https://", 1)
+    code = 301
+    return redirect(url, code=code)
+
 def get_database_name():
     try:
         with open("database_name.txt") as d:
