@@ -23,11 +23,11 @@ from utils import get_rbt_coordinator, get_second_monday, round_half_up
 from roles.models import get_all_roles
 from sup_view import inspect_supervisor
 from werkzeug.utils import secure_filename
-from werkzeug.middleware.proxy_fix import ProxyFix
+
+from flask_sslify import SSLify
 
 app = Flask(__name__)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
-
+sslify = SSLify(app)
 
 # Configuration
 app.config["DEBUG"] = True
