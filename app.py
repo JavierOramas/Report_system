@@ -35,8 +35,6 @@ app.secret_key = 'testing'
 
 app.config['APPLICATION_ROOT'] = '/'
 
-app.config['PREFERRED_URL_SCHEME'] = 'https'
-
 UPLOAD_FOLDER = 'static/files'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -79,9 +77,8 @@ def login_required(f):
         if 'logged_in' in session:
             return f(*args, **kwargs)
         else:
-            return redirect('/')
+            return redirect('/dashboard')
     return wrap
-
 
 def admin_required(f):
     @wraps(f)
@@ -195,7 +192,7 @@ def register():
 # Dashboard
 
 # Post endpoint to upoad file
-@app.route("/dashboard", methods=['POST'])
+@app.route("/dashboard/upload", methods=['POST'])
 @login_required
 @admin_required
 def upload_files():
@@ -250,8 +247,6 @@ def upload_users_file():
         flash(f'Error uploading file: {str(e)}', 'error')
 
     return redirect(url_for('upload_provider'))
-
-
 
 @app.route('/providers')
 @login_required
@@ -366,7 +361,7 @@ def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.no
 
         return render_template("user_work.html", face_to_face = face_to_face,  id=id, curr_year=curr_year, session=session, year=year, month=month, entries=entries, total_hours=total_hours, supervised_time=supervised_time, minimum_supervised=round(minimum_supervised, 2), ids=ids, meetings=meetings, min_year=min_year, supervisors=supervisors, report=True, user=user, observed_with_client=observed_with_client, alert=alert, pending=get_pending('basic', user), missing=missing, codes=list(db.procedure_codes.find()), code_id=[int(i['code']) for i in db.procedure_codes.find()], role=role, exp=exp)
 
-    return redirect("/")
+    return redirect("/dashboard")
 
 # Dashoard for client (login Needed)
 
@@ -545,7 +540,7 @@ def config_edit(id):
 
                 db.users.update_one({"_id": str(id)}, {
                     '$set': data})
-            return redirect("/")
+            return redirect("/dashboard")
 
         if request.method == 'GET':
             try:
@@ -598,7 +593,7 @@ def new_user():
             "background_exp_date": request.form.get('background_exp_date'),
         })
 
-        return redirect("/")
+        return redirect("/dashboard")
 
     if request.method == 'GET':
         user = db.users.find_one({'_id': str(id)})
@@ -724,7 +719,7 @@ def meeting(id, year, month):
         if rbt:
             return report(id=rbt['_id'], year=year, month=month)
             # return redirect(url_for('report', id=rbt["_id"], alert=None, year=year, month=month, curr_year=datetime.datetime.now().year))
-        return redirect("/")
+        return redirect("/dashboard")
 
 
 @ app.route('/del/entry/<id>', methods=('GET', 'POST'))
