@@ -30,14 +30,14 @@ $("form[name=login_form]").submit(function(e){
     var data = $form.serialize();
 
     $.ajax({
-        url: "https://rbt.americanbehavioralsolutions.com/user/login",
+        url: "/user/login",
         type: "POST",
         data: data,
         dataType: "json",
         success: function(resp){
             console.log(resp);
             $error.text(" ").addClass("error--hidden");
-            window.location.href = "https://rbt.americanbehavioralsolutions.com/dashboard"
+            window.location.href = "/dashboard"
         },
         error:function(resp){
             console.log(resp);
