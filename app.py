@@ -27,7 +27,7 @@ from werkzeug.utils import secure_filename
 from flask_sslify import SSLify
 
 app = Flask(__name__)
-sslify = SSLify(app)
+# sslify = SSLify(app)
 
 # Configuration
 app.config["DEBUG"] = True
