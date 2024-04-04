@@ -73,7 +73,8 @@ db = initialize_database()
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        log(session)
+        log(args)
+        log(kwargs)
         if 'logged_in' in session:
             log("redirecting to the called site")
             return f(*args, **kwargs)
