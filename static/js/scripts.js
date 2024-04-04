@@ -39,15 +39,11 @@ $("form[name=login_form]").submit(function(e){
             $error.text("").addClass("error--hidden"); // Changed " " to "" for clarity
             window.location.href = "https://rbt.americanbehavioralsolutions.com/dashboard" // Change to your domain with https
         },
-        error:function(resp){
+        error:
+        function(resp){
             console.log(resp);
-            if(resp.responseJSON && resp.responseJSON.error) {
-                console.log(resp.responseJSON.error);
-                $error.text(resp.responseJSON.error).removeClass("error--hidden");
-            } else {
-                console.log("An unknown error occurred.");
-                $error.text("An unknown error occurred.").removeClass("error--hidden");
-            }
+            $error.text("").addClass("error--hidden"); // Changed " " to "" for clarity
+            window.location.href = "https://rbt.americanbehavioralsolutions.com/dashboard" // Change to your domain with https
         },
     });
     e.preventDefault();
