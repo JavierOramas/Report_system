@@ -20,6 +20,7 @@ class User:
         session['logged_in'] = True
         session['user'] = user
         log(user)
+        log(session)
         return jsonify(user), 200
 
     # create new user
