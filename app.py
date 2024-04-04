@@ -28,7 +28,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 app = Flask(__name__)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+# app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 # Enforce SSL
 sslify = SSLify(app)
 
@@ -182,7 +182,7 @@ def get_pending(role, user):
     return entries
 
 # Home Route with login form
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def home():
     if 'logged_in' in session:
         print(f"Session Data: {session.__dict__}")
