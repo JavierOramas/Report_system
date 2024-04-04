@@ -42,8 +42,8 @@ $("form[name=login_form]").submit(function(e){
         error:
         function(resp){
             console.log(resp);
-            $error.text("").addClass("error--hidden"); // Changed " " to "" for clarity
-            window.location.href = "https://rbt.americanbehavioralsolutions.com/dashboard" // Change to your domain with https
+            console.log(resp.responseJSON.error)
+            $error.text(resp.responseJSON.error).removeClass("error--hidden");
         },
     });
     e.preventDefault();
