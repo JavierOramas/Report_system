@@ -23,30 +23,31 @@ $("form[name=signup_form]").submit(function(e){
     e.preventDefault();
 });
 
-$("form[name=login_form]").submit(function(e){
+// $("form[name=login_form]").submit(function(e){
 
-    var $form =  $(this);
-    var $error = $form.find(".error");
-    var data = $form.serialize();
+//     var $form =  $(this);
+//     var $error = $form.find(".error");
+//     var data = $form.serialize();
 
-    $.ajax({
-        url: "https://rbt.americanbehavioralsolutions.com/user/login",
-        type: "POST",
-        data: data,
-        dataType: "json",
-        success: function(resp){
-            console.log(resp);
-            $error.text(" ").addClass("error--hidden");
-            window.location.href = "https://rbt.americanbehavioralsolutions.com/dashboard"
-        },
-        error:function(resp){
-            console.log(resp);
-            console.log(resp.responseJSON.error)
-            $error.text(resp.responseJSON.error).removeClass("error--hidden");
-        },
-    });
-    e.preventDefault();
-});
+//     $.ajax({
+//         url: "https://rbt.americanbehavioralsolutions.com/user/login", // Change to your domain with https
+//         type: "POST",
+//         data: data,
+//         dataType: "json",
+//         success: function(resp){
+//             console.log(resp);
+//             $error.text("").addClass("error--hidden"); // Changed " " to "" for clarity
+//             window.location.href = "https://rbt.americanbehavioralsolutions.com/dashboard" // Change to your domain with https
+//         },
+//         error:
+//         function(resp){
+//             console.log(resp);
+//             console.log(resp.responseJSON.error)
+//             $error.text(resp.responseJSON.error).removeClass("error--hidden");
+//         },
+//     });
+//     e.preventDefault();
+// });
 
 // $("form[name=edit_form]").submit(function(e){
 

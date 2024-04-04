@@ -23,14 +23,15 @@ from utils import get_rbt_coordinator, get_second_monday, round_half_up
 from roles.models import get_all_roles
 from sup_view import inspect_supervisor
 from werkzeug.utils import secure_filename
-
 from flask_sslify import SSLify
 
 app = Flask(__name__)
-# sslify = SSLify(app)
+
+# Enforce SSL
+sslify = SSLify(app)
+
 
 # Configuration
-app.config["DEBUG"] = True
 app.secret_key = 'testing'
 
 app.config['APPLICATION_ROOT'] = '/'
@@ -74,10 +75,15 @@ db = initialize_database()
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
+        log(f)
+        log(args)
+        log(kwargs)
         if 'logged_in' in session:
+            log("redirecting to the called site")
             return f(*args, **kwargs)
         else:
-            return redirect('/dashboard')
+            log("redirecting to login")
+            return redirect('/')
     return wrap
 
 def admin_required(f):
@@ -177,6 +183,7 @@ def get_pending(role, user):
 @app.route("/")
 def home():
     if 'logged_in' in session:
+        print(f"Session Data: {session.__dict__}")
         return redirect('/dashboard')
     # Render the home page with the login form
     return render_template('home.html', register=False)
@@ -412,12 +419,15 @@ def dashboard(
     alert=None
     ):
 
+    log("1")
     if alert == None:
         alert = session['messages'] if 'messages' in session else None
         session['messages'] = None
 
     if 'providerId' in session['user']:
         session['user']['providerId'] = int(session['user']['providerId'])
+
+    log("2")
 
     # Detect the role of the loged user to determine the permissions
     if 'role' in session['user'] and session['user']['role'] != None:
@@ -427,10 +437,10 @@ def dashboard(
         
     users = db.users.find()
     users = sorted(users, key=lambda d: (d['role'], d['name']))
-    print(year, month)
+    log(year, month)
     entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face = get_entries(
         role, year, month, session['user'])
-    print(face_to_face)
+    log(face_to_face)
     if role in get_supervisors():
         us = inspect_supervisor(
             db=db, year=year, month=month, pid=session['user']['providerId'])
@@ -441,7 +451,7 @@ def dashboard(
         users = nus
 
     pending = get_pending(role, session['user'])
-
+    log("3")
     for entry in entries:
         name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
         if name:
@@ -454,8 +464,8 @@ def dashboard(
         # log(name)
         if name:
             entry['Supervisor'] = name['first_name']
-    # log(observed_with_client)
-
+    log(observed_with_client)
+    
     missing = []
     user = session['user']
     
@@ -465,7 +475,13 @@ def dashboard(
                 continue
             missing.append(i)
     exp = supervised_time >= 5/100*total_hours and observed_with_client >= 1 and face_to_face >= 2
-    return render_template('dashboard.html', user=user,  face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(5/100*total_hours, 2), supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client,exp = exp, missing=missing)
+    try:
+        template = render_template('dashboard.html', user=user,  face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(5/100*total_hours, 2), supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, exp=exp, missing=missing)
+        log("render")
+        return template
+    except Exception as e:
+        log(f"Error rendering dashboard template: {str(e)}")
+        return "An error occurred while trying to render the dashboard. Please try again later."
 
 # Only admins will see this page and it will let edit users and provider ids
 
@@ -810,7 +826,22 @@ def signup():
 
 @ app.route('/user/login', methods=['POST'])
 def login():
-    return User().login(db)
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = db.users.find_one({"email": email})
+
+        if user and pbkdf2_sha256.verify(password, user['password']):
+            session['logged_in'] = True
+            session['user'] = user
+            log(f"User {email} logged in successfully.")
+            # return redirect(url_for('dashboard'))
+        else:
+            log(f"Failed login attempt.")
+            flash('Invalid login credentials', 'danger')
+
+    usr = User().login(db)
+    return dashboard() 
 
 
 @ app.route('/user/signout')
