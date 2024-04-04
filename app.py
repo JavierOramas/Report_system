@@ -179,7 +179,7 @@ def get_pending(role, user):
 def home():
     app.logger.info(f"Accessing Home Page: User {'logged_in' if 'logged_in' in session else 'not logged_in'}")
     if 'logged_in' in session:
-        app.logger.info(f"Session Data: {session}")
+        app.logger.info(f"Session Data: {session.__dict__}")
         return redirect('/dashboard')
     # Render the home page with the login form
     return render_template('home.html', register=False)
@@ -823,10 +823,10 @@ def login():
         if user and pbkdf2_sha256.verify(password, user['password']):
             session['logged_in'] = True
             session['user'] = user
-            log.info(f"User {email} logged in successfully.")
+            log.info(f"User logged in successfully.")
             return redirect(url_for('dashboard'))
         else:
-            log.warning(f"Failed login attempt for {email}.")
+            log.warning(f"Failed login attempt.")
             flash('Invalid login credentials', 'danger')
 
     return User().login(db)
