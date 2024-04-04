@@ -421,12 +421,15 @@ def dashboard(
     alert=None
     ):
 
+    log("1")
     if alert == None:
         alert = session['messages'] if 'messages' in session else None
         session['messages'] = None
 
     if 'providerId' in session['user']:
         session['user']['providerId'] = int(session['user']['providerId'])
+
+    log("2")
 
     # Detect the role of the loged user to determine the permissions
     if 'role' in session['user'] and session['user']['role'] != None:
@@ -436,10 +439,10 @@ def dashboard(
         
     users = db.users.find()
     users = sorted(users, key=lambda d: (d['role'], d['name']))
-    print(year, month)
+    log(year, month)
     entries, total_hours, supervised_time, ids, meetings, min_year, supervisors, observed_with_client, face_to_face = get_entries(
         role, year, month, session['user'])
-    print(face_to_face)
+    log(face_to_face)
     if role in get_supervisors():
         us = inspect_supervisor(
             db=db, year=year, month=month, pid=session['user']['providerId'])
@@ -450,7 +453,7 @@ def dashboard(
         users = nus
 
     pending = get_pending(role, session['user'])
-
+    log("3")
     for entry in entries:
         name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
         if name:
@@ -463,8 +466,8 @@ def dashboard(
         # log(name)
         if name:
             entry['Supervisor'] = name['first_name']
-    # log(observed_with_client)
-
+    log(observed_with_client)
+    
     missing = []
     user = session['user']
     
@@ -474,6 +477,7 @@ def dashboard(
                 continue
             missing.append(i)
     exp = supervised_time >= 5/100*total_hours and observed_with_client >= 1 and face_to_face >= 2
+    log("render")
     return render_template('dashboard.html', user=user,  face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(5/100*total_hours, 2), supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client,exp = exp, missing=missing)
 
 # Only admins will see this page and it will let edit users and provider ids
