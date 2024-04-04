@@ -824,12 +824,13 @@ def login():
             session['logged_in'] = True
             session['user'] = user
             log(f"User {email} logged in successfully.")
-            return redirect(url_for('dashboard'))
+            # return redirect(url_for('dashboard'))
         else:
             log(f"Failed login attempt.")
             flash('Invalid login credentials', 'danger')
 
-    return User().login(db)
+    usr = User().login(db)
+    return dashboard() 
 
 
 @ app.route('/user/signout')
