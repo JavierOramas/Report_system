@@ -8,7 +8,7 @@ import os
 from termcolor import colored
 import datetime_format
 # from app import db
-
+from logger import log
 
 class User:
 
@@ -19,6 +19,7 @@ class User:
         user['_id'] = str(user['_id'])
         session['logged_in'] = True
         session['user'] = user
+        log(user)
         return jsonify(user), 200
 
     # create new user
