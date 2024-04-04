@@ -73,6 +73,7 @@ db = initialize_database()
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
+        log(session)
         if 'logged_in' in session:
             return f(*args, **kwargs)
         else:
