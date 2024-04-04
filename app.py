@@ -823,7 +823,7 @@ def login():
         if user and pbkdf2_sha256.verify(password, user['password']):
             session['logged_in'] = True
             session['user'] = user
-            log(f"User logged in successfully.")
+            log(f"User {email} logged in successfully.")
             return redirect(url_for('dashboard'))
         else:
             log(f"Failed login attempt.")
