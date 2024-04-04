@@ -27,11 +27,14 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # Configuration
-app.config["DEBUG"] = True
+app.config["DEBUG"] = False
 app.secret_key = 'testing'
 
 UPLOAD_FOLDER = 'static/files'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Add this line to enable secure cookies
+app.config['SESSION_COOKIE_SECURE'] = True
 
 def get_database_name():
     try:
@@ -257,7 +260,6 @@ def providers():
 
 
 @app.route('/manage_roles', methods=['GET', 'POST'])
-# @app.route('/manage_procedure_codes', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def role_manager():
