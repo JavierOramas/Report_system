@@ -177,7 +177,6 @@ def get_pending(role, user):
 # Home Route with login form
 @app.route("/")
 def home():
-    print(f"Accessing Home Page: User {'logged_in' if 'logged_in' in session else 'not logged_in'}")
     if 'logged_in' in session:
         print(f"Session Data: {session.__dict__}")
         return redirect('/dashboard')
