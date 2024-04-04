@@ -477,8 +477,13 @@ def dashboard(
                 continue
             missing.append(i)
     exp = supervised_time >= 5/100*total_hours and observed_with_client >= 1 and face_to_face >= 2
-    log("render")
-    return render_template('dashboard.html', user=user,  face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(5/100*total_hours, 2), supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client,exp = exp, missing=missing)
+    try:
+        template = render_template('dashboard.html', user=user,  face_to_face=face_to_face, role=role, entries=entries, providerIds=ids, supervisors=supervisors, session=session, total_hours=round_half_up(total_hours, 2), minimum_supervised=round(5/100*total_hours, 2), supervised_hours=supervised_time, meeting_group=meetings, year=year, min_year=min_year, month=month, users=users, pending=pending, id=str(session['user']['_id']), alert=alert, report=not (role in get_admins()), observed_with_client=observed_with_client, exp=exp, missing=missing)
+        log("render")
+        return template
+    except Exception as e:
+        log(f"Error rendering dashboard template: {str(e)}")
+        return "An error occurred while trying to render the dashboard. Please try again later."
 
 # Only admins will see this page and it will let edit users and provider ids
 

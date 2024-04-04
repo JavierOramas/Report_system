@@ -30,19 +30,24 @@ $("form[name=login_form]").submit(function(e){
     var data = $form.serialize();
 
     $.ajax({
-        url: "/user/login",
+        url: "https://rbt.americanbehavioralsolutions.com/user/login", // Change to your domain with https
         type: "POST",
         data: data,
         dataType: "json",
         success: function(resp){
             console.log(resp);
-            $error.text(" ").addClass("error--hidden");
-            window.location.href = "/dashboard"
+            $error.text("").addClass("error--hidden"); // Changed " " to "" for clarity
+            window.location.href = "https://rbt.americanbehavioralsolutions.com/dashboard" // Change to your domain with https
         },
         error:function(resp){
             console.log(resp);
-            console.log(resp.responseJSON.error)
-            $error.text(resp.responseJSON.error).removeClass("error--hidden");
+            if(resp.responseJSON && resp.responseJSON.error) {
+                console.log(resp.responseJSON.error);
+                $error.text(resp.responseJSON.error).removeClass("error--hidden");
+            } else {
+                console.log("An unknown error occurred.");
+                $error.text("An unknown error occurred.").removeClass("error--hidden");
+            }
         },
     });
     e.preventDefault();
