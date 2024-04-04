@@ -24,9 +24,11 @@ from roles.models import get_all_roles
 from sup_view import inspect_supervisor
 from werkzeug.utils import secure_filename
 from flask_sslify import SSLify
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 app = Flask(__name__)
-
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 # Enforce SSL
 sslify = SSLify(app)
 
