@@ -23,11 +23,15 @@ from utils import get_rbt_coordinator, get_second_monday, round_half_up
 from roles.models import get_all_roles
 from sup_view import inspect_supervisor
 from werkzeug.utils import secure_filename
+from flask_sslify import SSLify
 
 app = Flask(__name__)
 
+# Enforce SSL
+sslify = SSLify(app)
+
+
 # Configuration
-app.config["DEBUG"] = True
 app.secret_key = 'testing'
 
 UPLOAD_FOLDER = 'static/files'
@@ -173,7 +177,9 @@ def get_pending(role, user):
 # Home Route with login form
 @app.route("/")
 def home():
+    app.logger.info(f"Accessing Home Page: User {'logged_in' if 'logged_in' in session else 'not logged_in'}")
     if 'logged_in' in session:
+        app.logger.info(f"Session Data: {session}")
         return redirect('/dashboard')
     # Render the home page with the login form
     return render_template('home.html', register=False)
@@ -809,6 +815,20 @@ def signup():
 
 @ app.route('/user/login', methods=['POST'])
 def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = db.users.find_one({"email": email})
+
+        if user and pbkdf2_sha256.verify(password, user['password']):
+            session['logged_in'] = True
+            session['user'] = user
+            log.info(f"User {email} logged in successfully.")
+            return redirect(url_for('dashboard'))
+        else:
+            log.warning(f"Failed login attempt for {email}.")
+            flash('Invalid login credentials', 'danger')
+
     return User().login(db)
 
 
