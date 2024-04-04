@@ -824,6 +824,7 @@ def login():
             session['logged_in'] = True
             session['user'] = user
             log(f"User {email} logged in successfully.")
+            return dashboard()
             # return redirect(url_for('dashboard'))
         else:
             log(f"Failed login attempt.")
