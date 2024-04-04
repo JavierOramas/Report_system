@@ -75,8 +75,10 @@ def login_required(f):
     def wrap(*args, **kwargs):
         log(session)
         if 'logged_in' in session:
+            log("redirecting to the called site")
             return f(*args, **kwargs)
         else:
+            log("redirecting to login")
             return redirect('/')
     return wrap
 
