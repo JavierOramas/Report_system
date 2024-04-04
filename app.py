@@ -28,7 +28,7 @@ from flask_sslify import SSLify
 app = Flask(__name__)
 
 # Enforce SSL
-sslify = SSLify(app)
+# sslify = SSLify(app)
 
 
 # Configuration
