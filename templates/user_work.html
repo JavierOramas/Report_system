@@ -143,6 +143,7 @@
 
                         {% for entry in pending %}
                         <tr>
+                            <td>{{entry["_id"]}}</td>
                             <td>{{ entry["DateOfService"] }}</td>
                             <td>{{ entry["MeetingDuration"] }}</td>
                             <td>{{ entry["Individual"] }}</td>
@@ -151,7 +152,7 @@
                             <td>{{ entry["ObservedwithClient"] }}</td>
                             <td>{{ entry["Supervisor"] }}</td>
                             <td>
-                                <a type="button" class="btn btn-primary btn-sm" href="/verify/{{ entry['_id'] }}/{{year}}/{{month}}">Verify</a>
+                                <a type="button" class="btn btn-primary btn-sm" href="/verify/{{entry['_id']}}/{{year}}/{{month}}">Verify</a>
                             </td>
                         </tr>
                         {% endfor %}
