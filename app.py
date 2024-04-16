@@ -73,9 +73,7 @@ db = initialize_database()
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        log(f)
-        log(args)
-        log(kwargs)
+
         if 'logged_in' in session:
             log("redirecting to the called site")
             return f(*args, **kwargs)
@@ -696,8 +694,8 @@ def add(id=None):
 @ app.route('/verify/<id>/<year>/<month>', methods=('GET', 'POST'))
 @ login_required
 def verify(id, year, month):
-    # log('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
+    log('verifying ', entry)
     date = datetime_format.get_date(entry['DateOfService'])
     year, month = date.year, date.month
     if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['Supervisor']:
@@ -705,8 +703,7 @@ def verify(id, year, month):
         db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
             "Verified": True,
         }})
-    # log(db.Registry.find_one({"_id": ObjectId(id)}))
-    # log(db.Registry.find_one({"_id": ObjectId(id)}))
+        
     if not session['user']['role'] in get_admins():
         return redirect(url_for('dashboard', month=month, year=year))
     else:
@@ -718,17 +715,16 @@ def verify(id, year, month):
 @ app.route('/meeting/<id>/<year>/<month>', methods=('GET', 'POST'))
 @ login_required
 def meeting(id, year, month):
-    # log('verifying')
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     date = datetime_format.get_date(entry['DateOfService'])
     year, month = date.year, date.month
-    # print(entry)
+
+    log('verifying meeting form ', entry)
     if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['ProviderId']:
-        # log('here')
-        en = db.Registry.find_one({"_id": ObjectId(id)})
-        db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
-            "MeetingForm": not en["MeetingForm"],
+        db.Registry.update_one({"_id": entry["_id"]}, {"$set": {
+            "MeetingForm": not entry["MeetingForm"],
         }})
+        
     if not session['user']['role'] in get_admins():
         return redirect(url_for('dashboard', month=month, year=year))
     else:
