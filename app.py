@@ -733,7 +733,7 @@ def meeting(id, year, month):
         if rbt:
             return redirect(f"/user_report/{id}/{year}/{month}")
             # return redirect(url_for('report', id=rbt["_id"], alert=None, year=year, month=month, curr_year=datetime.datetime.now().year))
-        return redirect("/")
+        return redirect(f"/user_report/{id}/{year}/{month}")
 
 
 @ app.route('/del/entry/<id>', methods=('GET', 'POST'))
