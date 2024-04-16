@@ -692,7 +692,7 @@ def add(id=None):
 
 
 @ app.route('/verify/<id>/<year>/<month>', methods=('GET', 'POST'))
-@ login_required
+# @ login_required
 def verify(id, year, month):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     log('verifying ', entry)
@@ -713,7 +713,7 @@ def verify(id, year, month):
 
 
 @ app.route('/meeting/<id>/<year>/<month>', methods=('GET', 'POST'))
-@ login_required
+# @ login_required
 def meeting(id, year, month):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     date = datetime_format.get_date(entry['DateOfService'])
