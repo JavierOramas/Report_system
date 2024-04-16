@@ -726,12 +726,12 @@ def meeting(id, year, month):
         }})
         
     if not session['user']['role'] in get_admins():
-        return redirect(url_for('dashboard', month=month, year=year))
+        return redirect(f"/user_report/{id}/{year}/{month}")
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         # print(rbt)
         if rbt:
-            return report(id=rbt['_id'], year=year, month=month)
+            return redirect(f"/user_report/{id}/{year}/{month}")
             # return redirect(url_for('report', id=rbt["_id"], alert=None, year=year, month=month, curr_year=datetime.datetime.now().year))
         return redirect("/")
 
