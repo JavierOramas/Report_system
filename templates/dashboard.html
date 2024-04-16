@@ -216,6 +216,7 @@
                             <tbody>
                                 {% for entry in pending %}
                                 <tr>
+                                    <td> {{entry["_id"]}}</td>
                                     <td>{{ entry["DateOfService"] }}</td>
                                     <td>{{ entry["MeetingDuration"] }}</td>
                                     <td>{{ entry["Individual"] }}</td>
