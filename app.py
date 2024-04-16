@@ -696,11 +696,13 @@ def add(id=None):
 def verify(id, year, month):
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     log('verifying ', entry)
+    
     date = datetime_format.get_date(entry['DateOfService'])
     year, month = date.year, date.month
+    
     if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['Supervisor']:
         # log('here')
-        db.Registry.update_one({"_id": ObjectId(id)}, {"$set": {
+        db.Registry.update_one({"_id": entry["_id"]}, {"$set": {
             "Verified": True,
         }})
         
