@@ -451,7 +451,6 @@ def dashboard(
         users = nus
 
     pending = get_pending(role, session['user'])
-    log("3")
     for entry in entries:
         name = db.users.find_one({"ProviderId": int(entry['Supervisor'])})
         if name:
@@ -701,18 +700,17 @@ def verify(id, year, month):
     year, month = date.year, date.month
     
     if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['Supervisor']:
-        # log('here')
+
         db.Registry.update_one({"_id": entry["_id"]}, {"$set": {
             "Verified": True,
         }})
         
     if not session['user']['role'] in get_admins():
-        return redirect(url_for('dashboard', month=month, year=year))
+        return redirect(f"/user_report/{id}/{year}/{month}")
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
         
-        return report(id=rbt['_id'], year=year, month=month)
-
+        return redirect(f"/user_report/{id}/{year}/{month}")
 
 @ app.route('/meeting/<id>/<year>/<month>', methods=('GET', 'POST'))
 # @ login_required
