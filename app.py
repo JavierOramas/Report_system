@@ -726,7 +726,9 @@ def meeting(id, year, month):
             "MeetingForm": not entry["MeetingForm"],
         }})
         
-    return redirect(f"/user_report/{rbt._id}/{year}/{month}")
+    log("redirecting to ", rbt._id, year, month)
+    return url_for('report', id=rbt['_id'], curr_year=datetime.datetime.now().year)
+# redirect(f"/user_report/{rbt._id}/{year}/{month}")
 
 
 @ app.route('/del/entry/<id>', methods=('GET', 'POST'))
