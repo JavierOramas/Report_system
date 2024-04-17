@@ -727,11 +727,12 @@ def meeting(id, year, month):
             db.Registry.update_one({"_id": entry["_id"]}, {"$set": {
                 "MeetingForm": not entry["MeetingForm"],
             }})
+            
     except e:
         log("error occurred ", e)
             
     log("redirecting to ", rbt._id, year, month)
-    return url_for('user_report', id=rbt._id, year=year, month=month)
+    return redirect(url_for('user_report', id=rbt._id, year=year, month=month))
 # redirect(f"/user_report/{rbt._id}/{year}/{month}")
 
 
