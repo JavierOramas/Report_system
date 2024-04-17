@@ -727,7 +727,7 @@ def meeting(id, year, month):
         }})
         
     log("redirecting to ", rbt._id, year, month)
-    return url_for('report', id=rbt['_id'], curr_year=datetime.datetime.now().year)
+    return url_for('user_report', id=rbt._id, year=year, month=month)
 # redirect(f"/user_report/{rbt._id}/{year}/{month}")
 
 
