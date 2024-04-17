@@ -324,7 +324,7 @@ def redirecting(id, year, month):
 @app.route('/user_report/<id>/<year>/<month>/<alert>', methods=["POST", "GET"])
 @app.route('/user_report/<id>/<year>/<month>', methods=["POST", "GET"])
 @app.route('/user_report/<id>', methods=["POST", "GET"])
-@login_required
+# @login_required
 def report(id, year=None, month=None, alert=None, curr_year=datetime.datetime.now().year):
 
     if year is None and month is None:
@@ -715,6 +715,7 @@ def verify(id, year, month):
 @ app.route('/meeting/<id>/<year>/<month>', methods=('GET', 'POST'))
 # @ login_required
 def meeting(id, year, month):
+    
     entry = db.Registry.find_one({"_id": ObjectId(id)})
     date = datetime_format.get_date(entry['DateOfService'])
     year, month = date.year, date.month
@@ -726,14 +727,16 @@ def meeting(id, year, month):
         }})
         
     if not session['user']['role'] in get_admins():
+        log("redirect 1")
         return redirect(f"/user_report/{id}/{year}/{month}")
+
     else:
         rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-        # print(rbt)
         if rbt:
-            return redirect(f"/user_report/{id}/{year}/{month}")
-            # return redirect(url_for('report', id=rbt["_id"], alert=None, year=year, month=month, curr_year=datetime.datetime.now().year))
-        return redirect(f"/user_report/{id}/{year}/{month}")
+            log("redirect 2")
+            return redirect(f"/user_report/{rbt._id}/{year}/{month}")
+    log("redirect?")
+    return redirect(f"/user_report/{id}/{year}/{month}")
 
 
 @ app.route('/del/entry/<id>', methods=('GET', 'POST'))
