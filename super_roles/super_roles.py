@@ -3,6 +3,3 @@ def get_supervisors():
 
 def get_admins():
     return ['BCBA', 'BCBA (L)', 'BCaBA', 'admin']
-
-# def get_admins():
-#     return ['admin']

@@ -726,17 +726,7 @@ def meeting(id, year, month):
             "MeetingForm": not entry["MeetingForm"],
         }})
         
-    if not session['user']['role'] in get_admins():
-        log("redirect 1")
-        return redirect(f"/user_report/{id}/{year}/{month}")
-
-    else:
-        rbt = db.users.find_one({"ProviderId": entry['ProviderId']})
-        if rbt:
-            log("redirect 2")
-            return redirect(f"/user_report/{rbt._id}/{year}/{month}")
-    log("redirect?")
-    return redirect(f"/user_report/{id}/{year}/{month}")
+    return redirect(f"/user_report/{rbt._id}/{year}/{month}")
 
 
 @ app.route('/del/entry/<id>', methods=('GET', 'POST'))
