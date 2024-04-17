@@ -727,7 +727,8 @@ def meeting(id, year, month):
             db.Registry.update_one({"_id": entry["_id"]}, {"$set": {
                 "MeetingForm": not entry["MeetingForm"],
             }})
-            
+            log("meeting form verified")
+        log("redirect now")
     except e:
         log("error occurred ", e)
             
