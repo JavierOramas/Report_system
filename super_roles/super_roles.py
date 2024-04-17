@@ -1,5 +1,5 @@
 def get_supervisors():
-    return ['BCBA', 'BCBA (L)', 'BCaBA']
+    return [i.lower() for i in  ['BCBA', 'BCBA (L)', 'BCaBA']]
 
 def get_admins():
-    return ['BCBA', 'BCBA (L)', 'BCaBA', 'admin']
+    return [i.lower() for i in  ['BCBA', 'BCBA (L)', 'BCaBA', 'admin']]

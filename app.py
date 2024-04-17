@@ -721,11 +721,15 @@ def meeting(id, year, month):
     year, month = date.year, date.month
 
     log('verifying meeting form ', entry)
-    if session['user']['role'].lower() in ['admin', 'bcba', 'bcba (l)'] or session['user']['providerId'] == entry['ProviderId']:
-        db.Registry.update_one({"_id": entry["_id"]}, {"$set": {
-            "MeetingForm": not entry["MeetingForm"],
-        }})
-        
+    
+    try:
+        if session['user']['role'].lower() in get_admins() or session['user']['providerId'] == entry['ProviderId']:
+            db.Registry.update_one({"_id": entry["_id"]}, {"$set": {
+                "MeetingForm": not entry["MeetingForm"],
+            }})
+    except e:
+        log("error occurred ", e)
+            
     log("redirecting to ", rbt._id, year, month)
     return url_for('user_report', id=rbt._id, year=year, month=month)
 # redirect(f"/user_report/{rbt._id}/{year}/{month}")
