@@ -37,7 +37,7 @@ def get_remote_individual_supervision_codes():
 
 
 def get_valid_ids():
-    return [150582, 194640, 150577, 150580, 194642, 194641, 255975, 298632]
+    return [150582, 194640, 150577, 150580, 194642, 194641, 255975, 298632, 333940]
 
 
 def get_supervisor_ids():
@@ -70,6 +70,9 @@ def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId
     if entry[providerId] == i[providerId]:
         return False
 
+    # 53 - Telehealth
+    if procedure in [150580, 298632]  and i[procedureCodeId] in [333940]:
+        return True
     # 55 55NB - 55NB
     if procedure in [150582, 194640] and i[procedureCodeId] in [194640]:
         return True
