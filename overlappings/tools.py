@@ -70,6 +70,9 @@ def verify_valid_overlapping(entry, i, providerName, procedureCodeId, providerId
     if entry[providerId] == i[providerId]:
         return False
 
+
+    if procedure in [150580, 298632] and i[procedureCodeId] in [255975]:
+        return True
     # 53 - Telehealth
     if procedure in [150580, 298632]  and i[procedureCodeId] in [333940]:
         return True
