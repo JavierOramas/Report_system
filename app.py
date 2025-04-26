@@ -602,7 +602,7 @@ def new_user():
             "ProviderId": request.form.get('provider_id'),
             "BACB_id": request.form.get('BACB_id'),
             "credential": request.form.get('credential'),
-            "role": request.form.get('role'),
+            "role": request.form.get('role').strip(),
             "hired_date": request.form.get('hired_date'),
             "fingerprint_background": request.form.get('fingerprint'),
             "background_date": request.form.get('background_date'),
